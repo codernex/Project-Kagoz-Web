@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+}
+body {
+  font-size: 1.6rem;
+}
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #6f00ff;
+    --card: #ffffff;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: #ffffff;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: #6f00ff;
+    --primary-foreground: #ffffff;
+    --secondary: #3890f7;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: #6e6777;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    --black: #181023;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border scrollbar-hide;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .section_title {
+    @apply text-center text-md font-bold leading-xl text-black lg:text-lg;
+  }
+
+  .hero_tab_list {
+    @apply !ml-0 h-[4.8rem] w-full rounded-md border border-primary !px-[2.8rem] py-[1.6rem] !text-center md:w-fit md:!rounded-b-none md:border-0 md:bg-[#0000004D];
+  }
+
+  .section_padding {
+    @apply py-[4.8rem] md:py-[6.4rem] lg:py-[8.4rem] xl:py-[10rem] 2xl:py-[12rem];
+  }
+  .contact_box {
+    box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.hero_gradient {
+  background: radial-gradient(
+    62.66% 147.73% at 50% 0%,
+    #9452e9 0%,
+    #6f00ff 100%
+  );
+}
+
+.nav_gradient {
+  background: linear-gradient(
+    180deg,
+    rgba(111, 0, 255, 0.08) 0%,
+    rgba(111, 0, 255, 0) 100%
+  );
+}

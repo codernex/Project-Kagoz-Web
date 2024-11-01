@@ -1,0 +1,99 @@
+[?25l[2J[m[H]0;C:\Windows\system32\cmd.exe [?25h[?25l
+> web@0.1.0 build C:\Users\borha\Desktop\project-kagoz-monorepo\apps\web
+> next build[5;1H[?25h[?25l  [38;2;173;127;168m[1m▲ Next.js 15.0.1[7;1H[?25h[m [37m[1m [m Creating an optimized production build ...
+ [32m[1m✓[m Compiled successfully
+ [37m[1m [m Linting and checking validity of types  [36m.[?25l[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m [37m[1m [m Linting and checking validity of types  [36m.[K[125C[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m [37m[1m [m Linting and checking validity of types  [36m.[K[125C[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m [37m[1m [m Linting and checking validity of types  [36m.[K[125C[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m [37m[1m [m Linting and checking validity of types  [36m.[K[125C[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m [37m[1m [m Linting and checking validity of types  [36m.[K[125C[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m [37m[1m [m Linting and checking validity of types  [36m.[K[125C[m [37m[1m [m Linting and checking validity of types  [36m..[K[124C[m [37m[1m [m Linting and checking validity of types  [36m...[K[123C[m[K[36m
+./src/@types/index.d.ts[33m
+1[m:[33m11  [1mWarning[m: 'IBusiness' is defined but never used.  [90m[1mno-unused-vars[33m[22m
+6[m:[33m11  [1mWarning[m: 'IUser' is defined but never used.  [90m[1mno-unused-vars[36m[22m[14;1H./src/app/(public)/business/[slug]/_components/sidebar.tsx[33m
+1[m:[33m10  [1mWarning[m: 'AdSpace' is defined but never used.  [90m[1mno-unused-vars[36m[22m[17;1H./src/app/(public)/search/_components/mobile-filter.tsx[?25h[m
+[33m54[m:[33m3  [1mWarning[m: 'setActiveSearchType' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m93[m:[33m35  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m103[m:[33m35  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m116[m:[33m35  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m126[m:[33m35  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/app/(public)/search/_components/other-filter.tsx[m
+[33m48[m:[33m3  [1mWarning[m: 'setActiveSearchType' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m79[m:[33m31  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m89[m:[33m31  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m102[m:[33m31  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m112[m:[33m31  [1mWarning[m: 'e' is defined but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/app/(public)/search/_components/search-item.tsx[m
+[33m11[m:[33m36  [1mWarning[m: 'IBusiness' is not defined.  [90m[1mno-undef[m[K
+
+[36m./src/app/biz/dashboard/page.tsx[m
+[33m2[m:[33m15  [1mWarning[m: 'IUser' is not defined.  [90m[1mno-undef[m[K
+
+[36m./src/app/biz/_components/mobile-sidebar.tsx[m
+[33m67[m:[33m11  [1mWarning[m: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may in
+[16;169Hncur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [90m[1m@next/next/no-img-element[m[K
+
+[36m./src/components/map.tsx[m
+[33m23[m:[33m25  [1mWarning[m: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not listed as a dependency in turbo.json  [90m[1mturbo/no-undeclared-env-vars[m[K
+
+[36m./src/components/shared/error.tsx[m
+[33m13[m:[33m35  [1mWarning[m: 'error' is defined but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/components/shared/file-upload-dropdown.tsx[m
+[33m8[m:[33m10  [1mWarning[m: 'dragging' is assigned a value but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/components/shared/header.tsx[m
+[33m11[m:[33m8  [1mWarning[m: 'Image' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m16[m:[33m9  [1mWarning[m: 'router' is assigned a value but never used.  [90m[1mno-unused-vars[m[K
+[33m55[m:[33m13  [1mWarning[m: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may in
+[16;169Hncur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [90m[1m@next/next/no-img-element[m[K
+
+[36m./src/components/shared/nav-search.tsx[m
+[33m23[m:[33m26  [1mWarning[m: 'setSearchDropdown' is assigned a value but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/components/shared/sponsored-item.tsx[m
+[33m10[m:[33m49  [1mWarning[m: Unexpected empty object pattern.  [90m[1mno-empty-pattern[m[K
+
+[36m./src/components/svgs/calendar.tsx[m
+[33m1[m:[33m28  [1mWarning[m: 'className' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m1[m:[33m39  [1mWarning[m: 'width' is defined but never used.  [90m[1mno-unused-vars[m[K
+[33m1[m:[33m46  [1mWarning[m: 'height' is defined but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/components/widget/footer-2.tsx[m
+[33m1[m:[33m8  [1mWarning[m: 'Image' is defined but never used.  [90m[1mno-unused-vars[m[K
+
+[36m./src/components/widget/footer-4.tsx[m
+[33m1[m:[33m8  [1mWarning[m: 'Link' is defined but never used.  [90m[1mno-unused-vars[m[K
+
+[36minfo  [m- Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules[K
+ [36m.[K[?25l[167C[m [36m..[K[166C[m [36m...[K[165C[m [36m.[K[167C[m [36m..[K[166C[m [36m...[K[165C[m [32m[1m✓[m Linting and checking validity of types[K[?25h
+ [37m[1m [m Collecting page data  [36m.[K[?25l[143C[m[K[169C [37m[1m [m Collecting page data  [36m..[m [37m[1m [m Collecting page data  [36m...[K[141C[m [32m[1m✓[m Collecting page data[K[?25h
+ [37m[1m [m Generating static pages (0/18)  [36m[    ][?25l[m [37m[1m [m Generating static pages (0/18)  [36m[=   ][K[128C[m [37m[1m [m Generating static pages (0/18)  [36m[==  ][K[128C[m[][K[?25h
+ [32m[1m✓[m Generating static pages (18/18)
+ [37m[1m [m Finalizing page optimization  [36m. [37m[1m [m Collecting build traces  [36m.[K[?25l[106C[m [32m[1m✓[m Collecting build traces[K[?25h
+ [32m[1m✓[m Finalizing page optimization[K
+
+[4mRoute (app)[24m[33X[4m[33CSize[24m     [4mFirst Load JS[24m[K
+┌ ○ /                                       5.81 kB[37m[1m[9C189 kB[m[K
+├ ○ /_not-found                             900 B[37m[1m[11C100 kB[m[K
+├ ○ /about-us                               171 B[37m[1m[10C99.7 kB[m[K
+├ ○ /auth/sign-up                           173 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard                          173 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/add                      172 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/ads                      172 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/business                 172 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/customer-video-feedback  172 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/featured-clients         172 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/featured-offer           173 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/gallery                  173 B[37m[1m[10C99.7 kB[m[K
+├ ○ /biz/dashboard/info                     173 B[37m[1m[10C99.7 kB[m[K
+├ ○ /business                               173 B[37m[1m[10C99.7 kB[m[K
+├ ƒ /business/[slug]                        81 kB[37m[1m[11C258 kB[m[K
+├ ○ /contact-us                             175 B[37m[1m[11C109 kB[m[K
+└ ○ /search                                 12.6 kB[37m[1m[9C166 kB[m[K
++ First Load JS shared by all[37m[1m[15C99.6 kB[m[K
+  ├ chunks/5567-873f144d26ba9a88.js         44.6 kB
+  ├ chunks/7d9f9258-c7f312b2232d0453.js     52.6 kB
+  └ other shared chunks (total)             2.35 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
