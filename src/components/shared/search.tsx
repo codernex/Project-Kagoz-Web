@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useRouter } from "next/navigation";
 
 type SearchProps = {
   searchTerm?: string;
@@ -20,6 +21,7 @@ type SearchProps = {
 const Search: React.FC<SearchProps> = React.memo(({ ref }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState("Dhaka");
+  const navigate = useRouter()
 
   return (
     <div
@@ -105,7 +107,7 @@ const Search: React.FC<SearchProps> = React.memo(({ ref }) => {
       </Select>
 
       <div className="w-fit h-full flex items-center justify-center">
-        <Button className="h-[4rem] w-[4rem] lg:h-[6.4rem] lg:w-[6.4rem] rounded-full p-0">
+        <Button onClick={()=>navigate.push('/search')} className="h-[4rem] w-[4rem] lg:h-[6.4rem] lg:w-[6.4rem] rounded-full p-0">
           <ArrowRight />
         </Button>
       </div>

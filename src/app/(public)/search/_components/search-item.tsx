@@ -7,12 +7,14 @@ import { cn } from "@/lib/utils";
 import { Clock3 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ISearchItemProps extends IBusiness {
   index: number;
 }
 
 export const SearchItem: React.FC<ISearchItemProps> = ({ index, isOpen }) => {
+  const router = useRouter()
   const generateStarRating = useStarRatings(4.5);
   return (
     <div className="p-[2.4rem] drop-shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem] bg-white flex flex-col md:flex-row items-end h-fit relative w-full">
@@ -104,7 +106,7 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, isOpen }) => {
           asChild
           className="border border-primary rounded-xl py-[1.2rem] w-full max-w-[20rem]"
         >
-          <Link rel="nofollow" href={"tel:1234567890"} className="text-center">
+          <Link rel="nofollow" href={"/business/123"} className="text-center">
             View Details
           </Link>
         </Button>
