@@ -1,19 +1,22 @@
 "use client";
+import { useAuth } from "@/context/AuthContext";
+import { useAuthModal } from "@/hooks/loginModal";
+import { cn } from "@/lib/utils";
 import { AnimationProps, motion } from "framer-motion";
 import { Plus } from "lucide-react";
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { CustomButton } from "./custom-button";
-import NavSearch from "./nav-search";
-import { cn } from "@/lib/utils";
-import MobileNav from "./mobile-nav";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CustomButton } from "./custom-button";
+import MobileNav from "./mobile-nav";
+import NavSearch from "./nav-search";
 
 const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
   const router = useRouter();
+  const { isAuth } = useAuth()
+  const { setOpen } = useAuthModal()
 
   // Memoize the scroll handler
   const handleScroll = useCallback(() => {
@@ -76,18 +79,23 @@ const Header = () => {
         <div className="flex items-center md:space-x-8 lg:space-x-14">
           <Link
             href={"/blogs"}
-            className="text-black  text-xs lg:text-sm font-medium"
+            className="text-xs font-medium text-black lg:text-sm"
           >
             Our Blogs
           </Link>
           <CustomButton
-            asChild
+            onClick={() => {
+              if (isAuth) {
+                router.push('/biz/dashboard')
+              } else {
+                setOpen()
+              }
+            }}
             className="md:min-h-[40px] lg:min-h-[51px] md:min-w-[140px] lg:min-w-[196px] rounded-xl space-x-1 lg:space-x-3 text-xs lg:text-sm text-white"
           >
-            <Link href={"/business/add"}>
-              <Plus />
-              <span>Add Business</span>
-            </Link>
+            <Plus />
+            <span>Add Business</span>
+
           </CustomButton>
         </div>
       </nav>

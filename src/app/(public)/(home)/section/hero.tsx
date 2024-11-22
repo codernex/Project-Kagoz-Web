@@ -15,7 +15,7 @@ import "swiper/css/scrollbar";
 const Hero = () => {
   return (
     <section id="hero" className="container ">
-      <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md ">
+      <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md px-4">
         <div className="w-full max-w-2xl md:max-w-5xl lg:max-w-7xl mx-auto pt-[9.6rem] text-center ">
           <h1 className=" text-md md:text-xl text-white font-bold md:leading-[5.56rem] ">
             Your Business, Our Platform <br />
@@ -38,7 +38,7 @@ const Hero = () => {
                   Find by Business Name
                 </TabsTrigger>
               </TabsList>
-              <TabsContent className="mt-0 pt-0" value="category">
+              <TabsContent className="pt-0 mt-0" value="category">
                 <Search />
               </TabsContent>
               <TabsContent value="business" className="mt-0">
@@ -71,7 +71,7 @@ const Hero = () => {
             {Array.from({ length: 20 }).map((_, index) => {
               return (
                 <SwiperSlide key={index}>
-                  <div className="w-full  flex justify-center">
+                  <div className="flex justify-center w-full">
                     <div className="relative rounded-full w-full h-[8rem] max-w-[8rem] overflow-hidden">
                       <Image
                         alt="Logo"
@@ -84,7 +84,7 @@ const Hero = () => {
               );
             })}
           </Swiper>
-          <p className="text-center font-normal">Featured Business</p>
+          <p className="font-normal text-center">Featured Business</p>
         </div>
       </div>
     </section>

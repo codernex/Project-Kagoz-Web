@@ -19,10 +19,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { navLinks } from "./nav";
+import { useAuth } from "@/context/AuthContext";
 const MobileBusinessSidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const path = usePathname();
-
+  const { logout } = useAuth()
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     return () => {
@@ -49,7 +50,7 @@ const MobileBusinessSidebar: React.FC = () => {
     };
   }, [isOpen]);
 
-  const signOut = () => {};
+  const signOut = () => { };
 
   return (
     <nav
@@ -57,7 +58,7 @@ const MobileBusinessSidebar: React.FC = () => {
         " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem] z-[9999] bg-white ",
       )}
     >
-      <div className="flex container items-center justify-between w-full relative z-50">
+      <div className="container relative z-50 flex items-center justify-between w-full">
         <div className="flex gap-xs">
           <Menu
             onClick={() => setIsOpen(true)}
@@ -72,7 +73,7 @@ const MobileBusinessSidebar: React.FC = () => {
             className="object-contain"
           />
 
-          <h2 className="hidden lg:block font-bold text-black italic">
+          <h2 className="hidden italic font-bold text-black lg:block">
             For Business
           </h2>
         </div>
@@ -95,7 +96,7 @@ const MobileBusinessSidebar: React.FC = () => {
             <hr className="border-[#ededed]" />
 
             <DropdownMenuItem
-              onClick={() => signOut()}
+              onClick={logout}
               className="hover:bg-[#F0F0F0] rounded-[.6rem] cursor-pointer pl-4 py-3 space-x-3 font-semibold items-center flex"
             >
               <LogOutIcon />
@@ -116,10 +117,10 @@ const MobileBusinessSidebar: React.FC = () => {
                 } onClick={() => setIsOpen(false)}>
                     <XIcon className='' />
                 </div> */}
-        <div className="h-full px-3 overflow-y-auto  ">
-          <div className="space-y-4 relative">
+        <div className="h-full px-3 overflow-y-auto ">
+          <div className="relative space-y-4">
             <div className="w-[90%]">
-              <h2 className="text-mdx font-bold text-black">Business name</h2>
+              <h2 className="font-bold text-black text-mdx">Business name</h2>
               <p className="text-xsm text-muted">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit
               </p>

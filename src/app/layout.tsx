@@ -1,7 +1,11 @@
+
+import { AuthModal } from "@/components/shared/auth";
+import { AuthProvider } from "@/context/AuthContext";
 import "@/styles/globals.css";
 import { type Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { CookiesProvider } from 'next-client-cookies/server';
 
 export const metadata: Metadata = {
   title: "KAGOZ",
@@ -19,8 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Toaster richColors position="bottom-right" duration={3000} />
-        {children}
+        <CookiesProvider>
+          <AuthProvider>
+            <Toaster richColors position="bottom-right" duration={3000} />
+            {children}
+            <AuthModal />
+          </AuthProvider>
+        </CookiesProvider>
       </body>
     </html>
   );

@@ -5,8 +5,14 @@ import { Menu, Plus, Search, XIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CustomButton } from "./custom-button";
+import { useAuthModal } from "@/hooks/loginModal";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 const MobileNav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { setOpen } = useAuthModal()
+  const router = useRouter()
+  const { isAuth } = useAuth()
 
   const animate: AnimationProps["animate"] = useMemo(() => {
     return {
@@ -60,7 +66,7 @@ const MobileNav: React.FC = () => {
       <div className="flex items-center space-x-4">
         <Search />
         <div
-          className="h-16 shadow-md rounded-full w-16 flex items-center justify-center cursor-pointer"
+          className="flex items-center justify-center w-16 h-16 rounded-full shadow-md cursor-pointer"
           onClick={() => setIsOpen(!isOpen)}
         >
           <Menu className="shadow-sm" size={20} />
@@ -91,11 +97,18 @@ const MobileNav: React.FC = () => {
             height={100}
           />
         </div>
-        <div className="flex flex-col justify-center items-center space-y-20">
-          <h2 className="text-black text-sm font-medium text-center">
+        <div className="flex flex-col items-center justify-center space-y-20">
+          <h2 className="text-sm font-medium text-center text-black">
             Our Blogs
           </h2>
-          <CustomButton className="min-h-[51px] min-w-[196px] rounded-xl">
+          <CustomButton onClick={() => {
+            if (isAuth) {
+              router.push('/biz/dashboard')
+            } else {
+              setOpen()
+              setIsOpen(false)
+            }
+          }} className="min-h-[51px] min-w-[196px] rounded-xl">
             <Plus />
             <span>Add Business</span>
           </CustomButton>
