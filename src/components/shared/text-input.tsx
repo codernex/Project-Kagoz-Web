@@ -56,13 +56,13 @@ export function TextInput<
                             )}
                         >
                             {label ? (
-                                <FormLabel className={'w-full max-w-fit mb-3 inline-block text-black'}>{label}</FormLabel>
+                                <FormLabel className={'w-full max-w-fit mb-3 inline-block text-black font-normal text-[1.5rem]'}>{label}</FormLabel>
                             ) : (
                                 ''
                             )}
                             <FormControl className={'w-full'}>
                                 <div className='relative'>
-                                    <Input key={inputType} type={inputType} {...field} {...props} />
+                                    <Input className={cn('placeholder:text-sm', props.className)} key={inputType} type={inputType} {...field} {...props} />
 
                                     {
                                         type === 'password' ? (

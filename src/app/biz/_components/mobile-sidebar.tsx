@@ -5,34 +5,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
+import { useSwitchBusinessModal } from "@/hooks/switchBusinessModal";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
-  ExternalLink,
+  ArrowLeftRight,
   LogOutIcon,
   Menu,
   Settings2,
   ToggleRight,
-  User2Icon,
+  User2Icon
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { navLinks } from "./nav";
-import { useAuth } from "@/context/AuthContext";
+import { useDynamicNavLink } from "./nav";
 const MobileBusinessSidebar: React.FC = () => {
+  /**
+   * States
+   */
+  const { setOpen } = useSwitchBusinessModal()
   const [isOpen, setIsOpen] = useState(false);
   const path = usePathname();
   const { logout } = useAuth()
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const { dynamicNavLinks } = useDynamicNavLink([{ id: 1, isOpen: false, slug: "Hello" }])
+
+
+  /**
+   * Life Cycle Hook
+   */
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "scroll";
     };
   }, [isOpen]);
-
-  const menuRef = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -49,8 +58,6 @@ const MobileBusinessSidebar: React.FC = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen]);
-
-  const signOut = () => { };
 
   return (
     <nav
@@ -125,13 +132,13 @@ const MobileBusinessSidebar: React.FC = () => {
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit
               </p>
             </div>
-            <Link className="absolute top-0 right-0 text-secondary" href={"/"}>
-              <ExternalLink />
-            </Link>
+            <div className="absolute top-0 right-0 cursor-pointer text-secondary" onClick={() => setOpen(true)} >
+              <ArrowLeftRight />
+            </div>
           </div>
           <hr className="border-[#ededed] mt-6 mb-3" />
           <ul className="space-y-2 font-medium">
-            {navLinks.map(({ name, href, icon: Icon }) => {
+            {dynamicNavLinks.map(({ name, href, icon: Icon }) => {
               const isActive = path === href;
               return (
                 <li key={name}>

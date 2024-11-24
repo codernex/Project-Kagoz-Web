@@ -1,5 +1,8 @@
 interface IBusiness {
   id: number;
+  slug: string;
+  name: string;
+  owner: IUser;
   isOpen: boolean;
 }
 

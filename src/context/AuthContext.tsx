@@ -61,10 +61,11 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
             const { accessToken } = response.data.data
             const decodedUser = jwtDecode<User>(accessToken);
             cookies.set('auth_token', accessToken, {
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
             })
             setIsAuth(true)
             setUser(decodedUser); // Set the user
+            setOpen()
 
         } catch (error: any) {
             const message = error.response.data.message;
@@ -84,10 +85,11 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
             const { accessToken } = response.data.data
             const decodedUser = jwtDecode<User>(accessToken);
             cookies.set('auth_token', accessToken, {
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
             })
             setUser(decodedUser); // Set the user
             setIsAuth(true)
+            setOpen()
         } catch (error: any) {
             const message = error.response.data.message;
             if (message instanceof Array) {

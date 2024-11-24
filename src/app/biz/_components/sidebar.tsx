@@ -1,35 +1,36 @@
 "use client";
+import { useSwitchBusinessModal } from "@/hooks/switchBusinessModal";
 import { cn } from "@/lib/utils";
-import { ExternalLink } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navLinks } from "./nav";
-import { toast } from "sonner";
+import { getDynamicNavLink, useDynamicNavLink } from "./nav";
 
 export const Sidebar = () => {
   const path = usePathname();
-  toast.success("Hello");
+  const { setOpen } = useSwitchBusinessModal()
+  const { dynamicNavLinks } = useDynamicNavLink([{ id: 1, isOpen: false, slug: "Hello" }])
   return (
     <aside
       id="default-sidebar"
       className="w-[28rem] hidden lg:block h-screen transition-transform -translate-x-full sm:translate-x-0 "
       aria-label="Sidebar"
     >
-      <div className="h-full px-3 overflow-y-auto  ">
-        <div className="space-y-4 relative">
+      <div className="h-full px-3 overflow-y-auto ">
+        <div className="relative space-y-4">
           <div className="w-[90%]">
-            <h2 className="text-mdx font-bold text-black">Business name</h2>
+            <h2 className="font-bold text-black text-mdx">Business name</h2>
             <p className="text-xsm text-muted">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit
             </p>
           </div>
-          <Link className="absolute top-0 right-0 text-secondary" href={"/"}>
-            <ExternalLink />
-          </Link>
+          <div className="absolute top-0 right-0 cursor-pointer text-secondary" onClick={() => setOpen(true)}>
+            <ArrowLeftRight />
+          </div>
         </div>
         <hr className="border-[#ededed] mt-6 mb-3" />
         <ul className="space-y-4 font-medium">
-          {navLinks.map(({ name, href, icon: Icon }) => {
+          {dynamicNavLinks.map(({ name, href, icon: Icon }) => {
             const isActive = path === href;
             return (
               <li key={name}>
