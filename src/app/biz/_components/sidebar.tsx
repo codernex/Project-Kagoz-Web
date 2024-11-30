@@ -1,15 +1,18 @@
 "use client";
 import { useSwitchBusinessModal } from "@/hooks/switchBusinessModal";
 import { cn } from "@/lib/utils";
+import { useGetBusinessBySlugQuery } from "@/redux/api/business";
 import { ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { getDynamicNavLink, useDynamicNavLink } from "./nav";
+import { useParams, usePathname } from "next/navigation";
+import { useDynamicNavLink } from "./nav";
 
 export const Sidebar = () => {
+  const params = useParams() as { slug: string }
   const path = usePathname();
   const { setOpen } = useSwitchBusinessModal()
-  const { dynamicNavLinks } = useDynamicNavLink([{ id: 1, isOpen: false, slug: "Hello" }])
+  const { dynamicNavLinks } = useDynamicNavLink()
+  const { data } = useGetBusinessBySlugQuery(params.slug)
   return (
     <aside
       id="default-sidebar"
@@ -19,7 +22,7 @@ export const Sidebar = () => {
       <div className="h-full px-3 overflow-y-auto ">
         <div className="relative space-y-4">
           <div className="w-[90%]">
-            <h2 className="font-bold text-black text-mdx">Business name</h2>
+            <h2 className="font-bold text-black text-mdx">{data?.name}</h2>
             <p className="text-xsm text-muted">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit
             </p>

@@ -18,20 +18,26 @@ import {
   User2Icon
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useDynamicNavLink } from "./nav";
+import { useGetBusinessBySlugQuery } from "@/redux/api/business";
 const MobileBusinessSidebar: React.FC = () => {
   /**
    * States
    */
   const { setOpen } = useSwitchBusinessModal()
+  const params = useParams() as { slug: string }
   const [isOpen, setIsOpen] = useState(false);
   const path = usePathname();
   const { logout } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const { dynamicNavLinks } = useDynamicNavLink([{ id: 1, isOpen: false, slug: "Hello" }])
+  const { dynamicNavLinks } = useDynamicNavLink()
+  console.log(params);
 
+  const {
+    data
+  } = useGetBusinessBySlugQuery(params.slug)
 
   /**
    * Life Cycle Hook
@@ -62,10 +68,10 @@ const MobileBusinessSidebar: React.FC = () => {
   return (
     <nav
       className={cn(
-        " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem] z-[9999] bg-white ",
+        " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem]  bg-white lg:z-[9999]",
       )}
     >
-      <div className="container relative z-50 flex items-center justify-between w-full">
+      <div className="container relative flex items-center justify-between w-full">
         <div className="flex gap-xs">
           <Menu
             onClick={() => setIsOpen(true)}
@@ -127,7 +133,7 @@ const MobileBusinessSidebar: React.FC = () => {
         <div className="h-full px-3 overflow-y-auto ">
           <div className="relative space-y-4">
             <div className="w-[90%]">
-              <h2 className="font-bold text-black text-mdx">Business name</h2>
+              <h2 className="font-bold text-black text-mdx">{data?.name}</h2>
               <p className="text-xsm text-muted">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit
               </p>

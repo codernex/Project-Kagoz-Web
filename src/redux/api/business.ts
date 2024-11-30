@@ -28,8 +28,17 @@ const business = baseApi.injectEndpoints({
         url: "/business/me",
       }),
     }),
+
+    getBusinessBySlug: builder.query<IBusiness, string>({
+      query: (slug) => ({
+        url: `/business/${slug}`,
+      }),
+    }),
   }),
 });
 
-export const { useRegisterBusinessMutation, useGetBusinessByCurrentUserQuery } =
-  business;
+export const {
+  useRegisterBusinessMutation,
+  useGetBusinessByCurrentUserQuery,
+  useGetBusinessBySlugQuery,
+} = business;

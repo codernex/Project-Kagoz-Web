@@ -1,20 +1,25 @@
 import { UploadCloud } from "lucide-react"; // assuming you're using lucide-react for icons
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Input } from "../ui/input";
 import Image from "next/image";
 
-const FileUploadDropdown = () => {
+interface IFileUploadProps {
+  onChange?: (file: File | undefined) => void,
+  placeholder?: string
+}
+const FileUploadDropdown: React.FC<IFileUploadProps> = ({ onChange = (file) => { } ,placeholder="PNG,JPG or GIF (400x400 px)"}) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null | undefined>(
     null,
   );
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
       setSelectedFile(files[0]); // Set the selected file
+      onChange(files[0])
     }
-  };
+  }, [onChange]);
 
   const handleFileClick = () => {
     fileRef.current?.click();
@@ -60,11 +65,11 @@ const FileUploadDropdown = () => {
         {!selectedFile ? (
           <>
             <UploadCloud />
-            <p className="text-muted mt-6">
-              <span className="text-black font-semibold">Click to upload</span>{" "}
+            <p className="mt-6 text-muted">
+              <span className="font-semibold text-black">Click to upload</span>{" "}
               or drag and drop
             </p>
-            <p className="text-muted">PNG, JPG or GIF (400x400 px)</p>
+            <p className="text-muted">{placeholder}</p>
           </>
         ) : (
           <div className="text-center">

@@ -8,7 +8,9 @@ import { CustomButton } from "./custom-button";
 import { useAuthModal } from "@/hooks/loginModal";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useDynamicNavLink } from "@/app/biz/_components/nav";
 const MobileNav: React.FC = () => {
+  const { selectedSlug } = useDynamicNavLink()
   const [isOpen, setIsOpen] = useState(false);
   const { setOpen } = useAuthModal()
   const router = useRouter()
@@ -103,7 +105,7 @@ const MobileNav: React.FC = () => {
           </h2>
           <CustomButton onClick={() => {
             if (isAuth) {
-              router.push('/biz/dashboard')
+              router.push(`/biz/${selectedSlug}/dashboard`)
             } else {
               setOpen()
               setIsOpen(false)

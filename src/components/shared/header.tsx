@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CustomButton } from "./custom-button";
 import MobileNav from "./mobile-nav";
 import NavSearch from "./nav-search";
+import { useDynamicNavLink } from "@/app/biz/_components/nav";
 
 const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -17,6 +18,7 @@ const Header = () => {
   const router = useRouter();
   const { isAuth } = useAuth()
   const { setOpen } = useAuthModal()
+  const { selectedSlug } = useDynamicNavLink()
 
   // Memoize the scroll handler
   const handleScroll = useCallback(() => {
@@ -86,7 +88,7 @@ const Header = () => {
           <CustomButton
             onClick={() => {
               if (isAuth) {
-                router.push('/biz/dashboard')
+                router.push(`/biz/${selectedSlug}/dashboard`)
               } else {
                 setOpen()
               }
