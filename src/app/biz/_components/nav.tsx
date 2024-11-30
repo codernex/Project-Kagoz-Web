@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/AuthContext";
 import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 import { useBusinessStore } from "@/hooks/selectedBusiness";
 import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
@@ -11,6 +12,7 @@ import {
   Megaphone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { skip } from "node:test";
 import { useEffect, useMemo, useState } from "react";
 
 export const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
@@ -65,19 +67,25 @@ export const getDynamicNavLink = (slug: string) => {
 
 // Custom hook to manage business selection and dynamic navigation
 export const useDynamicNavLink = () => {
-  const { data: businesses, isLoading } = useGetBusinessByCurrentUserQuery()
+  const { isAuth } = useAuth()
+  const { data: businesses, isLoading } = useGetBusinessByCurrentUserQuery(undefined, {
+    skip: !isAuth
+  })
   const { selectedSlug, setSelectedSlug, loadSelectedSlug } = useBusinessStore();
   const { setOpen } = useAddBusinessModal()
   const router = useRouter()
   useEffect(() => {
     // Load selected business slug from localStorage when the component mounts
     loadSelectedSlug();
-  }, [loadSelectedSlug]);
+  }, [loadSelectedSlug, isAuth]);
 
   // Auto Redirect To Default Selected Slug
   useEffect(() => {
-    router.push(`/biz/${selectedSlug}/dashboard`)
-  }, [selectedSlug,router])
+    if (isAuth) {
+
+      router.push(`/biz/${selectedSlug}/dashboard`)
+    }
+  }, [selectedSlug, router, isAuth])
 
   useEffect(() => {
     if (!selectedSlug && businesses?.length && !isLoading) {
@@ -91,9 +99,6 @@ export const useDynamicNavLink = () => {
   // Return loading state or dynamic nav links once slug is available
   const dynamicNavLinks = useMemo(() => {
     if (selectedSlug) {
-
-
-
       return getDynamicNavLink(selectedSlug);
     }
     return []; // Return an empty array while slug is loading

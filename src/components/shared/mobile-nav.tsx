@@ -15,7 +15,7 @@ const MobileNav: React.FC = () => {
   const { setOpen } = useAuthModal()
   const router = useRouter()
   const { isAuth } = useAuth()
-
+  
   const animate: AnimationProps["animate"] = useMemo(() => {
     return {
       opacity: isOpen ? 1 : 0,

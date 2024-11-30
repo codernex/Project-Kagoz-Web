@@ -1,14 +1,14 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
+import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 import { useAuthModal } from "@/hooks/loginModal";
+import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import AddBusiness from "./_components/add-business";
 import MobileBusinessSidebar from "./_components/mobile-sidebar";
 import { Sidebar } from "./_components/sidebar";
 import SwitchBusiness from "./_components/switch-business";
-import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
-import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 export default function BusinessDashboardLayout({
   children,
 }: React.PropsWithChildren) {
@@ -20,18 +20,19 @@ export default function BusinessDashboardLayout({
   // State to track loading status
   const [loading, setLoading] = useState(true);
 
-  const { data, isLoading, isSuccess } = useGetBusinessByCurrentUserQuery(undefined, {
-    skip: !isAuth
-  })
+
 
   useEffect(() => {
     if (isAuth === false && !loading) {
-      setOpen();
       router.push("/"); // Redirect to home or login page
     } else {
       setLoading(false); // Once auth status is verified, stop loading
     }
   }, [isAuth, setOpen, router, loading]);
+
+  const { data, isLoading, isSuccess } = useGetBusinessByCurrentUserQuery(undefined, {
+    skip: !isAuth
+  })
 
   useEffect(() => {
     if (!isLoading && isSuccess && !data) {
