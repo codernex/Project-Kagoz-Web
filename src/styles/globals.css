@@ -76,3 +76,7 @@ body {
     rgba(111, 0, 255, 0) 100%
   );
 }
+
+.instagram {
+  background: linear-gradient(180deg, #7028ce 0%, #ed2a7c 50%, #f9cb35 100%);
+}
