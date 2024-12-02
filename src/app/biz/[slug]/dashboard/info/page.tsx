@@ -1,5 +1,7 @@
+import { AboutBusiness } from "./_components/about";
 import { Category } from "./_components/category";
 import { BusinessFacilities } from "./_components/facilities";
+import { Faqs } from "./_components/faq";
 import { GeneralInfo } from "./_components/general-info";
 import { OpeningHour } from "./_components/opeing-hour";
 import { SocialMediaLink } from "./_components/social-media";
@@ -16,6 +18,8 @@ export default function BusinessInfo() {
       <VerifiedLicense />
       <SocialMediaLink />
       <OpeningHour/>
+      <AboutBusiness/>
+      <Faqs/>
     </div>
   );
 }

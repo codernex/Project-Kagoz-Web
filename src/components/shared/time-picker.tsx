@@ -45,7 +45,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onTimeChange }) => {
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="flex bg-white border border-gray-300 divide-x divide-gray-300 rounded-[.8rem] px-6 py-4 max-w-[20rem]">
+            <div className="flex bg-white border border-gray-300 divide-x divide-gray-300 rounded-[.8rem] px-6 py-4 max-w-fit">
                 {/* Hour Selector */}
                 <Select value={hour} onValueChange={handleHourChange}>
                     <SelectTrigger className="flex-1 border-none rounded-none focus:ring-0">

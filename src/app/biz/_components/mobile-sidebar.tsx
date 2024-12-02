@@ -33,8 +33,6 @@ const MobileBusinessSidebar: React.FC = () => {
   const { logout } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { dynamicNavLinks } = useDynamicNavLink()
-  console.log(params);
-
   const {
     data
   } = useGetBusinessBySlugQuery(params.slug)

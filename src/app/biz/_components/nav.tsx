@@ -12,8 +12,7 @@ import {
   Megaphone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { skip } from "node:test";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 export const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
   {
@@ -80,12 +79,12 @@ export const useDynamicNavLink = () => {
   }, [loadSelectedSlug, isAuth]);
 
   // Auto Redirect To Default Selected Slug
-  useEffect(() => {
-    if (isAuth) {
-
-      router.push(`/biz/${selectedSlug}/dashboard`)
-    }
-  }, [selectedSlug, router, isAuth])
+  // useEffect(() => {
+  //   if (isAuth) {
+      
+  //     router.push(`/biz/${selectedSlug}/dashboard`)
+  //   }
+  // }, [selectedSlug, router, isAuth])
 
   useEffect(() => {
     if (!selectedSlug && businesses?.length && !isLoading) {
