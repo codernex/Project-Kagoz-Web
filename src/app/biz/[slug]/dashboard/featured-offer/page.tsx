@@ -1,6 +1,6 @@
 "use client"
 
-import { CustomButton } from "@/components/shared/custom-button";
+import { PremiumWarning } from "@/app/biz/_components/premium-warning";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ export default function FeaturedOffer() {
   }
   return (
     <div>
+      <PremiumWarning hasPremium={false} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Featured Offer</h1>
@@ -26,7 +27,7 @@ export default function FeaturedOffer() {
           Add Offer
         </Button>
       </div>
-      <hr className="border-[#ededed]"/>
+      <hr className="border-[#ededed]" />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl !rounded-xs">

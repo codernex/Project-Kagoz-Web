@@ -1,15 +1,20 @@
 "use client"
 
-import { CustomButton } from "@/components/shared/custom-button";
+import { PremiumWarning } from "@/app/biz/_components/premium-warning";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CustomerVideoFeedback() {
   const [file, setFile] = useState<File | null | undefined>(undefined)
   const [open, setOpen] = useState(false)
+  const [hasPremium, setHasPremium] = useState(false)
+
+  useEffect(()=>{
+    setHasPremium(true)
+  },[])
 
   const onSubmit = () => {
     console.log(file);
@@ -18,6 +23,7 @@ export default function CustomerVideoFeedback() {
   }
   return (
     <div>
+      <PremiumWarning hasPremium={hasPremium} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Customer Video Feedback</h1>
@@ -26,7 +32,7 @@ export default function CustomerVideoFeedback() {
           Add Feedback
         </Button>
       </div>
-      <hr className="border-[#ededed]"/>
+      <hr className="border-[#ededed]" />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl !rounded-xs">

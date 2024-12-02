@@ -66,7 +66,7 @@ const MobileBusinessSidebar: React.FC = () => {
   return (
     <nav
       className={cn(
-        " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem]  bg-white lg:z-[9999]",
+        " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem]  bg-white lg:z-[999]",
       )}
     >
       <div className="container relative flex items-center justify-between w-full">
