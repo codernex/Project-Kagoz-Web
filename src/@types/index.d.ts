@@ -12,3 +12,8 @@ interface IUser {
   email: string;
   role: "admin" | "user";
 }
+
+interface IPhoto {
+  id: number;
+  url: string;
+}

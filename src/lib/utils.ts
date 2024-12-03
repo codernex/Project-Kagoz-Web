@@ -9,3 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 export const successMessage = (message: string) => {
   toast.success(message);
 };
+
+export function appendApi(file: string) {
+  return process.env.NEXT_PUBLIC_API_URL + "/uploads/" + file;
+}

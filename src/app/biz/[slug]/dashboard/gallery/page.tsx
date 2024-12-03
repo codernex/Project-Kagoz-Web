@@ -6,24 +6,45 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { appendApi } from "@/lib/utils";
+import { useGetPhotosQuery, useUploadPhotoMutation } from "@/redux/api/business";
 import { TooltipContent } from "@radix-ui/react-tooltip";
 import { InfoIcon } from "lucide-react";
+import Image from "next/image";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Gallery() {
   const [file, setFile] = useState<File | null | undefined>(undefined)
   const [open, setOpen] = useState(false)
   const [hasPremium, setHasPremium] = useState(false)
+  const params = useParams() as { slug: string }
+  /**
+   * Add Photo To Gallery
+   */
+  const [upload] = useUploadPhotoMutation()
+
+  /**
+   * Get Gallery Date
+   */
+  const { data } = useGetPhotosQuery(params.slug)
 
   useEffect(() => {
     setHasPremium(true)
   }, [])
 
   const onSubmit = () => {
-    console.log(file);
+    const formData = new FormData()
+    formData.append('image', file as any)
+    upload({
+      slug: params.slug, data: formData
+    })
     setFile(undefined)
     setOpen(false)
   }
+
+  console.log(data);
+  
   return (
     <div>
       <PremiumWarning hasPremium={hasPremium} />
@@ -33,7 +54,7 @@ export default function Gallery() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <InfoIcon className="cursor-pointer text-muted"/>
+                <InfoIcon className="cursor-pointer text-muted" />
               </TooltipTrigger>
               <TooltipContent>
                 <p>Maximum of 5 photos</p>
@@ -46,6 +67,25 @@ export default function Gallery() {
         </Button>
       </div>
       <hr className="border-[#ededed]" />
+
+      {data?.length ? (
+        <div className="grid grid-cols-6 mt-6">
+          {data.map((file, index) => {
+            return (
+              <div
+                key={index}
+                className="max-w-[20rem] rounded-xs overflow-hidden"
+              >
+                <Image width={200} height={200} src={appendApi(file.url)} alt="h" />
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-muted">
+          No featured clients yet, Maybe try to add some!
+        </p>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl !rounded-xs">

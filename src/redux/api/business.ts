@@ -1,3 +1,4 @@
+import { successMessage } from "@/lib/utils";
 import { toast } from "sonner";
 import { baseApi } from "./base";
 
@@ -34,6 +35,30 @@ const business = baseApi.injectEndpoints({
         url: `/business/${slug}`,
       }),
     }),
+
+    getPhotos: builder.query<IPhoto[], string>({
+      query: (slug) => {
+        return {
+          url: `/business/gallery/${slug}`,
+        };
+      },
+      providesTags: ["Gallery"],
+    }),
+    uploadPhoto: builder.mutation<IPhoto, any>({
+      query: ({ slug, data }) => ({
+        url: `/business/gallery/${slug}`,
+        data,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("new photo added to gallery");
+      },
+      invalidatesTags: ["Gallery"],
+    }),
   }),
 });
 
@@ -41,4 +66,6 @@ export const {
   useRegisterBusinessMutation,
   useGetBusinessByCurrentUserQuery,
   useGetBusinessBySlugQuery,
+  useGetPhotosQuery,
+  useUploadPhotoMutation,
 } = business;

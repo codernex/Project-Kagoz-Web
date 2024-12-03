@@ -1,9 +1,8 @@
 "use client"
-import FileUploadDropdown from "@/components/shared/file-upload-dropdown"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
-import { XIcon } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 export const AboutBusiness = () => {
@@ -14,10 +13,6 @@ export const AboutBusiness = () => {
         }
     })
 
-    const handleFileRemove = useCallback((index: number) => {
-        setFiles(prev => prev.filter((_, i) => i !== index))
-    }, [])
-
     useEffect(() => {
         console.log(files);
     }, [files])
@@ -26,34 +21,32 @@ export const AboutBusiness = () => {
         <div className="p-6 space-y-8 text-black bg-white rounded-lg shadow"
         >
             <h2 className="text-[2.4rem] font-semibold">About Business</h2>
-            <div className="space-y-2">
-                <Label >About Business</Label>
-                <Textarea placeholder="Test message" className="placeholder:text-muted"/>
-            </div>
+            <Form {...form}>
+                <form className="space-y-3">
+                    <FormField
+                        render={({ field }) => {
 
-            <div className="space-y-2">
-                <Label >Business Photo</Label>
-                <div className="grid grid-cols-12">
+                            return (
+                                <FormItem>
+                                    <FormLabel>
+                                        About Business
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Test message" className="placeholder:text-muted" {...field} />
+                                    </FormControl>
+                                </FormItem>
+                            )
+                        }}
+                        control={form.control} name="about" />
 
-                    <div className="col-span-4">
-                        <FileUploadDropdown multiple selectedFiles={files} setSelectedFiles={setFiles} previewEnabled={false} />
-                    </div>
-                    <div>
+                    <div className="flex justify-end">
                         {
-                            files.map((file, index) => {
-                                return (
-                                    <div className="relative" key={index}>
-                                        <img src={URL.createObjectURL(file)} alt="preview" />
-                                        <div onClick={() => handleFileRemove(index)} className="absolute top-0 cursor-pointer bg-[#ededed] rounded-full -right-20">
-                                            <XIcon />
-                                        </div>
-                                    </div>
-                                )
-                            })
+                            form.getFieldState('about').isDirty ? <Button className="bg-black rounded-xs">Save</Button> : null
                         }
                     </div>
-                </div>
-            </div>
+                </form>
+            </Form>
+
         </div>
     )
 }
