@@ -12,6 +12,7 @@ const payments = baseApi.injectEndpoints({
         data,
         method: "POST",
       }),
+      invalidatesTags: ["PremiumFeature"],
     }),
   }),
 });

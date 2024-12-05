@@ -1,29 +1,56 @@
 "use client"
 
 import { PremiumWarning } from "@/app/biz/_components/premium-warning";
+import { Loader } from "@/components/shared/loader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useActivatePremiumFeatureMutation, useIsFeatureActiveQuery } from "@/redux/api";
+import { FeatureType } from "@/types";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function FeaturedOffer() {
   const [file, setFile] = useState<File | null | undefined>(undefined)
   const [open, setOpen] = useState(false)
+  const { slug } = useParams() as { slug: string }
+
+  /**
+   * Check is feature active query
+   */
+
+  const { data, isLoading } = useIsFeatureActiveQuery({ slug, type: FeatureType.FEATURED_OFFER })
+
+  /**
+   * Activate Premium Feature Mutation
+   */
+  const [activeFeature] = useActivatePremiumFeatureMutation()
 
   const onSubmit = () => {
     console.log(file);
     setFile(undefined)
     setOpen(false)
   }
+
+  if (isLoading) {
+    return <Loader />
+  }
   return (
     <div>
-      <PremiumWarning hasPremium={false} />
+      <PremiumWarning btnAction={() => {
+        activeFeature({ slug, type: FeatureType.FEATURED_OFFER })
+          .then(res => {
+            if (res.data?.url) {
+              window.open(res.data.url)
+            }
+          })
+      }} hasPremium={data?.hasFeatureActive} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Featured Offer</h1>
         </div>
-        <Button className="h-16 bg-black rounded-sm" onClick={() => setOpen(true)}>
+        <Button disabled={!data?.hasFeatureActive} className="h-16 bg-black rounded-sm" onClick={() => setOpen(true)}>
           Add Offer
         </Button>
       </div>

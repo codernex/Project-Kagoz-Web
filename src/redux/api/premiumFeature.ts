@@ -9,8 +9,10 @@ const premiumFeature = baseApi.injectEndpoints({
       query: (data) => ({
         url: `/premium-feature?type=${data.type}&slug=${data.slug}`,
       }),
+      providesTags: ["PremiumFeature"],
     }),
   }),
 });
 
-export const { useIsFeatureActiveQuery } = premiumFeature;
+export const { useIsFeatureActiveQuery, useLazyIsFeatureActiveQuery } =
+  premiumFeature;

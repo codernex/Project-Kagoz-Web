@@ -12,11 +12,31 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { Autoplay, Navigation } from "swiper/modules";
 import { type Swiper as SwiperType } from "swiper/types";
+import { extractYouTubeVideoId } from "@/lib/utils";
+import { useParams } from "next/navigation";
+import { useGetVideoFeedbacksQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import { FeatureType } from "@/types";
 
 export const CustomerFeedback = () => {
   const swiperRef = useRef<SwiperType>();
+  const { slug } = useParams() as { slug: string }
   const [videoUrl, setVideoUrl] = useState("");
   const [openPlayer, setOpenPlayer] = useState(false);
+  /**
+   * Get Is Feature Active
+   */
+  const { data } = useIsFeatureActiveQuery({ slug, type: FeatureType.CUSTOMER_VIDEO_FEEDBACK })
+
+  /**
+   * Get video feedback query
+   */
+  const { data: videos } = useGetVideoFeedbacksQuery(slug, {
+    skip: !data?.hasFeatureActive
+  })
+
+  if (!data?.hasFeatureActive) {
+    return null
+  }
   return (
     <div className="bg-bgPrimaryShade p-[2.4rem] rounded-sm space-y-[2.4rem]">
       <div className="flex space-x-4 items-center">
@@ -69,14 +89,14 @@ export const CustomerFeedback = () => {
             },
           }}
         >
-          {Array.from({ length: 8 }).map((_, index) => {
+          {videos?.map((video, index) => {
             return (
               <SwiperSlide className="w-full" key={index}>
                 <div className="w-full h-[20rem] relative rounded-[.8rem]  bg-white overflow-hidden flex items-center justify-center">
                   <Image
-                    src={"/images/blog.png"}
+                    src={`https://img.youtube.com/vi/${extractYouTubeVideoId(video.videoUrl)}/hqdefault.jpg`}
                     alt="Business Image"
-                    className="w-[10rem] h-[8rem] z-0"
+                    className="w-[10rem] h-[8rem] z-0 object-cover"
                     fill
                   />
                   <div className="bg-[#00000080] z-20 relative w-full h-full" />
@@ -84,10 +104,10 @@ export const CustomerFeedback = () => {
                     onClick={() => {
                       setOpenPlayer(true);
                       setVideoUrl(
-                        "https://youtu.be/4Z9mUjtFJYY?si=8Pq7fFPpv2WhCfP8",
+                        video.videoUrl,
                       );
                     }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer"
                   >
                     <svg
                       width="45"

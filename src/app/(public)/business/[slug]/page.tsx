@@ -24,11 +24,22 @@ import { PhotoGallery } from "./_components/photoGallery";
 import { ReviewModal } from "./_components/reviewModal";
 import { Reviews } from "./_components/reviews";
 import { useState } from "react";
+import { useGetBusinessBySlugQuery } from "@/redux/api";
+import { useParams } from "next/navigation";
+import { Loader } from "@/components/shared/loader";
 
 export default function SingleBusiness() {
+  const { slug } = useParams() as { slug: string }
+  const { data, isLoading } = useGetBusinessBySlugQuery(slug)
   const generateStarRating = useStarRatings(4.5, 20);
 
   const [writeReview, setWriteReview] = useState(false);
+
+  if (isLoading) {
+    return (
+      <Loader />
+    )
+  }
   return (
     <div>
       <div className="bg-single-business h-[28rem]"></div>
@@ -50,7 +61,7 @@ export default function SingleBusiness() {
                   <div className="space-y-[.6rem] lg:space-y-[1.6rem] flex-1">
                     <div className="relative w-fit">
                       <h3 className="text-md lg:text-[3.2rem] xl:text-lg font-bold leading-md text-black">
-                        {"McDonald's"}
+                        {data?.name}
                       </h3>
                       <VerifiedBadge className="absolute -top-4 -right-8" />
                     </div>

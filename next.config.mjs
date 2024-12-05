@@ -8,6 +8,10 @@ const nextConfig = {
         port: "9000",
         pathname: "/api/v1/uploads/**", // Add /** to allow dynamic paths
       },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+      },
     ],
   },
 };

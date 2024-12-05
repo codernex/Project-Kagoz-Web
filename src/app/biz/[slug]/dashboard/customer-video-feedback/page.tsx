@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, extractYouTubeVideoId } from "@/lib/utils";
 import { useActivatePremiumFeatureMutation, useAddVideoFeedbackMutation, useGetVideoFeedbacksQuery, useIsFeatureActiveQuery } from "@/redux/api";
 import { CreateVideoFeedback, CreateVideoFeedbackSchema } from "@/schema/video-feedback";
 import { FeatureType } from "@/types";
@@ -70,6 +70,10 @@ export default function CustomerVideoFeedback() {
         activateFeature({ slug, type: FeatureType.CUSTOMER_VIDEO_FEEDBACK }).then(res => {
           console.log(res);
 
+          if (res.data?.url) {
+            window.open(res.data.url)
+          }
+
         })
       }} isLoading={activateFeatureLoading} hasPremium={data?.hasFeatureActive} />
       <div className="flex items-center justify-between py-6">
@@ -120,22 +124,19 @@ export default function CustomerVideoFeedback() {
       <div className="grid grid-cols-4 gap-10 mt-6">
         {
           videos?.map(video => {
-
             return (
               <div onMouseEnter={() => setShowRemoveBtn(true)} onMouseLeave={() => setShowRemoveBtn(false)} key={video.id} className="w-full  h-[20rem] relative rounded-[.8rem]  bg-white overflow-hidden flex items-center justify-center">
                 <Image
-                  src={"/images/blog.png"}
+                  src={`https://img.youtube.com/vi/${extractYouTubeVideoId(video.videoUrl)}/hqdefault.jpg`}
                   alt="Business Image"
-                  className="w-[10rem] h-[8rem] z-0"
+                  className="w-[10rem] h-[8rem] z-0 object-cover"
                   fill
                 />
                 <div className="bg-[#00000080] z-20 relative w-full h-full" />
                 <div
                   onClick={() => {
                     setOpenPlayer(true);
-                    setVideoUrl(
-                      "https://youtu.be/4Z9mUjtFJYY?si=8Pq7fFPpv2WhCfP8",
-                    );
+                    setVideoUrl(video.videoUrl);
                   }}
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer"
                 >

@@ -1,24 +1,39 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
-import "swiper/css/navigation";
-import { Autoplay, Navigation } from "swiper/modules";
-import { ChevronLeft, ChevronRight, Info } from "lucide-react";
-import { useRef } from "react";
-import { type Swiper as SwiperType } from "swiper/types";
+import { Loader } from "@/components/shared/loader";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { appendApi } from "@/lib/utils";
+import { useGetFeauturedClientsQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import { FeatureType } from "@/types";
+import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useRef } from "react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
+import { Autoplay, Navigation } from "swiper/modules";
+import { type Swiper as SwiperType } from "swiper/types";
 export const FeaturedCustomer = () => {
+  const { slug } = useParams() as { slug: string }
+  const { data, isLoading } = useIsFeatureActiveQuery({ slug, type: FeatureType.FEATURED_CLIENT })
+  const { data: featuredCustomers, isLoading: featureLoading } = useGetFeauturedClientsQuery(slug, { skip: !data?.hasFeatureActive })
   const swiperRef = useRef<SwiperType>();
+  
+  if (!data?.hasFeatureActive) {
+    return null
+  }
+  if (featureLoading || isLoading) {
+    return <Loader />
+  }
+
   return (
     <div className="bg-bgPrimaryShade p-[2.4rem] rounded-sm space-y-[2.4rem]">
       <div className="flex space-x-4 items-center">
@@ -69,12 +84,12 @@ export const FeaturedCustomer = () => {
             },
           }}
         >
-          {Array.from({ length: 8 }).map((_, index) => {
+          {featuredCustomers?.map((customer, index) => {
             return (
               <SwiperSlide className="w-full" key={index}>
                 <div className="w-full h-[10rem] rounded-[.8rem]  bg-white  p-[1.2rem] flex items-center justify-center">
                   <Image
-                    src={"/images/feature_customer.png"}
+                    src={appendApi(customer.url)}
                     alt="Featured Customer"
                     className="object-contain"
                     width={100}
