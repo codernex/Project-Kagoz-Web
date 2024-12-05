@@ -17,3 +17,16 @@ interface IPhoto {
   id: number;
   url: string;
 }
+
+interface IVideo {
+  id: number;
+  videoUrl: string;
+}
+
+interface IPayment {
+  id: number;
+}
+
+interface IPremiumFeature {
+  id: number;
+}

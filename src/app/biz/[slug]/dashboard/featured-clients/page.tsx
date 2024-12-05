@@ -1,5 +1,6 @@
 "use client";
 import { PremiumWarning } from "@/app/biz/_components/premium-warning";
+import { Loader } from "@/components/shared/loader";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,24 +10,51 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { appendApi } from "@/lib/utils";
+import { useAddFeaturedClientMutation, useGetFeauturedClientsQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import Image from "next/image";
+import { useParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function BusinessFeaturedClients() {
   const [file, setFile] = useState<File | null | undefined>(undefined);
   const [open, setOpen] = useState(false);
-  const [hasPremium, setHasPremium] = useState(false)
+  const { slug } = useParams() as { slug: string }
 
-  const [files, setFiles] = useState<File[]>([]);
+  /**
+   * Get Featured Client
+   */
+  const { data: featuredClients } = useGetFeauturedClientsQuery(slug)
+
+  /**
+   * Add Featured Client Mutation Hook
+   */
+  const [addClient] = useAddFeaturedClientMutation()
 
   const onSubmit = () => {
-    console.log(file);
-    if (file) setFiles((prev) => [...prev, file]);
+    if (!file) {
+      toast.error("Please choose a file")
+      return
+    }
+    const formData = new FormData()
+    formData.append('image', file as any)
+    addClient({ slug, data: formData })
     setFile(undefined);
     setOpen(false);
   };
+
+  /**
+   * Is Feature Active Query
+   */
+  const { data, isLoading } = useIsFeatureActiveQuery({ slug, type: 'FEATURED_CLIENT' })
+
+  if (isLoading) {
+    return <Loader />
+  }
   return (
     <div className="relative">
-      <PremiumWarning hasPremium={hasPremium} />
+      <PremiumWarning hasPremium={data?.hasFeatureActive} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Featured Clients</h1>
@@ -34,22 +62,22 @@ export default function BusinessFeaturedClients() {
         <Button
           className="h-16 bg-black rounded-xs"
           onClick={() => setOpen(true)}
-          disabled={!hasPremium}
+          disabled={!data?.hasFeatureActive}
         >
           Add Client
         </Button>
       </div>
       <hr className="border-[#ededed] mb-6" />
 
-      {files.length ? (
+      {featuredClients?.length ? (
         <div className="grid grid-cols-6 mt-6">
-          {files.map((file, index) => {
+          {featuredClients.map((file, index) => {
             return (
               <div
                 key={index}
-                className="max-w-[20rem] rounded-xs overflow-hidden"
+                className="max-w-[20rem] rounded-xs overflow-hidden bg-[#ededed]"
               >
-                <img src={URL.createObjectURL(file)} alt="h" />
+                <Image width={200} height={200} src={appendApi(file.url)} alt="h" />
               </div>
             );
           })}

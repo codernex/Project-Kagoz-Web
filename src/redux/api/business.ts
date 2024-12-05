@@ -59,6 +59,33 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Gallery"],
     }),
+
+    /**
+     * Feature Clients
+     */
+    addFeaturedClient: builder.mutation<IPhoto, any>({
+      query: ({ slug, data }) => ({
+        url: `/business/featured-clients/${slug}`,
+        data,
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("new featured client added");
+      },
+      invalidatesTags: ["FeaturedClient"],
+    }),
+    getFeauturedClients: builder.query<IPhoto[], string>({
+      query: (slug) => {
+        return {
+          url: `/business/featured-clients/${slug}`,
+        };
+      },
+      providesTags: ["FeaturedClient"],
+    }),
   }),
 });
 
@@ -68,4 +95,6 @@ export const {
   useGetBusinessBySlugQuery,
   useGetPhotosQuery,
   useUploadPhotoMutation,
+  useAddFeaturedClientMutation,
+  useGetFeauturedClientsQuery,
 } = business;

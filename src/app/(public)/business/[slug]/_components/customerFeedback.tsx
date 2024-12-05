@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
-import Player from "react-player";
+import Player from "react-player/youtube";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -84,7 +84,7 @@ export const CustomerFeedback = () => {
                     onClick={() => {
                       setOpenPlayer(true);
                       setVideoUrl(
-                        "https://youtu.be/3qWKKjIaeaM?si=neOtghtceIh_HTZl",
+                        "https://youtu.be/4Z9mUjtFJYY?si=8Pq7fFPpv2WhCfP8",
                       );
                     }}
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
