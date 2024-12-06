@@ -30,3 +30,9 @@ interface IPayment {
 interface IPremiumFeature {
   id: number;
 }
+
+interface IFeaturedOffer {
+  id: number;
+  imageUrl: string;
+  ctaUrl: string;
+}

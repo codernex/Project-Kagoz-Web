@@ -54,5 +54,13 @@ export const baseApi = createApi({
   baseQuery: baseQuery({ baseURL: process.env.NEXT_PUBLIC_API_URL }),
   endpoints: () => ({}),
   refetchOnReconnect: true,
-  tagTypes: ["Business", "Gallery", "FeaturedClient", "VideoFeedback","Payments","PremiumFeature"],
+  tagTypes: [
+    "Business",
+    "Gallery",
+    "FeaturedClient",
+    "VideoFeedback",
+    "Payments",
+    "PremiumFeature",
+    "FeaturedOffer",
+  ],
 });
