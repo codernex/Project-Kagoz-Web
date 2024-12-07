@@ -9,6 +9,7 @@ import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { Heart, PlayIcon, Share2Icon, Star } from "lucide-react";
 import Image from "next/image";
 import { Sidebar } from "./_components/sidebar";
+import { differenceInYears } from 'date-fns'
 
 import Faq from "@/components/shared/faq";
 import FeaturedItem from "../../(home)/section/components/featured-item";
@@ -27,6 +28,8 @@ import { useState } from "react";
 import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { useParams } from "next/navigation";
 import { Loader } from "@/components/shared/loader";
+import { appendApi } from "@/lib/utils";
+import { NotFound } from "@/components/shared/not-found";
 
 export default function SingleBusiness() {
   const { slug } = useParams() as { slug: string }
@@ -39,6 +42,10 @@ export default function SingleBusiness() {
     return (
       <Loader />
     )
+  }
+
+  if (!data) {
+    return <NotFound />
   }
   return (
     <div>
@@ -55,7 +62,7 @@ export default function SingleBusiness() {
                 <div className="flex space-x-[2.4rem] items-start">
                   <div className=" w-[10rem] h-[10rem] md:!w-[12rem] md:!h-[12rem] p-[1.2rem] border border-borderColor rounded-xs">
                     <div className="relative w-full h-full ">
-                      <Image src={"/images/featured_brand.png"} alt="" fill />
+                      <Image src={appendApi(data?.logoUrl)} className="object-contain" alt="" fill />
                     </div>
                   </div>
                   <div className="space-y-[.6rem] lg:space-y-[1.6rem] flex-1">
@@ -89,11 +96,11 @@ export default function SingleBusiness() {
                             fill="#6E6777"
                           />
                         </svg>
-                        <span>12 years in business</span>
+                        <span>{differenceInYears(new Date(), data.startingDate)} years in business</span>
                       </p>
                       <p className="text-sm text-muted flex items-center space-x-[0.8rem]">
                         <Calendar />
-                        <span>6 Month with KAGOZ</span>
+                        <span>{differenceInYears(new Date(), data.createdAt)} Month with KAGOZ</span>
                       </p>
                     </div>
                     <div className="flex flex-col lg:flex-row lg:items-center py-[1.4rem] gap-x-[4rem] gap-y-[1rem]">

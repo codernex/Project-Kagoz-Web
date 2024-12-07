@@ -4,6 +4,16 @@ interface IBusiness {
   name: string;
   owner: IUser;
   isOpen: boolean;
+  city: string;
+  state: string;
+  streetAddress: string;
+  startingDate: string;
+  logoUrl: string;
+  email: string;
+  mobile: string;
+  postalCode: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface IUser {
@@ -35,4 +45,9 @@ interface IFeaturedOffer {
   id: number;
   imageUrl: string;
   ctaUrl: string;
+}
+
+interface ICategory {
+  id: number;
+  name: string;
 }

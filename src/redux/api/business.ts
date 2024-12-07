@@ -34,6 +34,20 @@ const business = baseApi.injectEndpoints({
       query: (slug) => ({
         url: `/business/${slug}`,
       }),
+      providesTags: ["Business"],
+    }),
+
+    updateBusiness: builder.mutation<IBusiness, any>({
+      query: ({ slug, data }) => ({
+        url: `/business/${slug}`,
+        data,
+        method: "PATCH",
+      }),
+      onQueryStarted:async(_,{queryFulfilled})=>{
+        await queryFulfilled
+        successMessage('Business updated succesfully')
+      },
+      invalidatesTags: ["Business"],
     }),
 
     getPhotos: builder.query<IPhoto[], string>({
@@ -97,4 +111,5 @@ export const {
   useUploadPhotoMutation,
   useAddFeaturedClientMutation,
   useGetFeauturedClientsQuery,
+  useUpdateBusinessMutation,
 } = business;
