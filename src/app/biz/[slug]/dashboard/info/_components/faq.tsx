@@ -1,12 +1,19 @@
 "use client"
+import FAQ from "@/app/(public)/(home)/section/faq"
+import Faq from "@/components/shared/faq"
 import { Button } from "@/components/ui/button"
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useAddFaqMutation, useGetFaqsQuery } from "@/redux/api"
 import { PlusIcon } from "lucide-react"
+import { useParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 
 export const Faqs = () => {
+    const { slug } = useParams() as { slug: string }
+    const { data } = useGetFaqsQuery(slug)
+    const [addFaq] = useAddFaqMutation()
     const form = useForm({
         defaultValues: {
             faqs: [
@@ -21,10 +28,12 @@ export const Faqs = () => {
         <div className="p-6 space-y-8 text-black bg-white rounded-lg shadow"
         >
             <h2 className="text-[2.4rem] font-semibold">{"FAQ's"}</h2>
+            <Faq faqs={data} />
 
             <Form {...form}>
                 <form className="space-y-6" onSubmit={form.handleSubmit((d) => {
-                    console.log(d);
+                    addFaq({ slug, ...d })
+                    form.reset()
                 })}>
                     <div>
                         <div className="flex flex-col gap-8">

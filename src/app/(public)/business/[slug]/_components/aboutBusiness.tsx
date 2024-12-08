@@ -1,14 +1,17 @@
+"use client"
+import { useGetBusinessBySlugQuery } from "@/redux/api";
+import { useParams } from "next/navigation";
+
 export const AboutBusiness = () => {
+  const { slug } = useParams() as { slug: string }
+  const { data } = useGetBusinessBySlugQuery(slug)
   return (
     <div className="grid grid-cols-1 md:grid-cols-2">
       <div className="space-y-sm">
         <h2 className="text-mdx font-bold text-black">About Our Business</h2>
         <div className="text-sm leading-smlg text-muted">
           <p>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi
-            aliquam quasi dolorem. Quisquam, repudiandae ab eligendi eum eaque
-            aliquam esse libero omnis culpa eius in magnam, dolores alias illo
-            nulla.
+            {data?.about}
           </p>
         </div>
       </div>

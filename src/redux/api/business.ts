@@ -113,6 +113,39 @@ const business = baseApi.injectEndpoints({
       },
       providesTags: ["FeaturedClient"],
     }),
+    getFaqs: builder.query<IBusiness["faqs"][], string>({
+      query: (slug) => ({
+        url: `/business/${slug}/faqs`,
+      }),
+      providesTags: ["Faq"],
+    }),
+    addFaq: builder.mutation<IBusiness["faqs"], any>({
+      query: ({ slug, ...data }) => ({
+        url: `/business/${slug}/faqs`,
+        data,
+        method: "POST",
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Faq added");
+      },
+      invalidatesTags: ["Faq"],
+    }),
+    updateLicense: builder.mutation<IBusiness, any>({
+      query: ({ slug, data }) => ({
+        url: `/business/${slug}/trade-license`,
+        method: "PATCH",
+        data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Trade license updated");
+      },
+      invalidatesTags: ["Business"],
+    }),
   }),
 });
 
@@ -126,4 +159,7 @@ export const {
   useGetFeauturedClientsQuery,
   useUpdateBusinessMutation,
   useAddCategoryToBusinessMutation,
+  useGetFaqsQuery,
+  useAddFaqMutation,
+  useUpdateLicenseMutation,
 } = business;

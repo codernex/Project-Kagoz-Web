@@ -15,7 +15,20 @@ interface IBusiness {
   primaryCategory: ICategory;
   subcategories: ICategory[];
   facilities: IFacility[];
+  faqs: {
+    id: number;
+    question: string;
+    answer: string;
+  };
   website: string;
+  tradeLicenseExpireDate: Date;
+  about: string;
+  facebook: string;
+  linkedin: string;
+  instagram: string;
+  twitter: string;
+  youtube: string;
+  tradeLicenseUrl: string;
   createdAt: string;
   updatedAt: string;
 }

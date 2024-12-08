@@ -1,3 +1,4 @@
+"use client"
 import { Loader } from "@/components/shared/loader";
 import SvgInline from "@/components/shared/svg-inline";
 import { appendApi } from "@/lib/utils";

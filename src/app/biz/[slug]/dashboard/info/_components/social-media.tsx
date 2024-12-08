@@ -1,8 +1,12 @@
 "use client"
+import { CustomButton } from "@/components/shared/custom-button"
 import { Form, FormField, FormItem } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api"
 import { FacebookIcon, InstagramIcon, LinkedinIcon, LucideIcon, TwitterIcon, YoutubeIcon } from "lucide-react"
+import { useParams } from "next/navigation"
+import { useMemo } from "react"
 import { useForm } from "react-hook-form"
 
 const socialMedia: {
@@ -10,31 +14,44 @@ const socialMedia: {
     Icon: LucideIcon,
     placeholder: string
 }[] = [
-    { name: 'facebook', Icon: FacebookIcon, placeholder: 'https://facebook.com' },
-    { name: 'linkedin', Icon: LinkedinIcon, placeholder: 'https://linkedin.com' },
-    { name: 'instagram', Icon: InstagramIcon, placeholder: 'https://instagram.com' },
-    { name: 'twitter', Icon: TwitterIcon, placeholder: 'https://twitter.com' },
-    { name: 'youtube', Icon: YoutubeIcon, placeholder: 'https://youtube.com' },
-]
+        { name: 'facebook', Icon: FacebookIcon, placeholder: 'https://facebook.com' },
+        { name: 'linkedin', Icon: LinkedinIcon, placeholder: 'https://linkedin.com' },
+        { name: 'instagram', Icon: InstagramIcon, placeholder: 'https://instagram.com' },
+        { name: 'twitter', Icon: TwitterIcon, placeholder: 'https://twitter.com' },
+        { name: 'youtube', Icon: YoutubeIcon, placeholder: 'https://youtube.com' },
+    ]
 export const SocialMediaLink = () => {
-    const form = useForm({
-        defaultValues: {
-            facebook: '',
-            linkedin: '',
-            instagram: '',
-            twitter: '',
-            youtube: '',
+    const { slug } = useParams() as { slug: string }
+    const { data } = useGetBusinessBySlugQuery(slug)
+    const [update] = useUpdateBusinessMutation()
+
+    const defaultValues = useMemo(() => {
+        return {
+            facebook: data?.facebook || '',
+            linkedin: data?.linkedin || '',
+            instagram: data?.instagram || '',
+            twitter: data?.twitter || '',
+            youtube: data?.youtube || ''
         }
+    }, [data])
+    const form = useForm({
+        defaultValues,
+        values: defaultValues
     })
+
+    const { isDirty } = form.formState
     return (
         <div className="text-black shadow-md py-[3rem] px-[2.4rem] rounded-smd">
             <h2 className="font-bold text-mdx mb-[2.4rem]">Social Media Link</h2>
             <div>
                 <Form {...form}>
-                    <form>
+                    <form onSubmit={form.handleSubmit(d => {
+                        update({ slug, data: d })
+                        form.reset({ ...defaultValues })
+                    })}>
                         <div className="grid grid-cols-2 gap-8">
                             {
-                                socialMedia.map(({ name, Icon,placeholder }) => {
+                                socialMedia.map(({ name, Icon, placeholder }) => {
                                     return (
                                         <FormField
                                             key={name}
@@ -61,6 +78,11 @@ export const SocialMediaLink = () => {
                                         />
                                     )
                                 })
+                            }
+                        </div>
+                        <div className="flex justify-end">
+                            {
+                                isDirty ? <CustomButton className="bg-black rounded-xs">Save</CustomButton> : null
                             }
                         </div>
                     </form>

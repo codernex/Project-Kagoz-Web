@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { useEffect, useState } from "react";
 
-export default function Faq() {
+export default function Faq({ faqs = [] }: { faqs?: IBusiness["faqs"][] }) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export default function Faq() {
   return (
     <div>
       <Accordion type="single" collapsible className="w-full space-y-[2.8rem]">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {faqs?.map((f, i) => (
           <AccordionItem
             value={`item-${i}`}
             key={i}
@@ -30,11 +30,11 @@ export default function Faq() {
                 <span className="h-[4rem] w-[4rem] flex items-center justify-center border border-borderColor rounded-[.6rem]">
                   {i + 1}
                 </span>
-                <span>Is it accessible?</span>
+                <span>{f.question}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="text-xs lg:text-sm text-muted">
-              Yes. It adheres to the WAI-ARIA design pattern.
+              {f.answer}
             </AccordionContent>
           </AccordionItem>
         ))}

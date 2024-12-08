@@ -2,27 +2,33 @@
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
-import { useEffect, useState } from "react"
+import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api"
+import { useParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 
 export const AboutBusiness = () => {
-    const [files, setFiles] = useState<File[]>([])
+    const { slug } = useParams() as { slug: string }
+    const { data } = useGetBusinessBySlugQuery(slug)
     const form = useForm({
         defaultValues: {
-            about: ''
+            about: data?.about || ''
+        },
+        values: {
+            about: data?.about || ''
         }
     })
 
-    useEffect(() => {
-        console.log(files);
-    }, [files])
+    const [update] = useUpdateBusinessMutation()
+
 
     return (
         <div className="p-6 space-y-8 text-black bg-white rounded-lg shadow"
         >
             <h2 className="text-[2.4rem] font-semibold">About Business</h2>
             <Form {...form}>
-                <form className="space-y-3">
+                <form onSubmit={form.handleSubmit(d => {
+                    update({ slug, data: d })
+                })} className="space-y-3">
                     <FormField
                         render={({ field }) => {
 

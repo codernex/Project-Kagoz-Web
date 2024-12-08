@@ -8,7 +8,8 @@ interface IFileUploadProps {
   multiple?: boolean;
   previewEnabled?: boolean;
   selectedFiles: File[],
-  setSelectedFiles: React.Dispatch<React.SetStateAction<File[]>>
+  setSelectedFiles: React.Dispatch<React.SetStateAction<File[]>>,
+  accept?: string
 }
 
 const FileUploadDropdown: React.FC<IFileUploadProps> = ({
@@ -16,14 +17,15 @@ const FileUploadDropdown: React.FC<IFileUploadProps> = ({
   multiple = false,
   previewEnabled = true,
   selectedFiles = [],
-  setSelectedFiles = (files) => { } // New prop to enable or disable previews
+  setSelectedFiles = (files) => { }, // New prop to enable or disable previews
+  accept
 }) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      
+
       const files = event.target.files;
       if (files) {
         const fileArray = Array.from(files);
@@ -113,6 +115,7 @@ const FileUploadDropdown: React.FC<IFileUploadProps> = ({
           </>
         )}
         <Input
+          accept={accept}
           multiple={multiple}
           ref={fileRef}
           type="file"

@@ -45,8 +45,6 @@ export const Category = () => {
 
     const { isDirty, touchedFields } = form.formState
 
-    console.log(isDirty, form.watch('subCategories'));
-
     return (
         <div className="text-black shadow-md py-[3rem] px-[2.4rem] rounded-smd">
             <h2 className="font-bold text-mdx mb-[2.4rem]">Category</h2>
