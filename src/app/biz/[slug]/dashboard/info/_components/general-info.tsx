@@ -19,6 +19,7 @@ type GeneralInfoInput = {
     postalCode: string
     streetAddress: string
     startingDate: string
+    website: string
 }
 export const GeneralInfo = () => {
     const [file, setFile] = useState<File[]>([])
@@ -35,7 +36,8 @@ export const GeneralInfo = () => {
         postalCode: data?.postalCode || '',
         startingDate: data?.startingDate || '',
         state: data?.state || '',
-        streetAddress: data?.streetAddress || ''
+        streetAddress: data?.streetAddress || '',
+        website: data?.website || ''
     };
 
     const generalInfoForm = useForm({
@@ -77,6 +79,7 @@ export const GeneralInfo = () => {
                         <TextInput name="streetAddress" placeholder="Enter Street Address" control={generalInfoForm.control} label="Street Address" />
                         <TextInput required disabled={!!defaultValues.startingDate} name="startingDate" type="date" placeholder="Enter Business Starting Date" control={generalInfoForm.control} label="Business Starting Date" />
                     </Flex>
+                    <TextInput name="website" control={generalInfoForm.control} placeholder="https://yourbusiness.com" label="Busines Website" />
                     <div className="max-w-[450px]">
                         <Label>Upload Logo</Label>
                         <FileUploadDropdown setSelectedFiles={setFile} selectedFiles={file} />

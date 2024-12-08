@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +28,7 @@ interface SelectSearch<T extends { id: string | number; name: string }> {
     value: Option<T>['id' | 'name'];
     onChange: (value: any) => void;
     placeholder?: string;
+    disabled?: boolean
 }
 
 
@@ -36,13 +37,15 @@ export const SelectSearch = <T extends { id: string | number; name: string }>({
     valueKey = 'id',
     value,
     onChange,
-    placeholder = 'Select Data'
+    placeholder = 'Select Data',
+    disabled = false
 }: SelectSearch<T>) => {
     const [open, setOpen] = React.useState(false);
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
+                    disabled={disabled}
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}

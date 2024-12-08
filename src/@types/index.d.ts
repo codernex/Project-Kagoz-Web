@@ -12,6 +12,10 @@ interface IBusiness {
   email: string;
   mobile: string;
   postalCode: string;
+  primaryCategory: ICategory;
+  subcategories: ICategory[];
+  facilities: IFacility[];
+  website: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -50,4 +54,10 @@ interface IFeaturedOffer {
 interface ICategory {
   id: number;
   name: string;
+}
+
+interface IFacility {
+  id: number;
+  name: string;
+  iconUrl: string;
 }

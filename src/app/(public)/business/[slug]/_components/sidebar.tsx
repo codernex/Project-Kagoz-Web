@@ -1,8 +1,21 @@
-import { AdSpace } from "@/components/shared/ad-space";
+"use client"
 import { Button } from "@/components/shared/button";
+import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { ArrowRight, Edit2, PhoneCall } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 export const Sidebar = () => {
+  const { slug } = useParams() as { slug: string }
+  const { data } = useGetBusinessBySlugQuery(slug)
+
+  const [mobile, setMobile] = useState('')
+
+  useEffect(() => {
+    if (data?.mobile) {
+      setMobile(data.mobile.substring(0, 5) + ' xxx xxx')
+    }
+  }, [data])
   return (
     <div className=" bg-white px-[2.4rem] py-[3rem] rounded-smd drop-shadow-md">
       <Button className="flex items-center justify-center p-[2rem] space-x-3 rounded-xl font-medium">
@@ -15,9 +28,11 @@ export const Sidebar = () => {
           Call Now For Booking
         </h2>
 
-        <Button className="flex items-center justify-center p-[2rem] space-x-3 bg-white border border-primary text-primary rounded-xl font-medium">
-          <PhoneCall />
-          <span>Call Now</span>
+        <Button asChild className="flex items-center justify-center p-[2rem] space-x-3 bg-white border border-primary text-primary rounded-xl font-medium">
+          <Link href={`tel:${data?.mobile}`}>
+            <PhoneCall />
+            <span>Call Now</span>
+          </Link>
         </Button>
       </div>
       <div className="p-[2.4rem] rounded-smd bg-[#6E677708] border border-[#6E677726] mt-[1.6rem] space-y-[1.6rem] ">
@@ -43,12 +58,16 @@ export const Sidebar = () => {
               </defs>
             </svg>
 
-            <span>dalycitymovingservices.com</span>
+            <span>{data?.website}</span>
           </span>
           <ArrowRight size={20} />
         </Button>
 
-        <Button className="flex items-center p-[2rem] justify-between bg-[#6E67770D] border-none text-primary rounded-xl font-medium">
+        <Button onMouseOver={() => {
+          setMobile(data?.mobile || '01888 xxx xxx')
+        }} onMouseLeave={() => {
+          setMobile((data?.mobile.substring(0, 5) || '01888') + ' xxx xxx')
+        }} className="flex items-center p-[2rem] justify-between bg-[#6E67770D] border-none text-primary rounded-xl font-medium">
           <span className="flex items-center space-x-[1.2rem] text-[#323031]">
             <svg
               width="20"
@@ -78,7 +97,7 @@ export const Sidebar = () => {
               </defs>
             </svg>
 
-            <span>+88 019**** ****</span>
+            <span>{mobile}</span>
           </span>
           <ArrowRight size={20} />
         </Button>
@@ -99,7 +118,7 @@ export const Sidebar = () => {
             </svg>
 
             <span className="text-start max-w-[28rem]">
-              Shop No-8, Kalwalapara Masjid Market, Mirpur-1, Dhaka 1216
+              {data?.streetAddress + ', ' + data?.city +', '+ data?.state}
             </span>
           </span>
           <ArrowRight size={20} />

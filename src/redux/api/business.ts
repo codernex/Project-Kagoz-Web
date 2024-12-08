@@ -37,15 +37,28 @@ const business = baseApi.injectEndpoints({
       providesTags: ["Business"],
     }),
 
+    addCategoryToBusiness: builder.mutation<IBusiness, any>({
+      query: ({ slug, ...data }) => ({
+        url: `/business/${slug}/categories`,
+        method: "PATCH",
+        data,
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Category Updated");
+      },
+      invalidatesTags: ["Business"],
+    }),
+
     updateBusiness: builder.mutation<IBusiness, any>({
       query: ({ slug, data }) => ({
         url: `/business/${slug}`,
         data,
         method: "PATCH",
       }),
-      onQueryStarted:async(_,{queryFulfilled})=>{
-        await queryFulfilled
-        successMessage('Business updated succesfully')
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Business updated succesfully");
       },
       invalidatesTags: ["Business"],
     }),
@@ -112,4 +125,5 @@ export const {
   useAddFeaturedClientMutation,
   useGetFeauturedClientsQuery,
   useUpdateBusinessMutation,
+  useAddCategoryToBusinessMutation,
 } = business;
