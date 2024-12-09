@@ -18,9 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useCreateReviewMutation } from "@/redux/api";
 import { type CreateReviewInput, createReviewSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StarIcon } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
@@ -29,9 +31,18 @@ interface ReviewModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
+  const { slug } = useParams() as { slug: string }
+  const [createReview] = useCreateReviewMutation()
   const form = useForm<CreateReviewInput>({
+    defaultValues: {
+      message: '',
+      name: '',
+      phone: '',
+      rating: 0
+    },
     resolver: zodResolver(createReviewSchema),
   });
+  const [files, setFiles] = useState<File[]>([])
 
   /**
    * Star rating
@@ -50,12 +61,22 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
    */
 
   const onSubmit: SubmitHandler<CreateReviewInput> = async (data) => {
-    console.log(data);
+    const formData = new FormData()
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value.toString())
+    })
+    if (files) {
+      formData.append('image', files[0] as any)
+    }
+
+    createReview({ slug, data: formData })
+    setOpen(false)
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-full max-w-[60%] text-black p-[3rem]">
+      <DialogContent className="w-full max-w-[60%] text-black p-[3rem] overflow-y-scroll">
         <DialogHeader>
           <DialogTitle className="text-mdx font-bold">
             Write A Review
@@ -148,7 +169,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                   />
                 </div>
                 <FormField
-                  render={() => {
+                  render={({ field }) => {
                     return (
                       <FormItem>
                         <FormLabel className="text-sm font-normal">
@@ -156,6 +177,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                         </FormLabel>
                         <FormControl>
                           <Textarea
+                            {...field}
                             rows={5}
                             className="bg-[#FAFAFA] placeholder:text-[#9EA5AC]"
                             placeholder="Describe your message in 250 characters"
@@ -166,12 +188,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                     );
                   }}
                   control={form.control}
-                  name="phone"
+                  name="message"
                 />
 
                 <div>
                   <Label className="font-normal">Upload image</Label>
-                  <FileUploadDropdown />
+                  <FileUploadDropdown selectedFiles={files} setSelectedFiles={setFiles} />
                 </div>
 
                 <div className="flex justify-center space-x-smdlg lg:px-[8rem]">

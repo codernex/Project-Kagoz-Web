@@ -1,6 +1,12 @@
 import { Star } from "lucide-react";
 import { useMemo } from "react";
 
+/**
+ * 
+ * @param starCount Star Count
+ * @param size Icon Size
+ * @returns 
+ */
 export const useStarRatings = (starCount: number, size = 16) => {
   const elem = useMemo((): JSX.Element[] => {
     const totalLength = 5;

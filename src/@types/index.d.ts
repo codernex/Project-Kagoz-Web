@@ -92,3 +92,13 @@ interface IFacility {
   name: string;
   iconUrl: string;
 }
+
+interface IReview {
+  id: number;
+  name: string;
+  phone: string;
+  message: string;
+  imageUrl: string;
+  rating: string;
+  createdAt: string;
+}

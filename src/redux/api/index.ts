@@ -5,3 +5,4 @@ export * from "./customer-video-feedback";
 export * from "./payments";
 export * from "./featuredOffer";
 export * from "./facilities";
+export * from "./reviews";
