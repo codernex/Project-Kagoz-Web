@@ -21,6 +21,7 @@ interface IBusiness {
     answer: string;
   };
   website: string;
+  openingHours: OpeningHour[];
   tradeLicenseExpireDate: Date;
   about: string;
   facebook: string;
@@ -31,6 +32,23 @@ interface IBusiness {
   tradeLicenseUrl: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface TimeRange {
+  id: number;
+  fromHours: string;
+  fromMinutes: string;
+  fromPeriod: string;
+  toHours: string;
+  toMinutes: string;
+  toPeriod: string;
+}
+
+interface OpeningHour {
+  id: number;
+  day: string;
+  isOpen: boolean;
+  timeRanges: TimeRange[];
 }
 
 interface IUser {

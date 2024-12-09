@@ -18,6 +18,7 @@ import { OwnerText } from "./_components/ownerText";
 import { PhotoGallery } from "./_components/photoGallery";
 import { Reviews } from "./_components/reviews";
 import { appendApi } from "@/lib/utils";
+import { FaqBusinessWrapper } from "./_components/FaqWrapper";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const { slug } = await params
@@ -71,10 +72,7 @@ export default function SingleBusiness() {
               <hr className="border-[#EEEDED]" />
               <OwnerText />
               <hr className="border-[#EEEDED]" />
-              <div className="space-y-sm">
-                <h2 className="text-mdx font-bold text-black">{"FAQ's"}</h2>
-                <Faq />
-              </div>
+              <FaqBusinessWrapper />
               <hr className="border-[#EEEDED]" />
               <Reviews />
             </div>

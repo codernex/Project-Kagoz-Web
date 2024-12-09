@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     Select,
     SelectTrigger,
@@ -25,31 +25,31 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onTimeChange }) => {
         setPeriod(value.period);
     }, [value]);
 
-    const handleHourChange = (newHour: string) => {
+    const handleHourChange = useCallback((newHour: string) => {
         const updatedTime = { hours: newHour, minutes: minute, period };
         setHour(newHour);
         onTimeChange(updatedTime); // Notify parent of the change
-    };
+    }, [minute, period, onTimeChange]);
 
-    const handleMinuteChange = (newMinute: string) => {
+    const handleMinuteChange = useCallback((newMinute: string) => {
         const updatedTime = { hours: hour, minutes: newMinute, period };
         setMinute(newMinute);
         onTimeChange(updatedTime); // Notify parent of the change
-    };
+    }, [hour, onTimeChange, period]);
 
-    const handlePeriodChange = (newPeriod: string) => {
+    const handlePeriodChange = useCallback((newPeriod: string) => {
         const updatedTime = { hours: hour, minutes: minute, period: newPeriod };
         setPeriod(newPeriod);
         onTimeChange(updatedTime); // Notify parent of the change
-    };
+    }, [hour, minute, onTimeChange]);
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="flex bg-white border border-gray-300 divide-x divide-gray-300 rounded-[.8rem] px-6 py-4 max-w-fit">
+            <div className="flex bg-white border border-gray-300 divide-x divide-gray-300 rounded-[.8rem] px-6 py-4 w-[20rem]">
                 {/* Hour Selector */}
                 <Select value={hour} onValueChange={handleHourChange}>
                     <SelectTrigger className="flex-1 border-none rounded-none focus:ring-0">
-                        <SelectValue placeholder="Hour" />
+                        <SelectValue placeholder="hh" />
                     </SelectTrigger>
                     <SelectContent className="border-[#ededed] py-3 text-black">
                         {Array.from({ length: 12 }, (_, i) => (
@@ -66,7 +66,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onTimeChange }) => {
                 {/* Minute Selector */}
                 <Select value={minute} onValueChange={handleMinuteChange}>
                     <SelectTrigger className="flex-1 border-none rounded-none focus:ring-0">
-                        <SelectValue placeholder="Minute" />
+                        <SelectValue placeholder="mm" />
                     </SelectTrigger>
                     <SelectContent className="border-[#ededed] py-3 text-black">
                         {Array.from({ length: 60 }, (_, i) => (
@@ -80,7 +80,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onTimeChange }) => {
                 {/* AM/PM Selector */}
                 <Select value={period} onValueChange={handlePeriodChange}>
                     <SelectTrigger className="flex-1 border-none rounded-none focus:ring-0">
-                        <SelectValue placeholder="AM/PM" />
+                        <SelectValue placeholder="aa" />
                     </SelectTrigger>
                     <SelectContent className="border-[#ededed] py-3 text-black">
                         <SelectItem value="AM">AM</SelectItem>

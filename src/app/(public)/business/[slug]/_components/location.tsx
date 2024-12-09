@@ -1,15 +1,23 @@
+"use client"
 import GoogleMapComponent from "@/components/map";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { Clock } from "lucide-react";
+import { useParams } from "next/navigation";
 
 export const LocationAndHours = () => {
+  const { slug } = useParams() as { slug: string }
+  const { data } = useGetBusinessBySlugQuery(slug)
+  if (!data?.openingHours) {
+    return null
+  }
   return (
     <div className="space-y-sm">
       <h2 className="text-mdx font-bold text-black">Location & Hours</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2xl">
         <div className="">
-          {Array.from({ length: 7 }).map((_, index) => {
+          {data?.openingHours.map((o, index) => {
             return (
               <div
                 key={index}
@@ -23,11 +31,18 @@ export const LocationAndHours = () => {
                     size={18}
                     className="text-muted fill-muted text-white"
                   />
-                  <span className="text-black">Monday</span>
+                  <span className="text-black">{o.day}</span>
                 </div>
-                <div className="text-black">
-                  <p>10:00 AM - 10:00 PM</p>
-                </div>
+                {
+                  o.timeRanges.map(t => {
+
+                    return (
+                      <div key={t.id} className="text-black">
+                        <p><span className="w-[8rem] inline-block">{t.fromHours}:{t.fromMinutes} {t.fromPeriod}</span> - <span className="w-[8rem] inline-block">{t.toHours}:{t.toMinutes} {t.toPeriod}</span></p>
+                      </div>
+                    )
+                  })
+                }
               </div>
             );
           })}

@@ -146,6 +146,20 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Business"],
     }),
+    setOpeningHours: builder.mutation<any, any>({
+      query: ({ slug, ...data }) => {
+        return {
+          url: `/business/${slug}/opening-hour`,
+          method: "PATCH",
+          data,
+        };
+      },
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Opening hour updated");
+      },
+      invalidatesTags: ["Business"],
+    }),
   }),
 });
 
@@ -162,4 +176,5 @@ export const {
   useGetFaqsQuery,
   useAddFaqMutation,
   useUpdateLicenseMutation,
+  useSetOpeningHoursMutation,
 } = business;

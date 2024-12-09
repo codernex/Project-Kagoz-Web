@@ -7,18 +7,20 @@ import Clock from "@/components/svgs/clock";
 import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
-import { appendApi } from "@/lib/utils";
+import { appendApi, cn } from "@/lib/utils";
 import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { differenceInYears } from 'date-fns';
-import { Heart, PlayIcon, Share2Icon, Star } from "lucide-react";
+import { Clock3, Heart, PlayIcon, Share2Icon, Star } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
+import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 export function TopSection() {
     const { slug } = useParams() as { slug: string }
     const { data, isLoading } = useGetBusinessBySlugQuery(slug)
     const generateStarRating = useStarRatings(4.5, 20);
+    const isOpen = useBusinessOpen(data?.openingHours)
 
     const [writeReview, setWriteReview] = useState(false);
 
@@ -49,9 +51,20 @@ export function TopSection() {
                                 <VerifiedBadge className="absolute -top-4 -right-8" />
                             </div>
                             <div className="flex space-x-1 items-center py-2">
-                                <Clock width="16" height="16" />
-                                <p className="text-secondary text-sm font-semibold">
-                                    Open Now
+                                <Clock3
+                                    size={18}
+                                    className={cn(
+                                        "fill-secondary text-white",
+                                        !isOpen ? "fill-[#FA5151]" : "fill-secondary",
+                                    )}
+                                />
+                                <p
+                                    className={cn(
+                                        "text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold",
+                                        !isOpen ? "text-[#FA5151]" : "",
+                                    )}
+                                >
+                                    {isOpen ? "Open Now" : "Closed"}
                                 </p>
                             </div>
                             <div className="flex flex-wrap gap-x-[3rem]">
