@@ -1,17 +1,20 @@
 "use client"
+import { TK_SYMBOL } from "@/lib/utils"
 import { InfoIcon } from "lucide-react"
 
 type IPremiumProps = {
-    hasPremium?: boolean;
+    feature: IPremiumFeature & {
+        hasFeatureActive: boolean
+    } | undefined
     btnAction?: () => void,
     isLoading?: boolean
 }
 export const PremiumWarning: React.FC<IPremiumProps> = ({
-    hasPremium,
+    feature,
     btnAction = () => { },
     isLoading = false
 }) => {
-    if (hasPremium) {
+    if (feature?.hasFeatureActive) {
         return null
     }
     return (
@@ -22,7 +25,11 @@ export const PremiumWarning: React.FC<IPremiumProps> = ({
                     <h2 className=" font-semibold text-white">
                         Activate this features, to access contents of this page
                     </h2>
+                    <p className="font-semibold">
+                        {TK_SYMBOL}{feature?.price} for {feature?.duration} days
+                    </p>
                 </div>
+
                 <button onClick={btnAction} className="bg-white text-black px-6 py-2 rounded-xs mt-4">
                     {isLoading ? <>Loading</> : ''}Upgrade Now
                 </button>

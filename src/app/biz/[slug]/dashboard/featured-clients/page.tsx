@@ -11,7 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { appendApi } from "@/lib/utils";
-import { useAddFeaturedClientMutation, useGetFeauturedClientsQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import { useActivatePremiumFeatureMutation, useAddFeaturedClientMutation, useGetFeauturedClientsQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import { FeatureType } from "@/types";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -49,12 +50,26 @@ export default function BusinessFeaturedClients() {
    */
   const { data, isLoading } = useIsFeatureActiveQuery({ slug, type: 'FEATURED_CLIENT' })
 
+  /**
+  * Activate Premium Feature Mutation
+  */
+  const [activateFeature, { isLoading: activateFeatureLoading }] = useActivatePremiumFeatureMutation()
+
   if (isLoading) {
     return <Loader />
   }
   return (
     <div className="relative">
-      <PremiumWarning hasPremium={data?.hasFeatureActive} />
+      <PremiumWarning feature={data} btnAction={() => {
+        activateFeature({ slug, type: FeatureType.FEATURED_CLIENT }).then(res => {
+          console.log(res);
+
+          if (res.data?.url) {
+            window.open(res.data.url)
+          }
+
+        })
+      }} isLoading={activateFeatureLoading} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Featured Clients</h1>

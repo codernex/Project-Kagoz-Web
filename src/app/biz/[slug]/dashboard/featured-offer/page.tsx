@@ -88,7 +88,7 @@ export default function FeaturedOffer() {
               window.open(res.data.url)
             }
           })
-      }} hasPremium={data?.hasFeatureActive} />
+      }} feature={data} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Featured Offer</h1>
@@ -104,7 +104,7 @@ export default function FeaturedOffer() {
           featuredOffers?.map((offer) => {
             return (
               <div key={offer.id} className="w-full relative h-[30rem] rounded-xs overflow-hidden">
-                <Image src={appendApi(offer.imageUrl)} fill  alt="Test" />
+                <Image src={appendApi(offer.imageUrl)} fill alt="Test" />
               </div>
             )
           })

@@ -8,20 +8,24 @@ import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { appendApi, cn } from "@/lib/utils";
-import { useGetBusinessBySlugQuery } from "@/redux/api";
+import { useGetBusinessBySlugQuery, useGetReviewQuery } from "@/redux/api";
 import { differenceInYears } from 'date-fns';
 import { Clock3, Heart, PlayIcon, Share2Icon, Star } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 export function TopSection() {
     const { slug } = useParams() as { slug: string }
     const { data, isLoading } = useGetBusinessBySlugQuery(slug)
-    const generateStarRating = useStarRatings(4.5, 20);
     const isOpen = useBusinessOpen(data?.openingHours)
-
+    const { data: reviews } = useGetReviewQuery(slug)
+    const averageRatings = useMemo(() => {
+        if (!reviews) return 0
+        return reviews?.reduce((a, b) => a + parseFloat(b.rating), 0) / reviews?.length || 0
+    }, [reviews])
+    const generateStarRating = useStarRatings(averageRatings, 20);
     const [writeReview, setWriteReview] = useState(false);
 
     if (isLoading) {
@@ -103,7 +107,7 @@ export function TopSection() {
                                     <span className="text-yellow-400 text-sm flex">
                                         {generateStarRating}
                                     </span>
-                                    <p className="text-sm text-muted">4.8 (34)</p>
+                                    <p className="text-sm text-muted">{averageRatings} ({reviews?.length})</p>
                                 </div>
                             </div>
                             <div className="flex flex-wrap gap-x-[.6rem] gap-y-[.6rem]">
@@ -153,6 +157,7 @@ export function TopSection() {
                 </div>
             </div>
             <ReviewModal open={writeReview} setOpen={setWriteReview} />
+            <hr className="border-[#EEEDED]" />
         </>
     )
 }

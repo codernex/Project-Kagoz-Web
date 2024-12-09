@@ -74,6 +74,10 @@ interface IPayment {
 
 interface IPremiumFeature {
   id: number;
+  name: string;
+  featureType: string;
+  price: number;
+  duration: number;
 }
 
 interface IFeaturedOffer {

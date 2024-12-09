@@ -3,7 +3,7 @@ import { baseApi } from "./base";
 const premiumFeature = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     isFeatureActive: builder.query<
-      { hasFeatureActive: boolean },
+      { hasFeatureActive: boolean }&IPremiumFeature,
       { type: string; slug: string }
     >({
       query: (data) => ({

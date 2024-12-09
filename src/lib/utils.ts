@@ -29,3 +29,5 @@ export function extractYouTubeVideoId(url: string): string {
 
   return ""; // Return null if no video ID is found
 }
+
+export const TK_SYMBOL = "৳";

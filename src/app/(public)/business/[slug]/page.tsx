@@ -53,27 +53,17 @@ export default function SingleBusiness() {
              * TOP SECTIONS
              */}
               <TopSection />
-              <hr className="border-[#EEEDED]" />
               <FeaturedCustomer />
-              <hr className="border-[#EEEDED]" />
               <CustomerFeedback />
-              <hr className="border-[#EEEDED]" />
               <FeaturedOffer />
-              <hr className="border-[#EEEDED]" />
+
               <BusinessFacilities />
-              <hr className="border-[#EEEDED]" />
               <AboutBusiness />
-              <hr className="border-[#EEEDED]" />
               <License />
-              <hr className="border-[#EEEDED]" />
               <PhotoGallery />
-              <hr className="border-[#EEEDED]" />
               <LocationAndHours />
-              <hr className="border-[#EEEDED]" />
               <OwnerText />
-              <hr className="border-[#EEEDED]" />
               <FaqBusinessWrapper />
-              <hr className="border-[#EEEDED]" />
               <Reviews />
             </div>
           </div>

@@ -75,7 +75,7 @@ export default function CustomerVideoFeedback() {
           }
 
         })
-      }} isLoading={activateFeatureLoading} hasPremium={data?.hasFeatureActive} />
+      }} isLoading={activateFeatureLoading} feature={data} />
       <div className="flex items-center justify-between py-6">
         <div>
           <h1 className="font-bold text-black text-mdx">Customer Video Feedback</h1>

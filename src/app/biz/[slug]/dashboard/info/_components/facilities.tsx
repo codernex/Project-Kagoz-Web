@@ -5,7 +5,7 @@ import { Loader } from "@/components/shared/loader"
 import SvgInline from "@/components/shared/svg-inline"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { appendApi } from "@/lib/utils"
+import { appendApi, cn } from "@/lib/utils"
 import { useAddFacilityMutation, useGetBusinessBySlugQuery, useGetFacilitiesQuery } from "@/redux/api"
 import { useParams } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -37,13 +37,16 @@ export const BusinessFacilities = () => {
                     facilities?.map(f => {
                         const isExist = data?.facilities.find(fa => fa.id === f.id)
                         return (
-                            <button disabled={!!isExist} key={f.id} className="flex items-center space-x-2 cursor-pointer select-none" onClick={() => toggleFacility(f.id)}>
+                            <div key={f.id} className={cn("flex items-center space-x-2 cursor-pointer select-none", !!isExist && 'cursor-not-allowed')} onClick={() => {
+                                if (!!isExist) return;
+                                toggleFacility(f.id)
+                            }}>
                                 <Checkbox disabled={!!isExist} checked={form.watch('facilities').includes(f.id) || !!isExist} />
                                 <span className="text-muted">
                                     {f.name}
                                 </span>
                                 <SvgInline className="w-10 h-10 hover:stroke-primary transition-colors ease-linear" url={appendApi(f.iconUrl)} />
-                            </button>
+                            </div>
                         )
                     })
                 }

@@ -19,31 +19,38 @@ export const FeaturedOffer = () => {
     return <Loader />
   }
 
+  if (!feature?.hasFeatureActive) {
+    return null
+  }
   return (
-    <div className="pb-10">
-      <h2 className="text-md text-black font-bold pb-[2.4rem]">
-        Featured Offer
-      </h2>
+    <>
+      <div className="pb-10">
+        <h2 className="text-md text-black font-bold pb-[2.4rem]">
+          Featured Offer
+        </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-[4rem]">
-        {data?.map((offer, index) => {
-          return (
-            <div key={index} className="flex flex-col items-center">
-              <div className="w-full h-[46rem] relative border-[2px] border-primary rounded-sm overflow-hidden">
-                <Image
-                  src={appendApi(offer.imageUrl)}
-                  className="object-cover"
-                  alt=""
-                  fill
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[4rem]">
+          {data?.map((offer, index) => {
+            return (
+              <div key={index} className="flex flex-col items-center">
+                <div className="w-full h-[46rem] relative border-[2px] border-primary rounded-sm overflow-hidden">
+                  <Image
+                    src={appendApi(offer.imageUrl)}
+                    className="object-cover"
+                    alt=""
+                    fill
+                  />
+                </div>
+                <Link target="_blank" rel="nofollow" href={offer.ctaUrl} className="h-[4.8rem] w-[14rem] rounded-xl -my-10 border-none relative z-20 bg-primary text-white flex items-center justify-center font-semibold">
+                  Book Now
+                </Link>
               </div>
-              <Link target="_blank" rel="nofollow" href={offer.ctaUrl} className="h-[4.8rem] w-[14rem] rounded-xl -my-10 border-none relative z-20 bg-primary text-white flex items-center justify-center font-semibold">
-                Book Now
-              </Link>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+      <hr className="border-[#EEEDED]" />
+    </>
+
   );
 };

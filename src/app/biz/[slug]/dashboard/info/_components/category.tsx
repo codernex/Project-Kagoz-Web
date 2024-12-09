@@ -121,7 +121,7 @@ export const Category = () => {
             <div>
                 <ul className="mt-2">
                     <li className="font-semibold text-md">Primary Category</li>
-                    <li className="ml-4 list-disc">{data?.primaryCategory.name}</li>
+                    <li className="ml-4 list-disc">{data?.primaryCategory?.name}</li>
                 </ul>
 
                 <ul className="mt-6">

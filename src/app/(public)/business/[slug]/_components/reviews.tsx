@@ -56,7 +56,7 @@ export const Reviews = () => {
           <div className="border border-[#EEEDED] border-t-0 border-b-0 space-y-xs pl-[2rem]">
             <h3 className="text-[2.1rem] font-semibold">Average Rating</h3>
             <div className="flex items-center space-x-4">
-              <h2 className="text-[2.8rem] font-bold">{averageRatings.toFixed(1)}</h2>
+              <h2 className="text-[2.8rem] font-bold">{averageRatings > 0 ? averageRatings.toFixed(1) : 0}</h2>
               <div className="flex">{ratings}</div>
             </div>
           </div>
