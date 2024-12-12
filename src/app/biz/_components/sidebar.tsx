@@ -12,7 +12,7 @@ export const Sidebar = () => {
   const path = usePathname();
   const { setOpen } = useSwitchBusinessModal()
   const { dynamicNavLinks } = useDynamicNavLink()
-  const { data } = useGetBusinessBySlugQuery(params.slug)
+  const { data } = useGetBusinessBySlugQuery(params.slug, { skip: params.slug === 'null' })
   return (
     <aside
       id="default-sidebar"

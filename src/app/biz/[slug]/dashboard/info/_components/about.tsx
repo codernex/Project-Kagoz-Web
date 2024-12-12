@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 
 export const AboutBusiness = () => {
     const { slug } = useParams() as { slug: string }
+    
     const { data } = useGetBusinessBySlugQuery(slug)
     const form = useForm({
         defaultValues: {

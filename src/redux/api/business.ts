@@ -23,11 +23,13 @@ const business = baseApi.injectEndpoints({
 
         toast.success("new business registered, successfully");
       },
+      invalidatesTags: ["CurrentUsersBusiness"],
     }),
     getBusinessByCurrentUser: builder.query<IBusiness[], void>({
       query: () => ({
         url: "/business/me",
       }),
+      providesTags: ["CurrentUsersBusiness"],
     }),
 
     getBusinessBySlug: builder.query<IBusiness, string>({

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { useAddBusinessModal } from "@/hooks/addBusinessModal";
-import { useRegisterBusinessMutation } from "@/redux/api/business";
+import { useGetBusinessByCurrentUserQuery, useRegisterBusinessMutation } from "@/redux/api/business";
 import { useForm } from "react-hook-form";
 
 export default function AddBusiness({
@@ -17,6 +17,7 @@ export default function AddBusiness({
 }: {
   onOpenChange?: boolean;
 }) {
+
   /**
    * State Management Hooks
    */
@@ -26,6 +27,11 @@ export default function AddBusiness({
    * Api Mutation & Queries
    */
   const [registerBusiness] = useRegisterBusinessMutation();
+
+  /**
+   * Current Users Business
+   */
+  const { data } = useGetBusinessByCurrentUserQuery()
 
   /**
    * Form Initialization
@@ -40,7 +46,7 @@ export default function AddBusiness({
 
   return (
     <div>
-      <Dialog open={open} onOpenChange={onOpenChange ? setOpen : () => {}}>
+      <Dialog open={open} onOpenChange={onOpenChange ? setOpen : () => { }}>
         <DialogContent className="max-w-5xl">
           <DialogHeader>
             <DialogTitle className="!text-black text-mdx">
@@ -51,8 +57,12 @@ export default function AddBusiness({
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit((d) => {
-                registerBusiness(d);
-                setOpen(false);
+                registerBusiness(d).then(res => {
+                  if (res.data || data?.length) {
+                    setOpen(false)
+                    form.reset()
+                  }
+                })
               })}
               className="space-y-4"
             >

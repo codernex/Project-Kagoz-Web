@@ -17,6 +17,10 @@ export const useBusinessStore = create<BusinessStore>((set) => ({
         const storedSlug = localStorage.getItem('selectedBusinessSlug');
         if (storedSlug) {
             set({ selectedSlug: storedSlug });
+        } else {
+            set({
+                selectedSlug: 'null'
+            })
         }
     },
 }));

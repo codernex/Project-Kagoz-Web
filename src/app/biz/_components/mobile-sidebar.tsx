@@ -21,7 +21,8 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useDynamicNavLink } from "./nav";
-import { useGetBusinessBySlugQuery } from "@/redux/api/business";
+import { useGetBusinessByCurrentUserQuery, useGetBusinessBySlugQuery } from "@/redux/api/business";
+import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 const MobileBusinessSidebar: React.FC = () => {
   /**
    * States
@@ -32,10 +33,12 @@ const MobileBusinessSidebar: React.FC = () => {
   const path = usePathname();
   const { logout } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const { dynamicNavLinks } = useDynamicNavLink()
+  const { dynamicNavLinks, setSelectedSlug } = useDynamicNavLink()
+  const { setOpen: setBusinessOpen } = useAddBusinessModal()
+  const { data: business, isLoading } = useGetBusinessByCurrentUserQuery()
   const {
     data
-  } = useGetBusinessBySlugQuery(params.slug)
+  } = useGetBusinessBySlugQuery(params.slug, { skip: params.slug === 'null' })
 
   /**
    * Life Cycle Hook
@@ -62,6 +65,12 @@ const MobileBusinessSidebar: React.FC = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isLoading && !business?.length) {
+      setBusinessOpen(true)
+    }
+  }, [business, isLoading, setBusinessOpen])
 
   return (
     <nav
@@ -107,7 +116,10 @@ const MobileBusinessSidebar: React.FC = () => {
             <hr className="border-[#ededed]" />
 
             <DropdownMenuItem
-              onClick={logout}
+              onClick={() => {
+                logout()
+                setSelectedSlug('')
+              }}
               className="hover:bg-[#F0F0F0] rounded-[.6rem] cursor-pointer pl-4 py-3 space-x-3 font-semibold items-center flex"
             >
               <LogOutIcon />

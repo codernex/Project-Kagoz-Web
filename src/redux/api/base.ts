@@ -63,5 +63,6 @@ export const baseApi = createApi({
     "PremiumFeature",
     "FeaturedOffer",
     "Faq",
+    "CurrentUsersBusiness",
   ],
 });

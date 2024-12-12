@@ -11,7 +11,7 @@ import {
   type LucideIcon,
   Megaphone,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 export const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
@@ -21,9 +21,9 @@ export const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
     icon: HomeIcon,
   },
   {
-    name: "KAGOZ Ads",
-    href: "/biz/dashboard/ads",
-    icon: Megaphone,
+    name: "Photo Gallery",
+    href: "/biz/dashboard/gallery",
+    icon: Images,
   },
   {
     name: "Business Information",
@@ -45,10 +45,11 @@ export const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
     href: "/biz/dashboard/featured-offer",
     icon: BookmarkPlus,
   },
+
   {
-    name: "Photo Gallery",
-    href: "/biz/dashboard/gallery",
-    icon: Images,
+    name: "KAGOZ Ads",
+    href: "/biz/dashboard/ads",
+    icon: Megaphone,
   },
 ];
 
@@ -71,29 +72,27 @@ export const useDynamicNavLink = () => {
     skip: !isAuth
   })
   const { selectedSlug, setSelectedSlug, loadSelectedSlug } = useBusinessStore();
-  const { setOpen } = useAddBusinessModal()
   const router = useRouter()
+  const pathName = usePathname()
   useEffect(() => {
-    // Load selected business slug from localStorage when the component mounts
     loadSelectedSlug();
-  }, [loadSelectedSlug, isAuth]);
+  }, [loadSelectedSlug]);
 
   // Auto Redirect To Default Selected Slug
-  // useEffect(() => {
-  //   if (isAuth) {
-      
-  //     router.push(`/biz/${selectedSlug}/dashboard`)
-  //   }
-  // }, [selectedSlug, router, isAuth])
+  useEffect(() => {
+    if (isAuth && selectedSlug !== 'null' && pathName.includes('dashboard')) {
+      console.log("Business Redirect");
+      // router.push(`/biz/${selectedSlug}/dashboard`)
+    }
+  }, [selectedSlug, router, isAuth, pathName])
 
   useEffect(() => {
-    if (!selectedSlug && businesses?.length && !isLoading) {
+    if (selectedSlug === 'null' && businesses?.length && !isLoading) {
       // If no business is selected, default to the first business
       setSelectedSlug(businesses[0]?.slug || '');
-    } else if (!isLoading && !businesses) {
-      setOpen(true)
+      router.push(`/biz/${businesses[0]?.slug}/dashboard`)
     }
-  }, [selectedSlug, businesses, setSelectedSlug, isLoading, setOpen]);
+  }, [selectedSlug, businesses, setSelectedSlug, isLoading, router]);
 
   // Return loading state or dynamic nav links once slug is available
   const dynamicNavLinks = useMemo(() => {
