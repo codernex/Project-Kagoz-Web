@@ -8,6 +8,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useSwitchBusinessModal } from "@/hooks/switchBusinessModal";
 import { cn } from "@/lib/utils";
+import { useGetBusinessBySlugQuery } from "@/redux/api/business";
 import { motion } from "framer-motion";
 import {
   ArrowLeftRight,
@@ -20,9 +21,7 @@ import {
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { useDynamicNavLink } from "./nav";
-import { useGetBusinessByCurrentUserQuery, useGetBusinessBySlugQuery } from "@/redux/api/business";
-import { useAddBusinessModal } from "@/hooks/addBusinessModal";
+import { useDynamicNavLink } from "./dynamic-nav";
 const MobileBusinessSidebar: React.FC = () => {
   /**
    * States
@@ -34,8 +33,6 @@ const MobileBusinessSidebar: React.FC = () => {
   const { logout } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { dynamicNavLinks, setSelectedSlug } = useDynamicNavLink()
-  const { setOpen: setBusinessOpen } = useAddBusinessModal()
-  const { data: business, isLoading } = useGetBusinessByCurrentUserQuery()
   const {
     data
   } = useGetBusinessBySlugQuery(params.slug, { skip: params.slug === 'null' })
@@ -49,6 +46,8 @@ const MobileBusinessSidebar: React.FC = () => {
       document.body.style.overflow = "scroll";
     };
   }, [isOpen]);
+  
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -65,12 +64,6 @@ const MobileBusinessSidebar: React.FC = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!isLoading && !business?.length) {
-      setBusinessOpen(true)
-    }
-  }, [business, isLoading, setBusinessOpen])
 
   return (
     <nav

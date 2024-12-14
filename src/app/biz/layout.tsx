@@ -1,6 +1,5 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
-import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 import { useAuthModal } from "@/hooks/loginModal";
 import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
 import { useRouter } from 'next/navigation';
@@ -8,19 +7,15 @@ import { useEffect, useState } from "react";
 import AddBusiness from "./_components/add-business";
 import MobileBusinessSidebar from "./_components/mobile-sidebar";
 import { Sidebar } from "./_components/sidebar";
-import SwitchBusiness from "./_components/switch-business";
 export default function BusinessDashboardLayout({
   children,
 }: React.PropsWithChildren) {
   const { isAuth } = useAuth()
   const { setOpen } = useAuthModal()
-  const { setOpen: setAddBusinessModal } = useAddBusinessModal()
   const router = useRouter()
 
   // State to track loading status
   const [loading, setLoading] = useState(true);
-
-
 
   useEffect(() => {
     if (isAuth === false && !loading) {
@@ -33,12 +28,6 @@ export default function BusinessDashboardLayout({
   const { data, isLoading, isSuccess } = useGetBusinessByCurrentUserQuery(undefined, {
     skip: !isAuth
   })
-
-  useEffect(() => {
-    if (!isLoading && isSuccess && !data) {
-      setAddBusinessModal(true)
-    }
-  }, [data, isLoading, setAddBusinessModal, isSuccess])
 
   if (loading) {
     return <div className="flex items-center justify-center h-screen">
@@ -55,7 +44,6 @@ export default function BusinessDashboardLayout({
       <AddBusiness onOpenChange={
         !!data?.length
       } />
-      <SwitchBusiness />
     </div>
   );
 }

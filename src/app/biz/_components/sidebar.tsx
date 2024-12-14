@@ -1,18 +1,31 @@
 "use client";
-import { useSwitchBusinessModal } from "@/hooks/switchBusinessModal";
+import { useMemorizedPath } from "@/hooks/memorizeCurrentPath";
 import { cn } from "@/lib/utils";
-import { useGetBusinessBySlugQuery } from "@/redux/api/business";
-import { ArrowLeftRight } from "lucide-react";
+import {
+  useGetBusinessByCurrentUserQuery
+} from "@/redux/api/business";
+import {
+  ChevronRightIcon,
+  SquareArrowOutUpRight
+} from "lucide-react";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
-import { useDynamicNavLink } from "./nav";
-
+import { usePathname } from "next/navigation";
+import { useDynamicNavLink } from "./dynamic-nav";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 export const Sidebar = () => {
-  const params = useParams() as { slug: string }
   const path = usePathname();
-  const { setOpen } = useSwitchBusinessModal()
-  const { dynamicNavLinks } = useDynamicNavLink()
-  const { data } = useGetBusinessBySlugQuery(params.slug, { skip: params.slug === 'null' })
+  const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink();
+  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined);
+  const memorizePath = useMemorizedPath(path)
+
+  const { isAuth } = useAuth()
+
+  useEffect(() => {
+    if (isAuth) {
+      refetch()
+    }
+  }, [isAuth, refetch])
   return (
     <aside
       id="default-sidebar"
@@ -21,14 +34,28 @@ export const Sidebar = () => {
     >
       <div className="h-full px-3 overflow-y-auto ">
         <div className="relative space-y-4">
-          <div className="w-[90%]">
-            <h2 className="font-bold text-black text-mdx">{data?.name}</h2>
-            <p className="text-xsm text-muted">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit
-            </p>
+          <div className="w-[90%] py-10">
+            {business?.map((b) => {
+              return (
+                <Link
+                  key={b.id}
+                  href={`/biz/${b.slug}/dashboard/${memorizePath}`}
+                  onClick={() => setSelectedSlug(b.slug)}
+                  className="font-bold text-black text-smd flex items-center justify-between border-b border-[#e4e4e4] last:border-none py-2"
+                >
+                  {b?.name}
+                  <ChevronRightIcon />
+                </Link>
+              );
+            })}
           </div>
-          <div className="absolute top-0 right-0 cursor-pointer text-secondary" onClick={() => setOpen(true)}>
-            <ArrowLeftRight />
+          <div
+            className="absolute top-0 right-0 cursor-pointer text-secondary"
+            onClick={() => {
+              window.open(window.location.origin + `/business/${selectedSlug}`)
+            }}
+          >
+            <SquareArrowOutUpRight />
           </div>
         </div>
         <hr className="border-[#ededed] mt-6 mb-3" />

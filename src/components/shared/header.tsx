@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CustomButton } from "./custom-button";
 import MobileNav from "./mobile-nav";
 import NavSearch from "./nav-search";
-import { useDynamicNavLink } from "@/app/biz/_components/nav";
+import { useDynamicNavLink } from "@/app/biz/_components/dynamic-nav";
 
 const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);

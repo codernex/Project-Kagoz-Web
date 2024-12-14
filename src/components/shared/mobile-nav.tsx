@@ -8,7 +8,7 @@ import { CustomButton } from "./custom-button";
 import { useAuthModal } from "@/hooks/loginModal";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useDynamicNavLink } from "@/app/biz/_components/nav";
+import { useDynamicNavLink } from "@/app/biz/_components/dynamic-nav";
 const MobileNav: React.FC = () => {
   const { selectedSlug } = useDynamicNavLink()
   const [isOpen, setIsOpen] = useState(false);

@@ -23,14 +23,14 @@ export const AuthModal = () => {
         defaultValues: {
             email: '',
             password: '',
-            name: ''
+            name: '',
+            phone: ''
         }
     })
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-3xl rounded-xs">
-
                 <DialogHeader>
                     <DialogTitle>
                     </DialogTitle>
@@ -60,6 +60,8 @@ export const AuthModal = () => {
                                 <TextInput className="text-black" control={signUpForm.control} name={'name'} type="text" label={'Name'} placeholder="John Doe" required />
                                 <TextInput className="text-black" control={signUpForm.control} name={'email'} type="email" label={'Email'} placeholder="yourmail@server.com" required />
                                 <TextInput className="text-black" control={signUpForm.control} name={'password'} type="password" placeholder="******" label={'Password'} required />
+                                <TextInput className="text-black" control={signUpForm.control} name={'phone'} type="number" placeholder="018xxxxxxxx" label={'Phone'} required />
+                                
                                 <Button className="w-40" type="submit">Sign Up</Button>
                             </form>
                         </Form>
