@@ -19,28 +19,45 @@ import { PhotoGallery } from "./_components/photoGallery";
 import { Reviews } from "./_components/reviews";
 import { appendApi } from "@/lib/utils";
 import { FaqBusinessWrapper } from "./_components/FaqWrapper";
+import { NotFound } from "@/components/shared/not-found";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = await params
-  const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, { withCredentials: true });
-  const data = response.data.data
-  return {
-    title: data.name + ' | KAGOZ',
-    description: data.about,
-    openGraph: {
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  try {
+    const { slug } = await params
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, { withCredentials: true });
+    const data = response.data.data
+    return {
       title: data.name + ' | KAGOZ',
       description: data.about,
-      images: appendApi(data.logoUrl),
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: data.name + ' | KAGOZ',
-      description: data.about,
-      images: [data.logoUrl],
-    },
-  };
+      openGraph: {
+        title: data.name + ' | KAGOZ',
+        description: data.about,
+        images: appendApi(data.logoUrl),
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: data.name + ' | KAGOZ',
+        description: data.about,
+        images: [data.logoUrl],
+      },
+    };
+  } catch (error) {
+    console.log(error);
+  }
 }
-export default function SingleBusiness() {
+export default async function SingleBusiness({ params }: { params: { slug: string } }) {
+  const { slug } = await params
+  let data: IBusiness;
+  let isLoading: boolean = false;
+  try {
+    isLoading = true
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, { withCredentials: true });
+    data = response.data.data
+  } catch (error) {
+    return <NotFound />
+  } finally {
+    isLoading = false
+  }
   return (
     <>
       <div>
