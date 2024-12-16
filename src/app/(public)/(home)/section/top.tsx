@@ -8,7 +8,7 @@ import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { appendApi, cn } from "@/lib/utils";
-import { useGetBusinessBySlugQuery, useGetReviewQuery } from "@/redux/api";
+import { useGetBusinessBySlugQuery, useGetReviewQuery, useHasLikedBusinessQuery, useLikeBusinessMutation } from "@/redux/api";
 import { differenceInYears } from 'date-fns';
 import { Clock3, Heart, PlayIcon, Share2Icon, Star } from "lucide-react";
 import Image from "next/image";
@@ -16,6 +16,7 @@ import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
+import millify from "millify";
 export function TopSection() {
     const { slug } = useParams() as { slug: string }
     const { data, isLoading } = useGetBusinessBySlugQuery(slug)
@@ -27,7 +28,8 @@ export function TopSection() {
     }, [reviews])
     const generateStarRating = useStarRatings(averageRatings, 20);
     const [writeReview, setWriteReview] = useState(false);
-
+    const [like] = useLikeBusinessMutation()
+    const { data: liked } = useHasLikedBusinessQuery(slug)
     if (isLoading) {
         return (
             <Loader />
@@ -150,9 +152,11 @@ export function TopSection() {
                         <Share2Icon size={18} />
                         <span>Share</span>
                     </Button>
-                    <Button className="text-muted bg-transparent items-center flex max-w-[22rem] md:w-fit  px-[3.2rem] py-[1rem]  md:py-[1.4rem] rounded-xl border border-[#6E67774D] space-x-[.8rem]">
-                        <Heart size={18} />
-                        <span>1.2k like </span>
+                    <Button onClick={() => like(slug)} className={
+                        cn('text-muted bg-transparent items-center flex max-w-[22rem] md:w-fit  px-[3.2rem] py-[1rem]  md:py-[1.4rem] rounded-xl border border-[#6E67774D] space-x-[.8rem]')
+                    }>
+                        <Heart className={cn(liked?.hasLiked && 'text-pink-500')} size={18} />
+                        <span>{millify(data.likes)} like </span>
                     </Button>
                 </div>
             </div>

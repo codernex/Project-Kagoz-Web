@@ -162,6 +162,18 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Business"],
     }),
+    likeBusiness: builder.mutation<string, string>({
+      query: (slug) => ({
+        url: `/business/${slug}/like`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Business"],
+    }),
+    hasLikedBusiness: builder.query<{ hasLiked: boolean }, string>({
+      query: (slug) => ({
+        url: `/business/${slug}/like`,
+      }),
+    }),
   }),
 });
 
@@ -179,4 +191,6 @@ export const {
   useAddFaqMutation,
   useUpdateLicenseMutation,
   useSetOpeningHoursMutation,
+  useLikeBusinessMutation,
+  useHasLikedBusinessQuery,
 } = business;

@@ -29,6 +29,7 @@ interface IBusiness {
   instagram: string;
   twitter: string;
   youtube: string;
+  likes: number;
   tradeLicenseUrl: string;
   createdAt: string;
   updatedAt: string;
