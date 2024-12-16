@@ -174,6 +174,16 @@ const business = baseApi.injectEndpoints({
         url: `/business/${slug}/like`,
       }),
     }),
+    getTotalPageViews: builder.query<any, any>({
+      query: (slug) => ({
+        url: `/business/${slug}/page-views/total`,
+      }),
+    }),
+    getDailyPageViews: builder.query<any, any>({
+      query: (slug) => ({
+        url: `/business/${slug}/page-views/daily`,
+      }),
+    }),
   }),
 });
 
@@ -193,4 +203,6 @@ export const {
   useSetOpeningHoursMutation,
   useLikeBusinessMutation,
   useHasLikedBusinessQuery,
+  useGetTotalPageViewsQuery,
+  useGetDailyPageViewsQuery,
 } = business;

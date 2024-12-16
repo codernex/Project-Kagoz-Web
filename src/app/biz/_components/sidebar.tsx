@@ -13,11 +13,14 @@ import { usePathname } from "next/navigation";
 import { useDynamicNavLink } from "./dynamic-nav";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 export const Sidebar = () => {
   const path = usePathname();
   const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink();
   const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined);
   const memorizePath = useMemorizedPath(path)
+  const { setOpen } = useAddBusinessModal()
 
   const { isAuth } = useAuth()
 
@@ -80,6 +83,10 @@ export const Sidebar = () => {
             );
           })}
         </ul>
+        <hr className="border-[#ededed] mt-6 mb-3" />
+        <Button onClick={() => setOpen(true)} variant={'outline'} className="text-black border-black rounded-xs">
+          Add Business
+        </Button>
       </div>
     </aside>
   );
