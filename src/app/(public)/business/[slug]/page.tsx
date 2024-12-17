@@ -1,15 +1,15 @@
 
 import { AdSpace } from "@/components/shared/ad-space";
 import { Sidebar } from "./_components/sidebar";
-
-import Faq from "@/components/shared/faq";
+import { NotFound } from "@/components/shared/not-found";
+import { appendApi } from "@/lib/utils";
 import axios from "axios";
-import { Metadata } from "next";
 import FeaturedItem from "../../(home)/section/components/featured-item";
 import { TopSection } from "../../(home)/section/top";
 import { AboutBusiness } from "./_components/aboutBusiness";
 import { BusinessFacilities } from "./_components/businessFacilities";
 import { CustomerFeedback } from "./_components/customerFeedback";
+import { FaqBusinessWrapper } from "./_components/FaqWrapper";
 import { FeaturedCustomer } from "./_components/featuredCustomer";
 import { FeaturedOffer } from "./_components/featuredOffer";
 import { License } from "./_components/license";
@@ -17,15 +17,23 @@ import { LocationAndHours } from "./_components/location";
 import { OwnerText } from "./_components/ownerText";
 import { PhotoGallery } from "./_components/photoGallery";
 import { Reviews } from "./_components/reviews";
-import { appendApi } from "@/lib/utils";
-import { FaqBusinessWrapper } from "./_components/FaqWrapper";
-import { NotFound } from "@/components/shared/not-found";
+import { cookies } from 'next/headers'
+
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   try {
+    const cookieStore = await cookies()
+    let cookie = cookieStore.get('access_token')
+
     const { slug } = await params
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, { withCredentials: true });
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, {
+      withCredentials: true, headers: {
+        Authorization: `Bearer ${cookie?.value}`
+      }
+    });
+
     const data = response.data.data
+
     return {
       title: data.name + ' | KAGOZ',
       description: data.about,
@@ -47,16 +55,30 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 export default async function SingleBusiness({ params }: { params: { slug: string } }) {
   const { slug } = await params
-  let data: IBusiness;
+  const cookieStore = await cookies()
+  let cookie = cookieStore.get('access_token')
+  let data: IBusiness | null;
   let isLoading: boolean = false;
+  let err;
   try {
     isLoading = true
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, { withCredentials: true });
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, {
+      withCredentials: true, headers: {
+        Authorization: `Bearer ${cookie?.value}`
+      }
+    });
     data = response.data.data
+
   } catch (error) {
-    return <NotFound />
+    data = null
+    err = error;
   } finally {
     isLoading = false
+  }
+  console.log(err);
+
+  if (err && !data) {
+    return <NotFound />
   }
   return (
     <>
@@ -66,9 +88,9 @@ export default async function SingleBusiness({ params }: { params: { slug: strin
           <div className="col-span-6 lg:col-span-4 bg-white px-[2.4rem] py-[3rem] rounded-smd drop-shadow-md lg:mb-[3rem]">
             <div className="space-y-[4rem]">
               {/**
-             *
-             * TOP SECTIONS
-             */}
+           *
+           * TOP SECTIONS
+           */}
               <TopSection />
               <FeaturedCustomer />
               <CustomerFeedback />
@@ -102,5 +124,5 @@ export default async function SingleBusiness({ params }: { params: { slug: strin
         </div>
       </div>
     </>
-  );
+  )
 }

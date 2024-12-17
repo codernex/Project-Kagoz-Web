@@ -13,8 +13,8 @@ export default function BusinessDashboard() {
   const { data: business } = useGetBusinessBySlugQuery(slug, {
     skip: slug === 'null'
   })
-  const { data: reviews } = useGetReviewQuery(slug)
   const { data: totalPageViews } = useGetTotalPageViewsQuery(slug)
+  const { data: reviews } = useGetReviewQuery(slug)
   const { data: dailyPageViews } = useGetDailyPageViewsQuery(slug)
 
   if (!data?.length) {
