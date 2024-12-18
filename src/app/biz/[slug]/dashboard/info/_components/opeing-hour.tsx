@@ -115,7 +115,7 @@ export const OpeningHour = () => {
                             control={form.control}
                             render={({ field }) => {
                                 return (
-                                    <FormItem className=" flex items-center gap-10">
+                                    <FormItem className=" flex items-center gap-10 flex-wrap border-b border-b-[#ededed] py-6">
                                         <span className="w-32">{day}</span>
                                         <FormField
                                             render={({ field }) => {
@@ -136,8 +136,8 @@ export const OpeningHour = () => {
                                                         {
                                                             form.watch(`days.${index}.timeRanges`).map((_, i) => {
                                                                 return (
-                                                                    <div key={i} className="flex items-center gap-8">
-                                                                        <div className="flex gap-6">
+                                                                    <div key={i} className="flex flex-wrap items-center gap-8">
+                                                                        <div className="flex flex-wrap gap-6">
                                                                             <FormField
                                                                                 name={`days.${index}.timeRanges.${i}.from`}
                                                                                 control={form.control}

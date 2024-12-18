@@ -32,7 +32,7 @@ export const BusinessFacilities = () => {
     return (
         <div className="text-black shadow-md py-[3rem] px-[2.4rem] rounded-smd">
             <h2 className="font-bold text-mdx mb-[2.4rem]">Business Facilities</h2>
-            <div className="grid grid-cols-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-6">
                 {
                     facilities?.map(f => {
                         const isExist = data?.facilities.find(fa => fa.id === f.id)

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,15 +7,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { useSwitchBusinessModal } from "@/hooks/switchBusinessModal";
+import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 import { cn } from "@/lib/utils";
-import { useGetBusinessBySlugQuery } from "@/redux/api/business";
+import { useGetBusinessByCurrentUserQuery, useGetBusinessBySlugQuery } from "@/redux/api/business";
 import { motion } from "framer-motion";
 import {
   ArrowLeftRight,
+  ChevronRightIcon,
   LogOutIcon,
   Menu,
   Settings2,
+  SquareArrowOutUpRight,
   ToggleRight,
   User2Icon
 } from "lucide-react";
@@ -22,21 +25,19 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useDynamicNavLink } from "./dynamic-nav";
+import { useMemorizedPath } from "@/hooks/memorizeCurrentPath";
 const MobileBusinessSidebar: React.FC = () => {
   /**
    * States
    */
-  const { setOpen } = useSwitchBusinessModal()
-  const params = useParams() as { slug: string }
+  const { setOpen } = useAddBusinessModal()
   const [isOpen, setIsOpen] = useState(false);
   const path = usePathname();
   const { logout } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const { dynamicNavLinks, setSelectedSlug } = useDynamicNavLink()
-  const {
-    data
-  } = useGetBusinessBySlugQuery(params.slug, { skip: params.slug === 'null' })
-
+  const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink()
+  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined);
+  const memorizePath = useMemorizedPath(path)
   /**
    * Life Cycle Hook
    */
@@ -46,8 +47,9 @@ const MobileBusinessSidebar: React.FC = () => {
       document.body.style.overflow = "scroll";
     };
   }, [isOpen]);
-  
-  
+
+
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -64,11 +66,18 @@ const MobileBusinessSidebar: React.FC = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen]);
+  const { isAuth } = useAuth()
+
+  useEffect(() => {
+    if (isAuth) {
+      refetch()
+    }
+  }, [isAuth, refetch])
 
   return (
     <nav
       className={cn(
-        " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem]  bg-white lg:z-[999]",
+        " py-4 flex justify-between sticky top-0 w-full shadow-md h-[8rem]  bg-white z-[99] lg:z-[999]",
       )}
     >
       <div className="container relative flex items-center justify-between w-full">
@@ -135,14 +144,34 @@ const MobileBusinessSidebar: React.FC = () => {
                 </div> */}
         <div className="h-full px-3 overflow-y-auto ">
           <div className="relative space-y-4">
-            <div className="w-[90%]">
-              <h2 className="font-bold text-black text-mdx">{data?.name}</h2>
-              <p className="text-xsm text-muted">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-              </p>
+            <div className="w-[90%] py-10">
+              {business?.map((b) => {
+                return (
+                  <Link
+                    key={b.id}
+                    href={`/biz/${b.slug}/dashboard/${memorizePath}`}
+                    onClick={() => setSelectedSlug(b.slug)}
+                    className={
+                      cn(
+                        "font-bold !text-black text-smd flex items-center justify-between border-b border-[#e4e4e4] last:border-none py-2",
+
+                        path.includes(b.slug) ? 'bg-[#ededed]' : ''
+                      )
+                    }
+                  >
+                    {b?.name}
+                    <ChevronRightIcon />
+                  </Link>
+                );
+              })}
             </div>
-            <div className="absolute top-0 right-0 cursor-pointer text-secondary" onClick={() => setOpen(true)} >
-              <ArrowLeftRight />
+            <div
+              className="absolute top-0 right-0 cursor-pointer text-secondary"
+              onClick={() => {
+                window.open(window.location.origin + `/business/${selectedSlug}`)
+              }}
+            >
+              <SquareArrowOutUpRight />
             </div>
           </div>
           <hr className="border-[#ededed] mt-6 mb-3" />
@@ -165,6 +194,13 @@ const MobileBusinessSidebar: React.FC = () => {
               );
             })}
           </ul>
+          <hr className="border-[#ededed] mt-6 mb-3" />
+          <Button onClick={() => {
+            setOpen(true)
+            setIsOpen(false)
+          }} variant={'outline'} className="text-black border-black rounded-xs">
+            Add Business
+          </Button>
         </div>
       </motion.div>
 

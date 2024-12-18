@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /cgi-bin/
+Disallow: /biz/*
+Disallow: /trackback/
+Disallow: /feed/
+Disallow: /comments/
+Disallow: /category/
+Disallow: /tag/
+Disallow: /author/
+Disallow: /?s=
+Disallow: /?p=
+Sitemap: https://example.com/sitemap.xml

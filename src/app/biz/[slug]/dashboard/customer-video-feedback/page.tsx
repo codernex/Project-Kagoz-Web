@@ -121,7 +121,7 @@ export default function CustomerVideoFeedback() {
         </DialogContent>
       </Dialog>
 
-      <div className="grid grid-cols-4 gap-10 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mt-6">
         {
           videos?.map(video => {
             return (

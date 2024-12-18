@@ -44,7 +44,12 @@ export const Sidebar = () => {
                   key={b.id}
                   href={`/biz/${b.slug}/dashboard/${memorizePath}`}
                   onClick={() => setSelectedSlug(b.slug)}
-                  className="font-bold text-black text-smd flex items-center justify-between border-b border-[#e4e4e4] last:border-none py-2"
+                  className={
+                    cn(
+                      "font-bold !text-black text-smd flex items-center justify-between border-b border-[#e4e4e4] last:border-none py-2",
+                      path.includes(b.slug) ? 'bg-[#ededed]' : ''
+                    )
+                  }
                 >
                   {b?.name}
                   <ChevronRightIcon />

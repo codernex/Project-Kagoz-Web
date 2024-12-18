@@ -19,7 +19,7 @@ export const PremiumWarning: React.FC<IPremiumProps> = ({
     }
     return (
         <div className="">
-            <div className="bg-primary text-white rounded-sm items-center justify-between px-8 py-6 flex">
+            <div className="bg-primary text-white rounded-sm items-center justify-between px-8 py-6 flex flex-wrap">
                 <div className=" flex items-center space-x-6">
                     <InfoIcon />
                     <h2 className=" font-semibold text-white">

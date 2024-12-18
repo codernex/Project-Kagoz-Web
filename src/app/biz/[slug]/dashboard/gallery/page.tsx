@@ -1,6 +1,5 @@
 "use client"
 
-import { PremiumWarning } from "@/app/biz/_components/premium-warning";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -44,10 +43,9 @@ export default function Gallery() {
   }
 
   console.log(data);
-  
+
   return (
     <div>
-      <PremiumWarning hasPremium={hasPremium} />
       <div className="flex items-center justify-between py-6">
         <div className="flex items-center space-x-2 ">
           <h1 className="font-bold text-black text-mdx">Photo Gallery</h1>
@@ -69,14 +67,14 @@ export default function Gallery() {
       <hr className="border-[#ededed]" />
 
       {data?.length ? (
-        <div className="grid grid-cols-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-6 gap-8">
           {data.map((file, index) => {
             return (
               <div
                 key={index}
-                className="max-w-[20rem] rounded-xs overflow-hidden"
+                className="w-full rounded-xs overflow-hidden relative h-[20rem]"
               >
-                <Image width={200} height={200} src={appendApi(file.url)} alt="h" />
+                <Image className="object-fill" fill src={appendApi(file.url)} alt="h" />
               </div>
             );
           })}
