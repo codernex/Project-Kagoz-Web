@@ -184,6 +184,12 @@ const business = baseApi.injectEndpoints({
         url: `/business/${slug}/page-views/daily`,
       }),
     }),
+    getSiteFaq: builder.query<IBusiness["faqs"][], void>({
+      query: () => ({
+        url: "/faq",
+      }),
+      providesTags: ["Faq"],
+    }),
   }),
 });
 
@@ -205,4 +211,5 @@ export const {
   useHasLikedBusinessQuery,
   useGetTotalPageViewsQuery,
   useGetDailyPageViewsQuery,
+  useGetSiteFaqQuery,
 } = business;

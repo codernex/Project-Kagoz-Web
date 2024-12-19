@@ -1,8 +1,11 @@
+"use client"
 import Faq from "@/components/shared/faq";
 import { Button } from "@/components/ui/button";
+import { useGetSiteFaqQuery } from "@/redux/api";
 import Link from "next/link";
 
 export default function FAQ() {
+  const { data } = useGetSiteFaqQuery()
   return (
     <section className="bg-white section section_padding">
       <div className="container">
@@ -28,7 +31,7 @@ export default function FAQ() {
           </div>
 
           <div className="md:w-1/2 w-full rounded-[2.2rem] bg-bgPrimaryShade py-[1.6rem] md:py-[6.2rem] md:px-[4.8rem]">
-            <Faq />
+            <Faq faqs={data?.slice(0,5)} />
           </div>
         </div>
       </div>
