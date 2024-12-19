@@ -29,7 +29,7 @@ export function BusinessDashboard() {
     }
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-10">
             <Stats title="Like" number={business?.likes || 0} Icon={HeartIcon} />
             <Stats title="Reviews" number={reviews?.length || 0} Icon={StarIcon} />
             <Stats title="Unique Page Views" number={dailyPageViews || 0} Icon={ChartColumn} />

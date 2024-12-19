@@ -8,24 +8,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { useAddBusinessModal } from "@/hooks/addBusinessModal";
-import { cn } from "@/lib/utils";
-import { useGetBusinessByCurrentUserQuery, useGetBusinessBySlugQuery } from "@/redux/api/business";
+import { useMemorizedPath } from "@/hooks/memorizeCurrentPath";
+import { appendApi, cn } from "@/lib/utils";
+import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
 import { motion } from "framer-motion";
 import {
-  ArrowLeftRight,
   ChevronRightIcon,
   LogOutIcon,
   Menu,
   Settings2,
   SquareArrowOutUpRight,
-  ToggleRight,
   User2Icon
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { useDynamicNavLink } from "./dynamic-nav";
-import { useMemorizedPath } from "@/hooks/memorizeCurrentPath";
+import { userUserProfile } from "@/hooks/userProfileModal";
+import Image from "next/image";
 const MobileBusinessSidebar: React.FC = () => {
   /**
    * States
@@ -38,6 +38,7 @@ const MobileBusinessSidebar: React.FC = () => {
   const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink()
   const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined);
   const memorizePath = useMemorizedPath(path)
+  const { setOpen: setOpenUserProfile } = userUserProfile()
   /**
    * Life Cycle Hook
    */
@@ -47,8 +48,6 @@ const MobileBusinessSidebar: React.FC = () => {
       document.body.style.overflow = "scroll";
     };
   }, [isOpen]);
-
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -66,7 +65,7 @@ const MobileBusinessSidebar: React.FC = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen]);
-  const { isAuth } = useAuth()
+  const { isAuth, user } = useAuth()
 
   useEffect(() => {
     if (isAuth) {
@@ -102,18 +101,19 @@ const MobileBusinessSidebar: React.FC = () => {
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="w-[5rem] h-[5rem] rounded-full flex items-center justify-center bg-[#F0F0F0] cursor-pointer">
-              <User2Icon size={30} className="text-muted" />
+              {
+                user?.imageUrl ? (
+                  <div className="rounded-full overflow-hidden">
+                    <Image src={appendApi(user.imageUrl)} height={60} width={60} alt='' />
+                  </div>
+                ) : <User2Icon size={30} className="text-muted" />
+              }
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-[25rem] rounded-[.6rem] border-none px-sm py-xs text-black space-y-2">
-            <DropdownMenuItem className="hover:bg-[#F0F0F0] rounded-[.6rem] cursor-pointer pl-4 py-3 space-x-3 font-semibold items-center flex">
+            <DropdownMenuItem onClick={() => setOpenUserProfile(true, user)} className="hover:bg-[#F0F0F0] rounded-[.6rem] cursor-pointer pl-4 py-3 space-x-3 font-semibold items-center flex">
               <Settings2 />
               <span>Account Settings</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem className="hover:bg-[#F0F0F0] rounded-[.6rem] cursor-pointer pl-4 py-3 space-x-3 font-semibold items-center flex">
-              <ToggleRight />
-              <span>Test</span>
             </DropdownMenuItem>
             <hr className="border-[#ededed]" />
 

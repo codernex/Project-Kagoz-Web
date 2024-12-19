@@ -54,7 +54,11 @@ export function TopSection() {
                                 <h3 className="text-md lg:text-[3.2rem] xl:text-lg font-bold leading-md text-black">
                                     {data?.name}
                                 </h3>
-                                <VerifiedBadge className="absolute -top-4 -right-8" />
+                                {
+                                    data?.isTrusted ? (
+                                        <VerifiedBadge className="absolute -top-4 -right-8" />
+                                    ) : null
+                                }
                             </div>
                             <div className="flex space-x-1 items-center py-2">
                                 <Clock3
@@ -99,12 +103,14 @@ export function TopSection() {
                                 </p>
                             </div>
                             <div className="flex flex-col lg:flex-row lg:items-center py-[1.4rem] gap-x-[4rem] gap-y-[1rem]">
-                                <div className="flex space-x-1 items-center">
-                                    <VerfiedLisence width="16" height="16" />
-                                    <p className="text-verifiedColor text-sm font-semibold">
-                                        Verified License
-                                    </p>
-                                </div>
+                                {
+                                    data?.isVerified ? <div className="flex space-x-1 items-center">
+                                        <VerfiedLisence width="16" height="16" />
+                                        <p className="text-verifiedColor text-sm font-semibold">
+                                            Verified License
+                                        </p>
+                                    </div> : ''
+                                }
                                 <div className="flex items-center space-x-2">
                                     <span className="text-yellow-400 text-sm flex">
                                         {generateStarRating}

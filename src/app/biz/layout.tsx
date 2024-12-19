@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import AddBusiness from "./_components/add-business";
 import MobileBusinessSidebar from "./_components/mobile-sidebar";
 import { Sidebar } from "./_components/sidebar";
+import { UserProfile } from "./_components/user-profile";
 export default function BusinessDashboardLayout({
   children,
 }: React.PropsWithChildren) {
@@ -44,6 +45,7 @@ export default function BusinessDashboardLayout({
       <AddBusiness onOpenChange={
         !!data?.length
       } />
+      <UserProfile />
     </div>
   );
 }

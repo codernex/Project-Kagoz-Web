@@ -1,4 +1,6 @@
 "use client"
+import { useDynamicNavLink } from '@/app/biz/_components/dynamic-nav';
+import { useOtpVerificationModal } from '@/hooks/enableOtpVerifiactionModal';
 import { useAuthModal } from '@/hooks/loginModal';
 import { axiosInstance } from '@/redux/api';
 import { jwtDecode } from 'jwt-decode';
@@ -7,17 +9,9 @@ import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-interface User {
-    username: string;
-    id: string
-    email: string
-    role: string;
-    name: string
-    // Add any other user data you expect from the JWT or external API
-}
 
 interface AuthContextType {
-    user: User | null;
+    user: IUser | null;
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
     signUp: (d: any) => Promise<void>;
@@ -27,7 +21,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const { setOpen: setOtpOpen } = useOtpVerificationModal()
+    const [user, setUser] = useState<IUser | null>(null);
     const [isAuth, setIsAuth] = useState(false)
     const { setOpen } = useAuthModal()
     const router = useRouter()
@@ -39,7 +34,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
         if (token) {
             try {
-                const decodedUser = jwtDecode<User>(token); // Decode JWT token to get user info
+                const decodedUser = jwtDecode<IUser>(token); // Decode JWT token to get user info
                 if (decodedUser.id) {
                     setIsAuth(true)
                 }
@@ -58,14 +53,20 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                 password
             });
 
-            const { accessToken } = response.data.data
-            const decodedUser = jwtDecode<User>(accessToken);
-            cookies.set('auth_token', accessToken, {
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
-            })
-            setIsAuth(true)
-            setUser(decodedUser); // Set the user
-            setOpen()
+            const { accessToken, isVerified } = response.data.data
+            if (!isVerified) {
+                setOpen()
+                setOtpOpen({ open: true, email, endpoint: '/auth/verify' })
+            } else {
+                const decodedUser = jwtDecode<IUser>(accessToken);
+                cookies.set('auth_token', accessToken, {
+                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+                })
+                setIsAuth(true)
+                setUser(decodedUser); // Set the user
+                setOpen()
+                router.push(`/biz/null/dashboard`)
+            }
 
         } catch (error: any) {
             const message = error.response.data.message;
@@ -82,14 +83,9 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     const signUp = async (d: any) => {
         try {
             const response = await axiosInstance.post('/auth/register', d);
-            const { accessToken } = response.data.data
-            const decodedUser = jwtDecode<User>(accessToken);
-            cookies.set('auth_token', accessToken, {
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
-            })
-            setUser(decodedUser); // Set the user
-            setIsAuth(true)
+            const { email } = response.data.data
             setOpen()
+            setOtpOpen({ open: true, email, endpoint: '/auth/verify' })
         } catch (error: any) {
             const message = error.response.data.message;
             if (message instanceof Array) {

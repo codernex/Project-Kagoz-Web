@@ -31,6 +31,8 @@ interface IBusiness {
   youtube: string;
   likes: number;
   tradeLicenseUrl: string;
+  isTrusted: boolean;
+  isVerified: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,6 +59,8 @@ interface IUser {
   name: string;
   email: string;
   role: "admin" | "user";
+  imageUrl: string;
+  ownerText: string;
 }
 
 interface IPhoto {
