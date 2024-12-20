@@ -14,10 +14,10 @@ import { useMemo } from "react";
 
 interface ISearchItemProps extends IBusiness {
   index: number;
-  isOpen: boolean
 }
 
-export const SearchItem: React.FC<ISearchItemProps> = ({ index, isOpen, ...business }) => {
+export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) => {
+  const isOpen = useBusinessOpen(business?.openingHours)
   const { data: reviews } = useGetReviewQuery(business.slug)
   const averageRatings = useMemo(() => {
     if (!reviews) return 0

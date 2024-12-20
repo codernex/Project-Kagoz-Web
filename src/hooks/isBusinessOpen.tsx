@@ -30,7 +30,7 @@ export function useBusinessOpen(openingHours: OpeningHour[] | undefined) {
             }
 
             // Check if current time is within any time range
-            return todayOpeningHour.timeRanges.some((range) => {
+            return todayOpeningHour.timeRanges?.some((range) => {
                 const fromHour24 = to24Hour(parseInt(range.fromHours), range.fromPeriod);
                 const toHour24 = to24Hour(parseInt(range.toHours), range.toPeriod);
 

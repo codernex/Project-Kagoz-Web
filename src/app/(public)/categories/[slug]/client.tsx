@@ -4,7 +4,7 @@ import { BlogWidget } from "@/components/shared/blog-widget";
 import { Pagination } from "@/components/shared/pagination";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Categories } from "./_components/categories";
 import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
@@ -12,6 +12,7 @@ import { SearchItem } from "./_components/search-item";
 import { SponsoredBusiness } from "./_components/sponsored-business";
 import { useGetBusinessByQueryQuery } from "@/redux/api";
 import { Loader } from "@/components/shared/loader";
+import { NotFound } from "@/components/shared/not-found";
 
 export default function CategoriesSearchPage({ slug }: { slug: string }) {
     const [page, setPage] = useState(1)
@@ -30,9 +31,12 @@ export default function CategoriesSearchPage({ slug }: { slug: string }) {
         isClosed: avalibility === 'Now Closed',
         isTrusted: lisenceType === 'KAGOZ',
         isVerified: lisenceType === 'Verified Lisence',
-        limit: 3,
+        limit: 20,
         page
     })
+    useEffect(() => {
+        window.scrollTo(0, 0); // Scroll to the top of the page on reload
+    }, []);
 
     if (isLoading) {
         return <Loader />
@@ -79,17 +83,21 @@ export default function CategoriesSearchPage({ slug }: { slug: string }) {
 
             <section className="container py-[6rem] grid grid-cols-6 gap-x-[6rem] gap-y-[4rem]">
                 <div className="w-full col-span-6 md:col-span-4 space-y-[3rem] ">
-                    {data?.items?.map((b, index) => {
-                        return (
-                            <SearchItem
-                                key={index}
-                                index={index}
-                                {...b}
-                                id={index}
-                                isOpen={avalibility === 'Now Open'}
-                            />
-                        );
-                    })}
+                    {
+                        data?.items.length ? data?.items?.map((b, index) => {
+                            return (
+                                <SearchItem
+                                    key={index}
+                                    index={index}
+                                    {...b}
+                                    id={index}
+                                    isOpen={avalibility === 'Now Open'}
+                                />
+                            );
+                        }) : (
+                            <h2 className="text-xl font-medium">No Result Found</h2>
+                        )
+                    }
                 </div>
                 <div className="col-span-6 md:col-span-2 space-y-[4rem]">
                     <BlogWidget />

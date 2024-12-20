@@ -119,13 +119,18 @@ export function TopSection() {
                                 </div>
                             </div>
                             <div className="flex flex-wrap gap-x-[.6rem] gap-y-[.6rem]">
-                                {Array.from({ length: 5 }).map((_, index) => {
+                                <div
+                                    className="flex rounded-xl text-[1.1rem] items-center space-x-2 py-[0.4rem] px-[1rem] text-muted bg-[#6E67771A] border border-[#6E677733]"
+                                >
+                                    <span>{data?.primaryCategory?.name}</span>
+                                </div>
+                                {data.subcategories.map((c, index) => {
                                     return (
                                         <div
                                             key={index}
                                             className="flex rounded-xl text-[1.1rem] items-center space-x-2 py-[0.4rem] px-[1rem] text-muted bg-[#6E67771A] border border-[#6E677733]"
                                         >
-                                            <span>Roofing</span>
+                                            <span>{c.name}</span>
                                         </div>
                                     );
                                 })}
