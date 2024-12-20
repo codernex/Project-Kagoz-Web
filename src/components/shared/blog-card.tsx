@@ -2,16 +2,18 @@ import Image from "next/image";
 import { Card, CardContent } from "../ui/card";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { appendApi, trimToWordCount } from "@/lib/utils";
+import { format } from "date-fns";
 
-export default function BlogCard() {
+export default function BlogCard({ post }: { post: IBlog }) {
   return (
     <Card className="border-none rounded-smd !p-[1.2rem]">
       <CardContent className="p-0 space-y-[1.6rem]">
         <div className="w-full h-full min-h-[20rem] relative">
           <Image
-            src="/images/blog.png"
+            src={appendApi(post.imageUrl)}
             className="object-cover rounded-sm"
-            alt="blog"
+            alt={post.title}
             fill
           />
         </div>
@@ -46,21 +48,25 @@ export default function BlogCard() {
                   </clipPath>
                 </defs>
               </svg>
-              <p className="text-black font-normal">03 Jun 2024</p>
+              <p className="text-black font-normal">{format(post.createdAt, 'd MMM yyy')}</p>
             </div>
-            <Link href={"/"} className="text-black">
+            <Link target="_blank" rel="nofollow" href={post.url} className="text-black">
               <h2 className="text-[2.1rem] font-bold">
-                How to design your site foot...
+                {
+                  trimToWordCount(post.title, 6)
+                }
               </h2>
             </Link>
           </div>
           <div className="space-y-[.8rem]">
             <p className="text-muted text-sm leading-md">
-              Turn your ideas into a thriving startup with our expert guidance.
+              {trimToWordCount(post.content, 10)}
             </p>
             <Link
+              target="_blank"
+              rel="nofollow"
               className="flex items-center font-medium space-x-[.8rem]"
-              href={"/"}
+              href={post.url}
             >
               Read More <ChevronRight />
             </Link>

@@ -1,20 +1,24 @@
 "use client";
+import { appendApi, trimToWordCount } from "@/lib/utils";
+import { useGetPostsQuery } from "@/redux/api";
+import { format } from "date-fns";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export const BlogWidget = () => {
+  const { data } = useGetPostsQuery()
   return (
     <div>
       <h2 className="text-md md:text-[2.8rem] font-semibold pb-[2.4rem] text-black">
         Recent Blogs
       </h2>
       <div className="space-y-[4rem]">
-        {Array.from({ length: 5 }).map((_, index) => (
+        {data?.map((post, index) => (
           <div key={index} className="flex space-x-[2rem]">
             <div className="w-[15rem] h-[8rem] relative rounded-[.8rem] overflow-hidden">
               <Image
-                src={"/images/blog.png"}
+                src={appendApi(post.imageUrl)}
                 objectFit="cover"
                 fill
                 alt={"Blog"}
@@ -38,15 +42,15 @@ export const BlogWidget = () => {
                     fill="#6F00FF"
                   />
                 </svg>
-                <span className="text-muted">03 Jun 2024</span>
+                <span className="text-muted">{format(post.createdAt, 'd MMM yyy')}</span>
               </div>
               <h2 className="text-xsm md:text-[2rem] text-black font-bold">
-                Where to grow your business as a photographer: site or social
-                media?
+                {trimToWordCount(post.content, 10)}
               </h2>
               <Link
                 rel="nofollow"
-                href={"/"}
+                href={post.url}
+                target="_blank"
                 className="flex items-center mt-4 text-xsm md:text-sm"
               >
                 Read More <ChevronRight />

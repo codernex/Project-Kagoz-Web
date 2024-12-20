@@ -6,3 +6,4 @@ export * from "./payments";
 export * from "./featuredOffer";
 export * from "./facilities";
 export * from "./reviews";
+export * from "./posts";

@@ -1,38 +1,66 @@
 import { useStarRatings } from "@/hooks/generate-star-ratings";
+import { useBusinessOpen } from "@/hooks/isBusinessOpen";
+import { appendApi, cn } from "@/lib/utils";
+import { useGetReviewQuery } from "@/redux/api";
+import { differenceInDays, differenceInYears } from "date-fns";
+import { Clock3 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
 import { Calendar } from "../svgs/calendar";
-import Clock from "../svgs/clock";
 import VerifiedBadge from "../svgs/verifed";
 import VerfiedLisence from "../svgs/verified-lisence";
 import { Button } from "./button";
 
-export const SponsoredBusinessItem: React.FC = ({}) => {
-  const generateStarRating = useStarRatings(4.5);
+type SponsoredBusinessItemProps = {
+  business: IBusiness
+}
+
+export const SponsoredBusinessItem: React.FC<SponsoredBusinessItemProps> = ({
+  business
+}) => {
+  const isOpen = useBusinessOpen(business?.openingHours)
+  const { data: reviews } = useGetReviewQuery(business.slug)
+  const averageRatings = useMemo(() => {
+    if (!reviews) return 0
+    return reviews?.reduce((a, b) => a + parseFloat(b.rating), 0) / reviews?.length || 0
+  }, [reviews])
+  const generateStarRating = useStarRatings(averageRatings, 20);
   return (
     <div className="p-[1.2rem] md:p-[2.4rem] shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem] bg-white">
-      <div className="flex space-x-[2rem] justify-between lg:space-x-[1rem] xl:space-x-[1rem] 2xl:space-x-[2rem]">
+      <div className="flex gap-x-[1rem] justify-between lg:gap-x-[1rem] xl:gap-x-[1rem] 2xl:gap-x-[2rem]">
         <div className="!w-[10rem] !h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
           <div className="relative !w-full h-full">
             <Image
-              src={"/images/featured_brand.png"}
-              alt="Featured Brand"
+              src={appendApi(business.logoUrl)}
+              alt={business.name}
               className="rounded-xs w-full"
               fill
             />
           </div>
         </div>
-        <div>
+        <div className="flex flex-col">
           <div className="relative w-fit">
             <h3 className="text-smd lg:text-md font-bold leading-md text-black">
-              {"McDonald's"}
+              {business.name}
             </h3>
-            <VerifiedBadge className="absolute top-0 -right-8" />
+            {business.isTrusted ? <VerifiedBadge className="absolute top-0 -right-8" /> : ''}
           </div>
           <div className="flex space-x-1 items-center py-2">
-            <Clock width="16" height="16" />
-            <p className="text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold">
-              Open Now
+            <Clock3
+              size={18}
+              className={cn(
+                "fill-secondary text-white",
+                !isOpen ? "fill-[#FA5151]" : "fill-secondary",
+              )}
+            />
+            <p
+              className={cn(
+                "text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold",
+                !isOpen ? "text-[#FA5151]" : "",
+              )}
+            >
+              {isOpen ? "Open Now" : "Closed"}
             </p>
           </div>
           <div className="flex flex-wrap md:space-x-[3rem]">
@@ -53,81 +81,80 @@ export const SponsoredBusinessItem: React.FC = ({}) => {
                   fill="#6E6777"
                 />
               </svg>
-              <span>12 years in business</span>
+              <span>{differenceInYears(new Date(), business.startingDate)} years in business</span>
             </p>
             <p className="text-xs text-muted flex space-x-[0.8rem]">
               <Calendar />
-              <span>6 Month with KAGOZ</span>
+              <span>{Math.round(differenceInDays(new Date(), business.createdAt) / 30)} Month with KAGOZ</span>
             </p>
           </div>
           <div className="flex flex-col py-[1rem]">
-            <div className="flex space-x-1 items-center">
-              <VerfiedLisence width="16" height="16" />
-              <p className="text-verifiedColor text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold">
-                Verified License
-              </p>
-            </div>
+            {
+              business?.isVerified ? <div className="flex space-x-1 items-center">
+                <VerfiedLisence width="16" height="16" />
+                <p className="text-verifiedColor text-sm font-semibold">
+                  Verified License
+                </p>
+              </div> : ''
+            }
           </div>
 
           <div className="flex items-center pb-[1rem] space-x-2">
             <span className="text-yellow-400 text-sm flex">
               {generateStarRating}
             </span>
-            <p className="text-xs text-muted">4.8 (34)</p>
+            <p className="text-sm text-muted">{averageRatings} ({reviews?.length})</p>
           </div>
         </div>
       </div>
       <p className="text-xsm lg:text-sm text-muted">
-        Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce
-        dignissim luctus sem eu dapibus.
+        {business.about}
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:grid-cols-4">
-        <Image
-          src={"/images/blog.png"}
-          alt="Business Image"
-          className="w-[10rem] h-[8rem] rounded-[.6rem]"
-          width={100}
-          height={80}
-        />
-        <Image
-          src={"/images/blog.png"}
-          alt="Business Image"
-          className="w-[10rem] h-[8rem] rounded-[.6rem]"
-          width={100}
-          height={80}
-        />
-        <Image
-          src={"/images/blog.png"}
-          alt="Business Image"
-          className="w-[10rem] h-[8rem] rounded-[.6rem]"
-          width={100}
-          height={80}
-        />
-        <div className="w-[10rem] h-[8rem] rounded-sm z-10 relative">
-          <div className="bg-[#00000099]  w-full h-full absolute top-0 left-0 text-white text-md rounded-[.6rem] flex items-center justify-center">
-            12+
-          </div>
-          <Image
-            src={"/images/blog.png"}
-            alt="Business Image"
-            className="w-[10rem] h-[8rem]"
-            width={100}
-            height={80}
-          />
-        </div>
+        {
+          business.photos?.slice(0, 3)?.map((p) => {
+            return (
+              <Image
+                key={p.id}
+                src={appendApi(p.url)}
+                alt="Business Image"
+                className="w-[10rem] h-[8rem] rounded-[.6rem] object-cover"
+                width={100}
+                height={80}
+              />
+            )
+          })
+        }
+        {
+          business.photos?.slice(3).length ? (
+            <div className="w-[10rem] h-[8rem] rounded-sm z-10 relative">
+              <div className="bg-[#00000099]  w-full h-full absolute top-0 left-0 text-white text-md rounded-[.6rem] flex items-center justify-center">
+                {business.photos?.slice(3).length}+
+              </div>
+              <Image
+                src={appendApi(business.photos[4]?.url ?? '')}
+                alt="Business Image"
+                className="w-[10rem] h-[8rem]"
+                width={100}
+                height={80}
+              />
+            </div>
+          ) : null
+        }
       </div>
 
       <div className="flex gap-x-[2rem]">
-        <Button className="bg-transparent text-primary rounded-sm md:rounded-xl md:py-[1.2rem]">
-          View Details
+        <Button asChild className="bg-transparent text-primary rounded-xl py-[1.2rem] text-center">
+          <Link href={`/business/${business.slug}`}>
+            View Details</Link>
         </Button>
 
         <Button
           asChild
-          className="border border-primary rounded-sm md:rounded-xl  md:py-[1.2rem]"
+          className="border border-primary rounded-xl py-[1.2rem]"
         >
-          <Link rel="nofollow" href={"tel:1234567890"} className="text-center">
+          <Link rel="nofollow" href={`tel:${business.mobile}`} className="text-center">
             Call Now
           </Link>
         </Button>

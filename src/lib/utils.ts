@@ -31,3 +31,14 @@ export function extractYouTubeVideoId(url: string): string {
 }
 
 export const TK_SYMBOL = "৳";
+
+export function trimToWordCount(str: string, wordCount: number) {
+  // Split the string into words
+  const words = str.split(" ");
+
+  // Slice the array to get the first 'wordCount' words
+  const trimmedWords = words.slice(0, wordCount);
+
+  // Join the words back into a string
+  return trimmedWords.join(" ")+'...';
+}

@@ -10,17 +10,33 @@ import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
 import { SearchItem } from "./_components/search-item";
 import { SponsoredBusiness } from "./_components/sponsored-business";
+import { useGetBusinessByQueryQuery } from "@/redux/api";
+import { Loader } from "@/components/shared/loader";
 
 export default function CategoriesSearchPage({ slug }: { slug: string }) {
+    const [page, setPage] = useState(1)
     const [activeSearchType, setActiveSearchType] = useState<
         "Category" | "Business"
     >("Category");
-    const [lisenceType, setLisenceType] = useState<"KAGOZ" | "Verified Lisence">(
-        "KAGOZ",
+    const [lisenceType, setLisenceType] = useState<"KAGOZ" | "Verified Lisence" | "None">(
+        "None",
     );
     const [avalibility, setAvalibility] = useState<"Now Open" | "Now Closed">(
         "Now Open",
     );
+    const { data, isLoading } = useGetBusinessByQueryQuery({
+        category: slug,
+        isOpen: avalibility === 'Now Open',
+        isClosed: avalibility === 'Now Closed',
+        isTrusted: lisenceType === 'KAGOZ',
+        isVerified: lisenceType === 'Verified Lisence',
+        limit: 3,
+        page
+    })
+
+    if (isLoading) {
+        return <Loader />
+    }
     return (
         <main>
             <section className="container">
@@ -63,14 +79,14 @@ export default function CategoriesSearchPage({ slug }: { slug: string }) {
 
             <section className="container py-[6rem] grid grid-cols-6 gap-x-[6rem] gap-y-[4rem]">
                 <div className="w-full col-span-6 md:col-span-4 space-y-[3rem] ">
-                    {Array.from({ length: 10 }).map((b: IBusiness, index) => {
+                    {data?.items?.map((b, index) => {
                         return (
                             <SearchItem
                                 key={index}
                                 index={index}
                                 {...b}
                                 id={index}
-                                isOpen={index % 2 === 0}
+                                isOpen={avalibility === 'Now Open'}
                             />
                         );
                     })}
@@ -84,7 +100,7 @@ export default function CategoriesSearchPage({ slug }: { slug: string }) {
             <section className="bg-bgPrimaryShade border border-borderColor">
                 <SponsoredBusiness />
             </section>
-            <Pagination />
+            <Pagination currentPage={data?.currentPage ?? 1} totalPages={data?.totalPages ?? 0} page={page} setPage={setPage} />
 
             <section className="py-[6rem] lg:py-[10rem] bg-[#00000005]">
                 <div className="container ">

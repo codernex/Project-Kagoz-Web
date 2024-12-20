@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -5,8 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import FilterWrapper from "./filter-wrapper";
 
 interface MobileFilterProps {
@@ -15,12 +14,12 @@ interface MobileFilterProps {
     React.SetStateAction<"Business" | "Category">
   >;
   setLisenceType: React.Dispatch<
-    React.SetStateAction<"KAGOZ" | "Verified Lisence">
+    React.SetStateAction<"KAGOZ" | "Verified Lisence" | "None">
   >;
   setAvalibility: React.Dispatch<
     React.SetStateAction<"Now Open" | "Now Closed">
   >;
-  lisenceType: "KAGOZ" | "Verified Lisence";
+  lisenceType: "KAGOZ" | "Verified Lisence" | "None";
   avalibility: "Now Open" | "Now Closed";
 }
 
@@ -53,7 +52,7 @@ export const OtherFilter: React.FC<MobileFilterProps> = ({
 }) => {
   return (
     <div className="hidden md:flex py-[3rem] flex-wrap md:space-x-0 gap-x-4 gap-y-6">
-      <FilterWrapper title="Search Type">
+      {/* <FilterWrapper title="Search Type">
         <button
           className={cn(
             "px-[2rem] py-[1.2rem]  text-muted rounded-full",
@@ -70,14 +69,18 @@ export const OtherFilter: React.FC<MobileFilterProps> = ({
         >
           Business
         </button>
-      </FilterWrapper>
+      </FilterWrapper> */}
       <FilterWrapper title="Licensed & Trusted">
         <div className="flex items-center py-[1.2rem] px-[2rem] text-muted space-x-2">
           <Checkbox
             className="w-8 h-8 rounded-[.4rem] border-muted"
             checked={lisenceType === "KAGOZ"}
             onCheckedChange={(e) => {
-              setLisenceType("KAGOZ");
+              if (lisenceType === "None") {
+                setLisenceType("KAGOZ")
+              } else {
+                setLisenceType("None")
+              };
             }}
           />
           <p>Trusted By KAGOZ</p>
@@ -87,7 +90,11 @@ export const OtherFilter: React.FC<MobileFilterProps> = ({
             className="w-8 h-8 rounded-[.4rem] border border-muted"
             checked={lisenceType === "Verified Lisence"}
             onCheckedChange={(e) => {
-              setLisenceType("Verified Lisence");
+              if (lisenceType === "None") {
+                setLisenceType("Verified Lisence")
+              } else {
+                setLisenceType("None")
+              };
             }}
           />
           <p>Verified License</p>

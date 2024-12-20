@@ -1,8 +1,11 @@
+"use client"
 import BlogCard from "@/components/shared/blog-card";
 import { Button } from "@/components/ui/button";
+import { useGetPostsQuery } from "@/redux/api";
 import Link from "next/link";
 
 export default function Blog() {
+  const { data } = useGetPostsQuery()
   return (
     <section id="blog" className="section_padding bg-bgPrimaryShade">
       <div className="container space-y-[6rem]">
@@ -15,8 +18,8 @@ export default function Blog() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[4rem]">
-          {Array.from({ length: 4 }).map((_, index) => {
-            return <BlogCard key={index} />;
+          {data?.map((post, index) => {
+            return <BlogCard key={index} post={post} />;
           })}
         </div>
         <div className="flex justify-center">

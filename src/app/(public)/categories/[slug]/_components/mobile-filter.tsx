@@ -4,7 +4,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import {
   Select,
   SelectTrigger,
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { FilterIcon } from "lucide-react";
 import FilterWrapper from "./filter-wrapper";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface MobileFilterProps {
   activeSearchType: "Business" | "Category";
@@ -21,12 +21,12 @@ interface MobileFilterProps {
     React.SetStateAction<"Business" | "Category">
   >;
   setLisenceType: React.Dispatch<
-    React.SetStateAction<"KAGOZ" | "Verified Lisence">
+    React.SetStateAction<"KAGOZ" | "Verified Lisence" | "None">
   >;
   setAvalibility: React.Dispatch<
     React.SetStateAction<"Now Open" | "Now Closed">
   >;
-  lisenceType: "KAGOZ" | "Verified Lisence";
+  lisenceType: "KAGOZ" | "Verified Lisence" | "None";
   avalibility: "Now Open" | "Now Closed";
 }
 
@@ -50,8 +50,6 @@ const sortBy = [
 ];
 
 export const MobileFilter: React.FC<MobileFilterProps> = ({
-  activeSearchType,
-  setActiveSearchType,
   lisenceType,
   setLisenceType,
   setAvalibility,
@@ -67,31 +65,17 @@ export const MobileFilter: React.FC<MobileFilterProps> = ({
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-full min-w-[32rem] py-6 space-y-6 md:hidden px-4">
-          <FilterWrapper title="Search Type">
-            <button
-              className={cn(
-                "px-[1rem] py-[.8rem]  text-muted rounded-full",
-                activeSearchType === "Category" ? "bg-primary text-white" : "",
-              )}
-            >
-              Categories
-            </button>
-            <button
-              className={cn(
-                "px-[1rem] py-[.8rem]  text-muted rounded-full",
-                activeSearchType === "Business" ? "bg-primary text-white" : "",
-              )}
-            >
-              Business
-            </button>
-          </FilterWrapper>
           <FilterWrapper title="Licensed & Trusted">
             <div className="flex items-center px-[1rem] py-[.6rem] text-muted space-x-2">
               <Checkbox
                 className="w-8 h-8 rounded-[.4rem] border-muted"
                 checked={lisenceType === "KAGOZ"}
                 onCheckedChange={(e) => {
-                  setLisenceType("KAGOZ");
+                  if (lisenceType === "None") {
+                    setLisenceType("KAGOZ")
+                  } else {
+                    setLisenceType("None")
+                  };
                 }}
               />
               <p>Trusted By KAGOZ</p>
@@ -101,7 +85,11 @@ export const MobileFilter: React.FC<MobileFilterProps> = ({
                 className="w-8 h-8 rounded-[.4rem] border border-muted"
                 checked={lisenceType === "Verified Lisence"}
                 onCheckedChange={(e) => {
-                  setLisenceType("Verified Lisence");
+                  if (lisenceType === "None") {
+                    setLisenceType("Verified Lisence")
+                  } else {
+                    setLisenceType("None")
+                  };
                 }}
               />
               <p>Verified License</p>

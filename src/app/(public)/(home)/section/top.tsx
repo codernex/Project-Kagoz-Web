@@ -9,7 +9,7 @@ import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { appendApi, cn } from "@/lib/utils";
 import { useGetBusinessBySlugQuery, useGetReviewQuery, useHasLikedBusinessQuery, useLikeBusinessMutation } from "@/redux/api";
-import { differenceInYears } from 'date-fns';
+import { differenceInDays, differenceInYears } from 'date-fns';
 import { Clock3, Heart, PlayIcon, Share2Icon, Star } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -99,7 +99,7 @@ export function TopSection() {
                                 </p>
                                 <p className="text-sm text-muted flex items-center space-x-[0.8rem]">
                                     <Calendar />
-                                    <span>{differenceInYears(new Date(), data.createdAt)} Month with KAGOZ</span>
+                                    <span>{Math.round(differenceInDays(new Date(), data.createdAt) / 30)} Month with KAGOZ</span>
                                 </p>
                             </div>
                             <div className="flex flex-col lg:flex-row lg:items-center py-[1.4rem] gap-x-[4rem] gap-y-[1rem]">

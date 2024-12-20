@@ -15,6 +15,7 @@ interface IBusiness {
   primaryCategory: ICategory;
   subcategories: ICategory[];
   facilities: IFacility[];
+  photos: IPhoto[];
   faqs: {
     id: number;
     question: string;
@@ -110,4 +111,14 @@ interface IReview {
   imageUrl: string;
   rating: string;
   createdAt: string;
+}
+
+interface IBlog {
+  id: number;
+  title: string;
+  content: string;
+  imageUrl: string;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -1,20 +1,31 @@
 "use client";
-import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { Calendar } from "@/components/svgs/calendar";
-import Clock from "@/components/svgs/clock";
 import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
+import { useStarRatings } from "@/hooks/generate-star-ratings";
+import { useBusinessOpen } from "@/hooks/isBusinessOpen";
+import { appendApi, cn } from "@/lib/utils";
+import { useGetReviewQuery } from "@/redux/api";
+import { differenceInDays, differenceInYears } from "date-fns";
+import { Clock3 } from "lucide-react";
 import Image from "next/image";
+import { useMemo } from "react";
 
-const FeaturedItem = () => {
-  const generateStarRating = useStarRatings(4.5);
+const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
+  const isOpen = useBusinessOpen(business?.openingHours)
+  const { data: reviews } = useGetReviewQuery(business?.slug)
+  const averageRatings = useMemo(() => {
+    if (!reviews) return 0
+    return reviews?.reduce((a, b) => a + parseFloat(b.rating), 0) / reviews?.length || 0
+  }, [reviews])
+  const generateStarRating = useStarRatings(averageRatings, 20);
   return (
     <div className="p-[2.4rem] shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem]">
       <div className="flex space-x-[2rem] lg:space-x-[1rem] xl:space-x-[1rem] 2xl:space-x-[2rem]">
         <div className="w-[10rem] h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
           <div className="relative w-full h-full">
             <Image
-              src={"/images/featured_brand.png"}
+              src={appendApi(business?.logoUrl)}
               alt="Featured Brand"
               className="rounded-xs"
               fill
@@ -24,9 +35,11 @@ const FeaturedItem = () => {
         <div>
           <div className="relative w-fit">
             <h3 className="font-bold text-black text-smd lg:text-md leading-md">
-              {"McDonald's"}
+              {business?.name}
             </h3>
-            <VerifiedBadge className="absolute top-0 -right-8" />
+            {
+              business?.isTrusted ? <VerifiedBadge className="absolute top-0 -right-8" /> : ''
+            }
           </div>
           <div className="flex flex-wrap md:space-x-[3rem] mt-2">
             <p className="text-xs text-muted flex space-x-[0.8rem]">
@@ -46,40 +59,52 @@ const FeaturedItem = () => {
                   fill="#6E6777"
                 />
               </svg>
-              <span>12 years in business</span>
+              <span>{differenceInYears(new Date(), business?.startingDate)} years in business</span>
             </p>
             <p className="text-xs text-muted flex space-x-[0.8rem]">
               <Calendar />
-              <span>6 Month with KAGOZ</span>
+              <span>{Math.round(differenceInDays(new Date(), business?.createdAt) / 30)} Month with KAGOZ</span>
             </p>
           </div>
           <div className="flex items-center py-[1rem] space-x-2">
             <span className="flex text-sm text-yellow-400">
               {generateStarRating}
             </span>
-            <p className="text-xs text-muted">4.8 (34)</p>
+            <p className="text-xs text-muted">{averageRatings} ({reviews?.length})</p>
           </div>
 
           <div className="flex flex-col space-y-[1rem] xl:flex-row  xl:space-x-[1rem] xl:space-y-0 mb-[1rem]">
-            <div className="flex items-center space-x-1">
-              <VerfiedLisence width="16" height="16" />
-              <p className="text-verifiedColor text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold">
-                Verified License
-              </p>
-            </div>
+            {
+              business?.isVerified ? <div className="flex items-center space-x-1">
+                <VerfiedLisence width="16" height="16" />
+                <p className="text-verifiedColor text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold">
+                  Verified License
+                </p>
+              </div> : ''
+            }
           </div>
 
-          <div className="flex items-center space-x-1">
-            <Clock width="16" height="16" />
-            <p className="text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold">
-              Open Now
+          <div className="flex space-x-1 items-center py-2">
+            <Clock3
+              size={18}
+              className={cn(
+                "fill-secondary text-white",
+                !isOpen ? "fill-[#FA5151]" : "fill-secondary",
+              )}
+            />
+            <p
+              className={cn(
+                "text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold",
+                !isOpen ? "text-[#FA5151]" : "",
+              )}
+            >
+              {isOpen ? "Open Now" : "Closed"}
             </p>
           </div>
         </div>
       </div>
       <p className="text-xsm lg:text-sm text-muted">
-        Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce
-        dignissim luctus sem eu dapibus.
+        {business?.about}
       </p>
     </div>
   );

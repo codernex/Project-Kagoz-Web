@@ -190,6 +190,36 @@ const business = baseApi.injectEndpoints({
       }),
       providesTags: ["Faq"],
     }),
+
+    getSponsoredBusiness: builder.query<IBusiness[], void>({
+      query: () => ({
+        url: "/business/sponsored-business",
+      }),
+    }),
+    getBusinessByQuery: builder.query<
+      {
+        items: IBusiness[];
+        totalItems: number;
+        totalPages: number;
+        currentPage: number;
+      },
+      {
+        category?: string;
+        name?: string;
+        isTrusted?: boolean;
+        isVerified?: boolean;
+        sortBy?: string;
+        isOpen?: boolean;
+        isClosed?: boolean;
+        page: number;
+        limit: number;
+      }
+    >({
+      query: (query) => ({
+        url: "/business/search",
+        params: query,
+      }),
+    }),
   }),
 });
 
@@ -212,4 +242,6 @@ export const {
   useGetTotalPageViewsQuery,
   useGetDailyPageViewsQuery,
   useGetSiteFaqQuery,
+  useGetSponsoredBusinessQuery,
+  useGetBusinessByQueryQuery,
 } = business;
