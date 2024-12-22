@@ -6,7 +6,7 @@ import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { Clock } from "lucide-react";
 import { useParams } from "next/navigation";
 
-export const LocationAndHours = () => {
+export default function LocationAndHours() {
   const { slug } = useParams() as { slug: string }
   const { data } = useGetBusinessBySlugQuery(slug)
   if (!data?.openingHours) {

@@ -7,10 +7,12 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use((req) => {
-  req.headers.Authorization = `Bearer ${localStorage.getItem("_auth")}`;
-  return req;
-});
+if (typeof window !== "undefined") {
+  axiosInstance.interceptors.request.use((req) => {
+    req.headers.Authorization = `Bearer ${localStorage.getItem("_auth")}`;
+    return req;
+  });
+}
 
 axiosInstance.interceptors.response.use((res) => {
   return res;

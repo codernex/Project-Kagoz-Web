@@ -95,6 +95,8 @@ interface IFeaturedOffer {
 interface ICategory {
   id: number;
   name: string;
+  businessCount: number;
+  slug: string;
 }
 
 interface IFacility {

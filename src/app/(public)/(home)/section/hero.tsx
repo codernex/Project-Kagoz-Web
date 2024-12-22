@@ -12,7 +12,13 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
+import { useEffect, useState } from "react";
 const Hero = () => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
   return (
     <section id="hero" className="container ">
       <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md px-4">
@@ -47,45 +53,47 @@ const Hero = () => {
             </Tabs>
           </div>
         </div>
-        <div className="w-full py-[8rem] max-w-[70%] mx-auto">
-          <Swiper
-            slidesPerView={9}
-            className="mb-2"
-            autoplay
-            modules={[Parallax, Autoplay]}
-            breakpoints={{
-              320: {
-                slidesPerView: 2,
-              },
-              768: {
-                slidesPerView: 5,
-              },
-              1024: {
-                slidesPerView: 7,
-              },
-              1280: {
-                slidesPerView: 9,
-              },
-            }}
-          >
-            {Array.from({ length: 20 }).map((_, index) => {
-              return (
-                <SwiperSlide key={index}>
-                  <div className="flex justify-center w-full">
-                    <div className="relative rounded-full w-full h-[8rem] max-w-[8rem] overflow-hidden">
-                      <Image
-                        alt="Logo"
-                        src={"/images/featured/logo.png"}
-                        fill
-                      />
+        {
+          isMounted ? <div className="w-full py-[8rem] max-w-[70%] mx-auto">
+            <Swiper
+              slidesPerView={9}
+              className="mb-2"
+              autoplay
+              modules={[Parallax, Autoplay]}
+              breakpoints={{
+                320: {
+                  slidesPerView: 2,
+                },
+                768: {
+                  slidesPerView: 5,
+                },
+                1024: {
+                  slidesPerView: 7,
+                },
+                1280: {
+                  slidesPerView: 9,
+                },
+              }}
+            >
+              {Array.from({ length: 20 }).map((_, index) => {
+                return (
+                  <SwiperSlide key={index}>
+                    <div className="flex justify-center w-full">
+                      <div className="relative rounded-full w-full h-[8rem] max-w-[8rem] overflow-hidden">
+                        <Image
+                          alt="Logo"
+                          src={"/images/featured/logo.png"}
+                          fill
+                        />
+                      </div>
                     </div>
-                  </div>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-          <p className="font-normal text-center">Featured Business</p>
-        </div>
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+            <p className="font-normal text-center">Featured Business</p>
+          </div> : null
+        }
       </div>
     </section>
   );

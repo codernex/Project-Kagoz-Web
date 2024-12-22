@@ -15,4 +15,8 @@ const category = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetCategoriesQuery, useGetSubcategoriesQuery } = category;
+export const {
+  useGetCategoriesQuery,
+  useGetSubcategoriesQuery,
+  useLazyGetCategoriesQuery,
+} = category;

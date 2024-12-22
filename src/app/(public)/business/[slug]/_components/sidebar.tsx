@@ -1,13 +1,14 @@
 "use client"
 import { Button } from "@/components/shared/button";
+import { Loader } from "@/components/shared/loader";
 import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { ArrowRight, Edit2, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-export const Sidebar = () => {
+const Sidebar = () => {
   const { slug } = useParams() as { slug: string }
-  const { data } = useGetBusinessBySlugQuery(slug)
+  const { data, isLoading } = useGetBusinessBySlugQuery(slug)
 
   const [mobile, setMobile] = useState('')
 
@@ -16,6 +17,10 @@ export const Sidebar = () => {
       setMobile(data.mobile.substring(0, 5) + ' xxx xxx')
     }
   }, [data])
+
+  if (isLoading) {
+    return <Loader />
+  }
   return (
     <div className=" bg-white px-[2.4rem] py-[3rem] rounded-smd drop-shadow-md">
       <Button className="flex items-center justify-center p-[2rem] space-x-3 rounded-xl font-medium">
@@ -250,3 +255,5 @@ export const Sidebar = () => {
     </div>
   );
 };
+
+export default Sidebar

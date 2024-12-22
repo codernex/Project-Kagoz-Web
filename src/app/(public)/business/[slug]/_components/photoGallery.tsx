@@ -4,7 +4,7 @@ import { useGetPhotosQuery } from "@/redux/api";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 
-export const PhotoGallery = () => {
+export default function PhotoGallery() {
   const { slug } = useParams() as { slug: string }
   const { data } = useGetPhotosQuery(slug)
 

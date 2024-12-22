@@ -1,21 +1,23 @@
 "use client";
 import { AdSpace } from "@/components/shared/ad-space";
 import { BlogWidget } from "@/components/shared/blog-widget";
+import { Loader } from "@/components/shared/loader";
 import { Pagination } from "@/components/shared/pagination";
+import { useGetBusinessByQueryQuery } from "@/redux/api";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Categories } from "./_components/categories";
 import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
 import { SearchItem } from "./_components/search-item";
 import { SponsoredBusiness } from "./_components/sponsored-business";
-import { useGetBusinessByQueryQuery } from "@/redux/api";
-import { Loader } from "@/components/shared/loader";
-import { NotFound } from "@/components/shared/not-found";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+const Categories = dynamic(() => import('./_components/categories').then(m => m.Categories), { ssr: false })
 
 export default function CategoriesSearchPage({ slug }: { slug: string }) {
     const [page, setPage] = useState(1)
+    const router = useRouter()
     const [activeSearchType, setActiveSearchType] = useState<
         "Category" | "Business"
     >("Category");
@@ -154,7 +156,7 @@ export default function CategoriesSearchPage({ slug }: { slug: string }) {
                 </div>
             </section>
 
-            <section className="bg-search-add-business h-[40rem]" />
+            <section onClick={() => router.push(`/biz/null/dashboard`)} className="bg-search-add-business h-[40rem] cursor-pointer" />
             <Categories />
         </main>
     );

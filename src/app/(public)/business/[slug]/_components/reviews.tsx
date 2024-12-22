@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import millify from 'millify'
 
-export const Reviews = () => {
+export default function Reviews() {
   const { slug } = useParams() as { slug: string }
 
   const { data } = useGetReviewQuery(slug)

@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 
-export const License = () => {
+export default function License() {
   const { slug } = useParams() as { slug: string }
   const { data } = useGetBusinessBySlugQuery(slug)
 

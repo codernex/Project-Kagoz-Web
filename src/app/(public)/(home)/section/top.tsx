@@ -17,7 +17,7 @@ import { useMemo, useState } from "react";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import millify from "millify";
-export function TopSection() {
+export default function TopSection() {
     const { slug } = useParams() as { slug: string }
     const { data, isLoading } = useGetBusinessBySlugQuery(slug)
     const isOpen = useBusinessOpen(data?.openingHours)
