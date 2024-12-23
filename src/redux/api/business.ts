@@ -220,6 +220,9 @@ const business = baseApi.injectEndpoints({
         params: query,
       }),
     }),
+    getBusiness: builder.query<IBusiness[], void>({
+      query: () => ({ url: "/business" }),
+    }),
   }),
 });
 
@@ -244,4 +247,5 @@ export const {
   useGetSiteFaqQuery,
   useGetSponsoredBusinessQuery,
   useGetBusinessByQueryQuery,
+  useGetBusinessQuery,
 } = business;

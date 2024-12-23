@@ -1,8 +1,9 @@
+import Link from "next/link";
 import React from "react";
 
-const CategoryItem = () => {
+const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
   return (
-    <div className="py-[1rem] lg:py-[3.2rem] px-[2.4rem] bg-white rounded-sm flex flex-col items-center gap-y-[.5rem] lg:gap-y-[2rem]">
+    <Link href={`/categories/${category.slug}`} className="py-[1rem] lg:py-[3.2rem] px-[2.4rem] bg-white rounded-sm flex flex-col items-center gap-y-[.5rem] lg:gap-y-[2rem]">
       <div className="h-[6rem] w-[6rem] lg:h-[8rem] lg:w-[8rem] rounded-full bg-[#6F00FF0D] flex items-center justify-center border-[1px] border-[#6F00FF33]">
         <svg
           className="w-[2rem] h-[2rem] lg:w-[4.2rem] lg:h-[2.8rem]"
@@ -17,14 +18,14 @@ const CategoryItem = () => {
         </svg>
       </div>
       <h3 className=" text-sm lg:text-md font-semibold leading-[25.41px] text-black">
-        Automotive
+        {category.name}
       </h3>
       <div className="border-[1px] border-[#6F00FF33] rounded-xl bg-[#6F00FF0D] w-[5rem] lg:w-[6.8rem] text-center h-[2.4rem] lg:h-[3.4rem] flex items-center justify-center">
         <p className="text-primary font-semibold text-xs lg:text-[1.8rem]">
-          20+
+          {category.businessCount}
         </p>
       </div>
-    </div>
+    </Link>
   );
 };
 

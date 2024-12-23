@@ -61,7 +61,7 @@ export const Category = () => {
                             render={({ field }) => (
                                 <FormItem className="flex flex-col w-full">
                                     <FormLabel className="mb-3 font-normal">Category</FormLabel>
-                                    <SelectSearch disabled={!!data?.primaryCategory} placeholder="Select Category" value={field.value} options={categories} onChange={(v) => field.onChange(v)} />
+                                    <SelectSearch placeholder="Select Category" value={field.value} options={categories} onChange={(v) => field.onChange(v)} />
                                 </FormItem>
                             )}
                             control={form.control}
@@ -69,7 +69,7 @@ export const Category = () => {
                         />
 
                         <div className="w-full">
-                            <Label className="mb-3 font-normal">Category</Label>
+                            <Label className="mb-3 font-normal">Sub Category</Label>
                             <SelectSearch value={''} placeholder="Select Sub-category" options={subCategories} onChange={(v) => {
                                 const sub = subCategories?.find(s => s.id === v)
                                 if (form.watch('subCategories').findIndex(s => s.id === sub?.id) !== -1) {

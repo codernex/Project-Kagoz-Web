@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -10,47 +10,76 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useGetCategoriesQuery } from "@/redux/api/category";
+import { useGetBusinessQuery } from "@/redux/api";
+import Fuse from "fuse.js";
+import { Loader } from "./loader";
 
 type SearchResult = {
   id: string;
   name: string;
+  slug: string
 };
 
-type SearchProps = {
-  apiFetch: (query: string, type: string) => Promise<SearchResult[]>;
-  searchTerm?: string;
-  setSearchTerm?: React.Dispatch<React.SetStateAction<string>>;
-  searchedResults?: any[];
-  ref?: React.LegacyRef<HTMLDivElement> | undefined;
-};
 
-const NavSearch: React.FC<SearchProps> = React.memo(({ apiFetch, ref }) => {
+
+const NavSearch: React.FC = React.memo(() => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState("Dhaka");
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [selectedTab, setSelectedTab] = useState("categories");
+  const [selectedTab, setSelectedTab] = useState<"categories" | "business">("categories");
   const [searchDropdown, setSearchDropdown] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Handle search input changes and fetch results
+  const { data: categories } = useGetCategoriesQuery()
+  const { data: business } = useGetBusinessQuery()
+
+  // Debounced search term to reduce excessive filtering
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(searchTerm);
+
   useEffect(() => {
-    if (searchTerm) {
-      const fetchResults = async () => {
-        const results = await apiFetch(searchTerm, selectedTab);
-        setSearchResults(results);
-      };
-      fetchResults();
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // Adjust debounce delay as needed
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Fuse.js configuration for efficient fuzzy search
+  const fuseOptions = useMemo(
+    () => ({
+      keys: ["name"],
+      threshold: 0.3, // Adjust for more or less fuzzy matching
+    }),
+    []
+  );
+
+  const fuseCategories = useMemo(() => new Fuse(categories || [], fuseOptions), [categories, fuseOptions]);
+  const fuseBusiness = useMemo(() => new Fuse(business || [], fuseOptions), [business, fuseOptions]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      setLoading(true); // Start loading
+      const fuse = selectedTab === "categories" ? fuseCategories : fuseBusiness;
+      const results = fuse.search(debouncedSearchTerm).slice(0, 5).map(result => result.item);
+      setSearchResults(results as any[]);
+      setLoading(false); // Stop loading
     } else {
       setSearchResults([]);
+      setLoading(false); // Ensure loading stops if search term is cleared
     }
-  }, [searchTerm, selectedTab, apiFetch]);
+  }, [debouncedSearchTerm, selectedTab, fuseCategories, fuseBusiness]);
 
   // Handle selecting a search result
-  const handleSelectResult = (result: SearchResult) => {
-    setSearchTerm(result.name); // Set selected result to input field
-    setSearchDropdown(false); // Close dropdown
-  };
+  const handleSelectResult = useCallback((result: SearchResult) => {
+    if (selectedTab === 'categories') {
+      window.location.href = `/categories/${result.slug}`
+    } else {
+      window.location.href = `/business/${result.slug}`
+    }
+  }, [selectedTab]);
 
   const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (dropdownRef.current && dropdownRef.current.contains(event.relatedTarget as Node)) {
@@ -60,7 +89,6 @@ const NavSearch: React.FC<SearchProps> = React.memo(({ apiFetch, ref }) => {
   };
   return (
     <div
-      ref={ref}
       className="bg-white rounded-xl h-[4rem] lg:h-[5rem] flex items-center pl-[3.2rem] pr-[.8rem] w-full shadow-none z-10 relative"
       onBlur={handleBlur}
       tabIndex={-1} // Ensure focusable behavior for blur handling
@@ -123,8 +151,8 @@ const NavSearch: React.FC<SearchProps> = React.memo(({ apiFetch, ref }) => {
         </Button>
       </div>
 
-      {searchDropdown && (
-        <div ref={dropdownRef} className="absolute left-0 -bottom-60 w-full bg-white rounded-xs p-[2rem] shadow-md">
+      {true && (
+        <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem]">
           <div className="flex mb-4 py-2 gap-2 border-b border-[#ededed]">
             <Button
               variant={selectedTab === "categories" ? "default" : "outline"}
@@ -141,14 +169,22 @@ const NavSearch: React.FC<SearchProps> = React.memo(({ apiFetch, ref }) => {
               By Business
             </Button>
           </div>
-          {searchResults.length > 0 ? (
+          {
+            loading && (
+              <div>
+                loading
+              </div>
+            )
+          }
+          {!loading && searchResults.length > 0 ? (
             searchResults.map((result) => (
               <div
                 key={result.id}
-                className="cursor-pointer py-2 px-4 hover:bg-gray-100"
+                className="cursor-pointer py-3 px-4 hover:bg-gray-100 border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
                 onClick={() => handleSelectResult(result)}
               >
                 {result.name}
+                <ChevronRight/>
               </div>
             ))
           ) : (

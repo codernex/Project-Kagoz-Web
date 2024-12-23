@@ -9,6 +9,7 @@ import { useGetReviewQuery } from "@/redux/api";
 import { differenceInDays, differenceInYears } from "date-fns";
 import { Clock3 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo } from "react";
 
 const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
@@ -34,9 +35,10 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
         </div>
         <div>
           <div className="relative w-fit">
-            <h3 className="font-bold text-black text-smd lg:text-md leading-md">
-              {business?.name}
-            </h3>
+            <Link href={`/business/${business.slug}`}>
+              <h3 className="font-bold text-black text-smd lg:text-md leading-md">
+                {business?.name}
+              </h3></Link>
             {
               business?.isTrusted ? <VerifiedBadge className="absolute top-0 -right-8" /> : ''
             }

@@ -14,7 +14,7 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { useEffect, useState } from "react";
 const Hero = () => {
-  const [isMounted, setIsMounted] = useState(false)
+  const [isMounted, setIsMounted] = useState(true)
 
   useEffect(() => {
     setIsMounted(true)

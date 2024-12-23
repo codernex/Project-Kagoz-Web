@@ -75,9 +75,7 @@ const Header = () => {
             scrollTop < 400 ? "hidden" : "lg:block",
           )}
         >
-          <NavSearch apiFetch={() => {
-            return [] as any
-          }} />
+          <NavSearch />
         </motion.div>
         {/* Navigation */}
         <div className="flex items-center md:space-x-8 lg:space-x-14">

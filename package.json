@@ -31,6 +31,7 @@
     "cookies-next": "^5.0.2",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.11.11",
+    "fuse.js": "^7.0.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.453.0",
     "millify": "^6.1.0",
