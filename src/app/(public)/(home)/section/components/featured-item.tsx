@@ -29,6 +29,7 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
               src={appendApi(business?.logoUrl)}
               alt="Featured Brand"
               className="rounded-xs"
+              sizes="100%"
               fill
             />
           </div>

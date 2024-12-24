@@ -15,6 +15,7 @@ export default function BlogCard({ post }: { post: IBlog }) {
             className="object-cover rounded-sm"
             alt={post.title}
             fill
+            sizes="100%"
           />
         </div>
         <div className="space-y-[1.2rem]">

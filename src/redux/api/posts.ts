@@ -10,4 +10,4 @@ const posts = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetPostsQuery } = posts;
+export const { useGetPostsQuery, useLazyGetPostsQuery } = posts;

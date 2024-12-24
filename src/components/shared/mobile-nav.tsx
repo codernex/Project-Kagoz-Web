@@ -1,21 +1,24 @@
 "use client";
+import { useDynamicNavLink } from "@/app/biz/_components/dynamic-nav";
+import { useAuth } from "@/context/AuthContext";
+import { useAuthModal } from "@/hooks/loginModal";
+import { useMobileSearch } from "@/hooks/mobileSearch";
 import { cn } from "@/lib/utils";
 import { type AnimationProps, motion } from "framer-motion";
 import { Menu, Plus, Search, XIcon } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CustomButton } from "./custom-button";
-import { useAuthModal } from "@/hooks/loginModal";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { useDynamicNavLink } from "@/app/biz/_components/dynamic-nav";
+import Link from "next/link";
 const MobileNav: React.FC = () => {
   const { selectedSlug } = useDynamicNavLink()
   const [isOpen, setIsOpen] = useState(false);
+  const { setOpen: setSearchOpen } = useMobileSearch()
   const { setOpen } = useAuthModal()
   const router = useRouter()
   const { isAuth } = useAuth()
-  
+
   const animate: AnimationProps["animate"] = useMemo(() => {
     return {
       opacity: isOpen ? 1 : 0,
@@ -55,7 +58,7 @@ const MobileNav: React.FC = () => {
         "container py-4 flex justify-between nav_gradient sticky top-0 md:hidden",
       )}
     >
-      <div className="flex items-center">
+      <Link href={'/'} className="flex items-center">
         <Image
           src="/images/logo.png"
           alt="logo"
@@ -63,10 +66,9 @@ const MobileNav: React.FC = () => {
           width={150}
           height={100}
         />
-      </div>
-
+      </Link>
       <div className="flex items-center space-x-4">
-        <Search />
+        <Search className="cursor-pointer" onClick={() => setSearchOpen(true)} />
         <div
           className="flex items-center justify-center w-16 h-16 rounded-full shadow-md cursor-pointer"
           onClick={() => setIsOpen(!isOpen)}
@@ -74,7 +76,6 @@ const MobileNav: React.FC = () => {
           <Menu className="shadow-sm" size={20} />
         </div>
       </div>
-
       <motion.div
         animate={animate}
         className={cn(

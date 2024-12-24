@@ -1,6 +1,10 @@
 "use client";
+import { useGetBusinessQuery, useLazyGetBusinessQuery } from "@/redux/api";
+import { useGetCategoriesQuery, useLazyGetCategoriesQuery } from "@/redux/api/category";
+import Fuse from "fuse.js";
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -10,10 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useGetCategoriesQuery } from "@/redux/api/category";
-import { useGetBusinessQuery } from "@/redux/api";
-import Fuse from "fuse.js";
-import { Loader } from "./loader";
 
 type SearchResult = {
   id: string;
@@ -33,8 +33,8 @@ const NavSearch: React.FC = React.memo(() => {
   const [searchDropdown, setSearchDropdown] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { data: categories } = useGetCategoriesQuery()
-  const { data: business } = useGetBusinessQuery()
+  const [categoryAction, { data: categories }] = useLazyGetCategoriesQuery()
+  const [businessAction, { data: business }] = useLazyGetBusinessQuery()
 
   // Debounced search term to reduce excessive filtering
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(searchTerm);
@@ -72,21 +72,17 @@ const NavSearch: React.FC = React.memo(() => {
     }
   }, [debouncedSearchTerm, selectedTab, fuseCategories, fuseBusiness]);
 
-  // Handle selecting a search result
-  const handleSelectResult = useCallback((result: SearchResult) => {
-    if (selectedTab === 'categories') {
-      window.location.href = `/categories/${result.slug}`
-    } else {
-      window.location.href = `/business/${result.slug}`
-    }
-  }, [selectedTab]);
-
   const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
     if (dropdownRef.current && dropdownRef.current.contains(event.relatedTarget as Node)) {
       return; // Prevent hiding when clicking inside the dropdown
     }
     setSearchDropdown(false);
   };
+
+  useEffect(()=>{
+    console.log("Running under mobile view");
+    
+  },[])
   return (
     <div
       className="bg-white rounded-xl h-[4rem] lg:h-[5rem] flex items-center pl-[3.2rem] pr-[.8rem] w-full shadow-none z-10 relative"
@@ -125,7 +121,11 @@ const NavSearch: React.FC = React.memo(() => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search..."
-          onFocus={() => setSearchDropdown(true)}
+          onFocus={() => {
+            setSearchDropdown(true);
+            categoryAction()
+            businessAction()
+          }}
           className="h-fit text-muted outline-none focus:outline-none ring-0 border-none"
         />
       </div>
@@ -145,13 +145,17 @@ const NavSearch: React.FC = React.memo(() => {
         </SelectContent>
       </Select>
 
-      <div className="w-fit h-full flex items-center justify-center">
-        <Button className="h-[4rem] w-[4rem] md:h-[5rem] md:w-[5rem] rounded-full p-0">
-          <ArrowRight />
-        </Button>
-      </div>
+      {
+        /**
+         *  <div className="w-fit h-full flex items-center justify-center">
+          <Button className="h-[4rem] w-[4rem] md:h-[5rem] md:w-[5rem] rounded-full p-0">
+            <ArrowRight />
+          </Button>
+        </div>
+         */
+      }
 
-      {true && (
+      {searchDropdown && (
         <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem]">
           <div className="flex mb-4 py-2 gap-2 border-b border-[#ededed]">
             <Button
@@ -178,14 +182,14 @@ const NavSearch: React.FC = React.memo(() => {
           }
           {!loading && searchResults.length > 0 ? (
             searchResults.map((result) => (
-              <div
+              <Link
+                href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}`}
                 key={result.id}
-                className="cursor-pointer py-3 px-4 hover:bg-gray-100 border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
-                onClick={() => handleSelectResult(result)}
+                className="cursor-pointer py-3 px-4 hover:bg-gray-50 bg-gray-50 rounded-[.6rem] border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
               >
                 {result.name}
-                <ChevronRight/>
-              </div>
+                <ChevronRight />
+              </Link>
             ))
           ) : (
             <div className="text-muted text-center">No results found</div>

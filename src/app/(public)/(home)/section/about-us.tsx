@@ -144,7 +144,7 @@ const AboutUs = () => {
           </Button>
         </div>
         <div className="w-full relative lg:w-1/2 h-[33rem] lg:h-[53rem] my-[5rem]">
-          <Image src={"/images/about_right.png"} alt="about-us" fill />
+          <Image src={"/images/about_right.png"} alt="about-us" fill sizes="100%" />
         </div>
       </div>
     </section>

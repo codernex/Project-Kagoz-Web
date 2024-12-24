@@ -15,7 +15,8 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 const Categories = dynamic(() => import('./_components/categories').then(m => m.Categories), { ssr: false })
 
-export default function CategoriesSearchPage({ slug }: { slug: string }) {
+export default function CategoriesSearchPage({ slug, category }: { slug: string, category: ICategory }) {
+
     const [page, setPage] = useState(1)
     const router = useRouter()
     const [activeSearchType, setActiveSearchType] = useState<
@@ -53,7 +54,7 @@ export default function CategoriesSearchPage({ slug }: { slug: string }) {
                         <span>Movers</span>
                     </div>
                     <h1 className="text-md lg:text-lg text-muted font-bold">
-                        Top 10 <span className="text-black capitalize">{`"${slug}"`}</span> in{" "}
+                        Top {data?.items.length} <span className="text-black capitalize">{`"${slug}"`}</span> in{" "}
                         <span className="text-black">Dhaka</span>
                     </h1>
                 </div>

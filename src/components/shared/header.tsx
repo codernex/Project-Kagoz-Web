@@ -38,12 +38,6 @@ const Header = () => {
   }, [handleScroll]);
 
   // Memoize the animation object to prevent re-creation on every render
-  const animation: AnimationProps["animate"] = useMemo(
-    () => ({
-      opacity: scrollTop > 400 ? 1 : 0,
-    }),
-    [scrollTop],
-  );
 
   return (
     <header
@@ -67,16 +61,14 @@ const Header = () => {
           </div>
         </Link>
         {/* Search */}
-        <motion.div
-          animate={animation}
-          transition={{ duration: 0.25 }}
+        <div
           className={cn(
             "w-full md:max-w-2xl lg:max-w-3xl xl:max-w-5xl shadow-md rounded-xl px-4 py-3 bg-white",
             scrollTop < 400 ? "hidden" : "lg:block",
           )}
         >
           <NavSearch />
-        </motion.div>
+        </div>
         {/* Navigation */}
         <div className="flex items-center md:space-x-8 lg:space-x-14">
           <Link

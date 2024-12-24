@@ -49,10 +49,6 @@ body {
     @apply text-center text-md font-bold leading-xl text-black lg:text-lg;
   }
 
-  .hero_tab_list {
-    @apply !ml-0 h-[4.8rem] w-full rounded-md border border-primary !px-[2.8rem] py-[1.6rem] !text-center md:w-fit md:!rounded-b-none md:border-0 md:bg-[#0000004D];
-  }
-
   .section_padding {
     @apply py-[4.8rem] md:py-[6.4rem] lg:py-[8.4rem] xl:py-[10rem] 2xl:py-[12rem];
   }

@@ -1,13 +1,17 @@
 "use client"
 import BlogCard from "@/components/shared/blog-card";
 import { Button } from "@/components/ui/button";
-import { useGetPostsQuery } from "@/redux/api";
+import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
+import { useLazyGetPostsQuery } from "@/redux/api";
 import Link from "next/link";
+import { useRef } from "react";
 
 export default function Blog() {
-  const { data } = useGetPostsQuery()
+  const ref = useRef<HTMLElement>(null)
+  const [getPosts, { data }] = useLazyGetPostsQuery()
+  useFetchOnVisible(ref, getPosts)
   return (
-    <section id="blog" className="section_padding bg-bgPrimaryShade">
+    <section ref={ref} id="blog" className="section_padding bg-bgPrimaryShade">
       <div className="container space-y-[6rem]">
         <div className="max-w-7xl mx-auto">
           <h2 className="section_title">Our Blogs</h2>

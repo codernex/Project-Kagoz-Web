@@ -14,6 +14,7 @@ const WhyChooseUs = () => {
               className="object-contain"
               alt="about-us"
               fill
+              sizes="100%"
             />
           </div>
           <div className="w-full lg:w-1/2 space-y-[4.6rem]">

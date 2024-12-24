@@ -1,7 +1,5 @@
 "use client";
-import { ArrowRight } from "lucide-react";
 import React, { useState } from "react";
-import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -10,19 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { useRouter } from "next/navigation";
 
 type SearchProps = {
-  searchTerm?: string;
-  setSearchTerm?: React.Dispatch<React.SetStateAction<string>>;
-  searchedResults?: any[];
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   ref?: React.LegacyRef<HTMLDivElement> | undefined;
+  handleFocus: () => void
 };
-const Search: React.FC<SearchProps> = React.memo(({ ref }) => {
+const Search: React.FC<SearchProps> = React.memo(({ ref, searchTerm, setSearchTerm, handleFocus }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState("Dhaka");
-  const navigate = useRouter()
-
   return (
     <div
       onClick={() => {
@@ -58,7 +53,10 @@ const Search: React.FC<SearchProps> = React.memo(({ ref }) => {
         </svg>
 
         <Input
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
           ref={inputRef}
+          onFocus={handleFocus}
           className="h-fit text-muted outline-none focus:outline-none ring-0 border-none"
           placeholder="Search what you are looking for..."
         />
@@ -105,12 +103,6 @@ const Search: React.FC<SearchProps> = React.memo(({ ref }) => {
           </SelectItem>
         </SelectContent>
       </Select>
-
-      <div className="w-fit h-full flex items-center justify-center">
-        <Button onClick={()=>navigate.push('/search')} className="h-[4rem] w-[4rem] lg:h-[6.4rem] lg:w-[6.4rem] rounded-full p-0">
-          <ArrowRight />
-        </Button>
-      </div>
     </div>
   );
 });

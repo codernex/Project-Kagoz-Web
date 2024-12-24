@@ -244,8 +244,10 @@ export const {
   useHasLikedBusinessQuery,
   useGetTotalPageViewsQuery,
   useGetDailyPageViewsQuery,
-  useGetSiteFaqQuery,
+  useLazyGetSiteFaqQuery,
   useGetSponsoredBusinessQuery,
+  useLazyGetSponsoredBusinessQuery,
   useGetBusinessByQueryQuery,
   useGetBusinessQuery,
+  useLazyGetBusinessQuery,
 } = business;

@@ -1,11 +1,17 @@
 "use client"
-import { useGetSponsoredBusinessQuery } from "@/redux/api";
+import { useGetSponsoredBusinessQuery, useLazyGetSponsoredBusinessQuery } from "@/redux/api";
 import FeaturedItem from "./components/featured-item";
+import { useRef } from "react";
+import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
 
 export default function FeaturedBusiness() {
-  const { data, isLoading } = useGetSponsoredBusinessQuery()
+  const [action, { data, isLoading }] = useLazyGetSponsoredBusinessQuery()
+  const ref = useRef<HTMLElement>(null)
+
+  useFetchOnVisible(ref, action)
+
   return (
-    <section className="container section_padding space-y-[6rem]">
+    <section ref={ref} className="container section_padding space-y-[6rem]">
       <div className="space-y-[2rem] max-w-7xl mx-auto">
         <h2 className="section_title">Featured Business</h2>
         <p className="text-xsm lg:text-sm text-muted text-center">

@@ -1,6 +1,5 @@
 "use client";
 import Search from "@/components/shared/search";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
 // import Swiper core and required modules
 import { Autoplay, Parallax } from "swiper/modules";
@@ -8,17 +7,88 @@ import { Autoplay, Parallax } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import { useEffect, useState } from "react";
+import Fuse from "fuse.js";
+import { ChevronRight } from "lucide-react";
+import { useGetCategoriesQuery, useLazyGetCategoriesQuery } from "@/redux/api/category";
+import { useGetBusinessQuery, useLazyGetBusinessQuery } from "@/redux/api";
+import Link from "next/link";
+
+type SearchResult = {
+  id: string;
+  name: string;
+  slug: string
+};
+
 const Hero = () => {
-  const [isMounted, setIsMounted] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [loading, setLoading] = useState(false)
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [selectedTab, setSelectedTab] = useState<'categories' | 'business'>('categories')
+  const [searchDropdown, setSearchDropdown] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  const [categoryAction, { data: categories }] = useLazyGetCategoriesQuery()
+  const [businessAction, { data: business }] = useLazyGetBusinessQuery()
+
+  // Debounced search term to reduce excessive filtering
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(searchTerm);
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // Adjust debounce delay as needed
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Fuse.js configuration for efficient fuzzy search
+  const fuseOptions = useMemo(
+    () => ({
+      keys: ["name"],
+      threshold: 0.3, // Adjust for more or less fuzzy matching
+    }),
+    []
+  );
+
+  const fuseCategories = useMemo(() => new Fuse(categories || [], fuseOptions), [categories, fuseOptions]);
+  const fuseBusiness = useMemo(() => new Fuse(business || [], fuseOptions), [business, fuseOptions]);
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      setLoading(true); // Start loading
+      const fuse = selectedTab === "categories" ? fuseCategories : fuseBusiness;
+      const results = fuse.search(debouncedSearchTerm).slice(0, 5).map(result => result.item);
+      setSearchResults(results as any[]);
+      setLoading(false); // Stop loading
+    } else {
+      setSearchResults([]);
+      setLoading(false); // Ensure loading stops if search term is cleared
+    }
+  }, [debouncedSearchTerm, selectedTab, fuseCategories, fuseBusiness]);
+
+  const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (dropdownRef.current && dropdownRef.current.contains(event.relatedTarget as Node)) {
+      return; // Prevent hiding when clicking inside the dropdown
+    }
+    setSearchDropdown(false);
+  };
+
+  useEffect(() => {
+    if (searchTerm.length) {
+      setSearchDropdown(true);
+    } else {
+      setSearchDropdown(false)
+    }
+  }, [searchTerm])
+
   return (
     <section id="hero" className="container ">
       <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md px-4">
@@ -35,26 +105,64 @@ const Hero = () => {
 
           {/**Tabs */}
           <div className="mt-[4rem]">
-            <Tabs defaultValue="category" className="space-y-0">
-              <TabsList className="bg-black pt-6 px-4 pb-0 rounded-b-none w-[80%] mx-auto md:bg-transparent space-y-2 md:space-y-0 flex flex-col justify-center items-center md:flex-row md:!space-x-4 mb-0 md:pt-0 h-fit">
-                <TabsTrigger value="category" className="hero_tab_list">
-                  Find by Category
-                </TabsTrigger>
-                <TabsTrigger value="business" className="hero_tab_list">
+            <div onBlur={handleBlur}>
+              <div className="bg-black pt-6 px-4 pb-0 rounded-b-none w-[80%] mx-auto md:bg-transparent md:space-y-0 flex flex-col justify-center items-center md:flex-row md:!space-x-4 mb-0 md:pt-0 h-fit">
+                <Button onClick={() => {
+                  setSelectedTab('categories')
+                  searchRef.current?.click()
+                }} className={
+                  cn("!ml-0 h-[4.8rem] max-w-full rounded-xs border border-primary !px-[2.8rem] py-[1.6rem] !text-center md:w-fit md:!rounded-b-none md:border-0 md:bg-[#0000004D]", selectedTab === 'categories' ? "!bg-primary" : "bg-transparent")
+                }>
+                  Find By Category
+                </Button>
+                <Button
+                  onClick={() => {
+                    setSelectedTab('business')
+                    searchRef.current?.click()
+                  }}
+                  className={
+                    cn("!ml-0 h-[4.8rem] max-w-full rounded-xs border border-primary !px-[2.8rem] py-[1.6rem] !text-center md:w-fit md:!rounded-b-none md:border-0 md:bg-[#0000004D] ", selectedTab === 'business' ? "!bg-primary" : "bg-transparent")
+                  }>
                   Find by Business Name
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent className="pt-0 mt-0" value="category">
-                <Search />
-              </TabsContent>
-              <TabsContent value="business" className="mt-0">
-                <Search />
-              </TabsContent>
-            </Tabs>
+                </Button>
+              </div>
+              <div className="relative">
+                <Search handleFocus={() => {
+                  setSearchDropdown(true)
+                  categoryAction()
+                  businessAction()
+                }} searchTerm={searchTerm} setSearchTerm={setSearchTerm} ref={searchRef} />
+                {searchDropdown && (
+                  <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem] z-[99] grid !gap-y-3">
+                    {
+                      loading && (
+                        <div>
+                          loading
+                        </div>
+                      )
+                    }
+                    {!loading && searchResults.length > 0 ? (
+                      searchResults.map((result) => (
+                        <Link
+                          href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}`}
+                          key={result.id}
+                          className="cursor-pointer py-3 px-4 hover:bg-gray-50 bg-gray-50 rounded-[.6rem] border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
+                        >
+                          {result.name}
+                          <ChevronRight />
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="text-muted text-center">No results found</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
         {
-          isMounted ? <div className="w-full py-[8rem] max-w-[70%] mx-auto">
+          <div className="w-full py-[8rem] max-w-[70%] mx-auto">
             <Swiper
               slidesPerView={9}
               className="mb-2"
@@ -84,6 +192,7 @@ const Hero = () => {
                           alt="Logo"
                           src={"/images/featured/logo.png"}
                           fill
+                          sizes="100%"
                         />
                       </div>
                     </div>
@@ -92,7 +201,7 @@ const Hero = () => {
               })}
             </Swiper>
             <p className="font-normal text-center">Featured Business</p>
-          </div> : null
+          </div>
         }
       </div>
     </section>

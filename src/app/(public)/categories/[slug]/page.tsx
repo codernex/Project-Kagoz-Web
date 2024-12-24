@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import CategoriesSearchPage from "./client";
 import { axiosInstance } from "@/redux/api";
+import { NotFound } from "@/components/shared/not-found";
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { slug } = await params;
@@ -24,7 +25,14 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
 export default async function Page({ params }: any) {
   const { slug } = await params
+  let data: ICategory | null;
+  try {
+    const response = await axiosInstance.get<{ data: ICategory }>(`/categories/${slug}`);
+    data = response.data.data;
+  } catch (error) {
+    return <NotFound />
+  }
   return (
-    <CategoriesSearchPage slug={slug} />
+    <CategoriesSearchPage slug={slug} category={data!} />
   )
 }

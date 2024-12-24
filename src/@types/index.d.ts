@@ -97,6 +97,7 @@ interface ICategory {
   name: string;
   businessCount: number;
   slug: string;
+  business: IBusiness[];
 }
 
 interface IFacility {
