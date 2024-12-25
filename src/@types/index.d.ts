@@ -98,6 +98,7 @@ interface ICategory {
   businessCount: number;
   slug: string;
   business: IBusiness[];
+  updatedAt: string;
 }
 
 interface IFacility {
