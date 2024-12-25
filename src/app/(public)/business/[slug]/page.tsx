@@ -12,6 +12,7 @@ import { FeaturedOffer } from "./_components/featuredOffer";
 import { OwnerText } from "./_components/ownerText";
 import { axiosInstance } from "@/redux/api";
 import { Loader } from "@/components/shared/loader";
+import { Metadata } from "next";
 const AdSpace = dynamic(() => import('@/components/shared/ad-space').then(m => m.AdSpace))
 const License = dynamic(() => import('./_components/license'))
 const Sidebar = dynamic(() => import('./_components/sidebar'))
@@ -20,7 +21,7 @@ const PhotoGallery = dynamic(() => import('./_components/photoGallery'))
 const LocationAndHours = dynamic(() => import('./_components/location'))
 const Reviews = dynamic(() => import('./_components/reviews'))
 
-export async function generateMetadata({ params }: any) {
+export async function generateMetadata({ params }: any): Promise<Metadata> {
   try {
     const cookieStore = await cookies()
     let cookie = cookieStore.get('access_token')
@@ -32,7 +33,9 @@ export async function generateMetadata({ params }: any) {
       }
     });
 
-    const data = response.data.data
+    const data = response.data.data as IBusiness
+
+    const categories = [data?.primaryCategory?.name, ...data?.subcategories?.map(s => s.name)]
 
     return {
       title: data.name + ' | KAGOZ',
@@ -41,16 +44,19 @@ export async function generateMetadata({ params }: any) {
         title: data.name + ' | KAGOZ',
         description: data.about,
         images: appendApi(data.logoUrl),
+        type: "website",
+        url:`https://localhost:3000/business/${data.slug}`
       },
       twitter: {
         card: 'summary_large_image',
         title: data.name + ' | KAGOZ',
         description: data.about,
-        images: [data.logoUrl],
+        images: appendApi(data.logoUrl),
       },
+      keywords: categories.join(',')
     };
   } catch (error) {
-    console.log(error);
+    return {}
   }
 }
 export default async function SingleBusiness({ params }: any) {

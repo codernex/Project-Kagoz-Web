@@ -64,7 +64,8 @@ export async function GET() {
 
   const businessPage = business.map((category) => ({
     url: `/business/${category.slug}`,
-    lastModified: category.updatedAt, // Replace with actual modification time if available
+    lastModified: category.updatedAt,
+    images:[category.logoUrl]
   }));
 
   // Combine static and dynamic pages
