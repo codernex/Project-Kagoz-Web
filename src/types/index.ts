@@ -5,3 +5,11 @@ export enum FeatureType {
   FEATURED_OFFER = "FEATURED_OFFER",
   SPONSOR_BUSINESS = "SPONSOR_BUSINESS",
 }
+
+export enum PageType {
+  HOME = "HOME",
+  ABOUT = "ABOUT",
+  CONTACT = "CONTACT",
+  PrivacyPolicy = "PrivacyPolicy",
+  TermsOfService = "TermsOfService",
+}

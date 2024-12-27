@@ -99,6 +99,8 @@ interface ICategory {
   slug: string;
   business: IBusiness[];
   updatedAt: string;
+  iconUrl: string;
+  about: string;
 }
 
 interface IFacility {
@@ -125,4 +127,15 @@ interface IBlog {
   url: string;
   createdAt: string;
   updatedAt: string;
+}
+interface ISeo {
+  id: number;
+  name: string;
+  title: string;
+  pageType: PageType;
+  keyword: string;
+  description: string;
+  seo_image: string;
+  createdAt: Date | string | number;
+  updatedAt: Date | string | number;
 }

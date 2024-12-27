@@ -1,3 +1,4 @@
+"use client"
 import { useLazyGetCategoriesQuery } from "@/redux/api/category";
 import CategoryItem from "./components/category-item";
 import { useFetchOnVisible } from "@/hooks/useLazyApiCall";

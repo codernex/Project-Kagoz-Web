@@ -10,9 +10,11 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     const data = response.data.data;
     return {
       title: `${data.name} | KAGOZ`,
+      description: data.about,
       openGraph: {
         type: 'website',
-        title: `${data.name} | KAGOZ`
+        title: `${data.name} | KAGOZ`,
+        description: data.about
       },
       keywords: ['kagoz']
     };
