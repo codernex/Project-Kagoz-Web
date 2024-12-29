@@ -17,6 +17,7 @@ import { useMemo, useState } from "react";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import millify from "millify";
+import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 export default function TopSection() {
     const { slug } = useParams() as { slug: string }
     const { data, isLoading } = useGetBusinessBySlugQuery(slug)
@@ -30,6 +31,8 @@ export default function TopSection() {
     const [writeReview, setWriteReview] = useState(false);
     const [like] = useLikeBusinessMutation()
     const { data: liked } = useHasLikedBusinessQuery(slug)
+    const { open, setOpen } = useVideoPalyerModal()
+
     if (isLoading) {
         return (
             <Loader />
@@ -137,16 +140,20 @@ export default function TopSection() {
                             </div>
                         </div>
                     </div>
-                    <div className="md:absolute top-0 right-0">
-                        <Button className="flex items-center w-[22rem] md:w-fit  bg-[#323031] px-[3.2rem] py-[1rem] md:py-[1.9rem] rounded-xl space-x-[.8rem]">
-                            <div className="w-[2.2rem] h-[2.2rem] rounded-full bg-white flex items-center justify-center">
-                                <PlayIcon size={18} className="fill-black" />
+                    {
+                        data?.youtubeVideo ? (
+                            <div className="md:absolute top-0 right-0">
+                                <Button onClick={() => setOpen(true, data.youtubeVideo)} className="flex items-center w-[22rem] md:w-fit  bg-[#323031] px-[3.2rem] py-[1rem] md:py-[1.9rem] rounded-xl space-x-[.8rem]">
+                                    <div className="w-[2.2rem] h-[2.2rem] rounded-full bg-white flex items-center justify-center">
+                                        <PlayIcon size={18} className="fill-black" />
+                                    </div>
+                                    <span className="text-sm xl:text-[2rem] font-medium">
+                                        Play Video
+                                    </span>
+                                </Button>
                             </div>
-                            <span className="text-sm xl:text-[2rem] font-medium">
-                                Play Video
-                            </span>
-                        </Button>
-                    </div>
+                        ) : null
+                    }
                 </div>
                 {/**
        * TOP SECTION BUTTONS

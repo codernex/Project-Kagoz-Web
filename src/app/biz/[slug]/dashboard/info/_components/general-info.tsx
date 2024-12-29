@@ -20,6 +20,7 @@ type GeneralInfoInput = {
     streetAddress: string
     startingDate: string
     website: string
+    youtubeVideo: string
 }
 export const GeneralInfo = () => {
     const [file, setFile] = useState<File[]>([])
@@ -37,7 +38,8 @@ export const GeneralInfo = () => {
         startingDate: data?.startingDate || '',
         state: data?.state || '',
         streetAddress: data?.streetAddress || '',
-        website: data?.website || ''
+        website: data?.website || '',
+        youtubeVideo: data?.youtubeVideo || ''
     };
 
     const generalInfoForm = useForm({
@@ -79,7 +81,10 @@ export const GeneralInfo = () => {
                         <TextInput name="streetAddress" placeholder="Enter Street Address" control={generalInfoForm.control} label="Street Address" />
                         <TextInput required disabled={!!defaultValues.startingDate} name="startingDate" type="date" placeholder="Enter Business Starting Date" control={generalInfoForm.control} label="Business Starting Date" />
                     </Flex>
-                    <TextInput name="website" control={generalInfoForm.control} placeholder="https://yourbusiness.com" label="Busines Website" />
+                    <Flex>
+                        <TextInput name="website" control={generalInfoForm.control} placeholder="https://yourbusiness.com" label="Busines Website" />
+                        <TextInput name="youtubeVideo" control={generalInfoForm.control} placeholder="https://www.youtube.com/watch?v=Cs2g2VFWtbo" label="Youtube Introduction Video" />
+                    </Flex>
                     <div className="max-w-[450px]">
                         <Label>Upload Logo</Label>
                         <FileUploadDropdown setSelectedFiles={setFile} selectedFiles={file} />

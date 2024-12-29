@@ -2,8 +2,9 @@
 import { useAuth } from "@/context/AuthContext";
 import { useAuthModal } from "@/hooks/loginModal";
 import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import AddBusiness from "./_components/add-business";
 import MobileBusinessSidebar from "./_components/mobile-sidebar";
 import { Sidebar } from "./_components/sidebar";
@@ -14,6 +15,11 @@ export default function BusinessDashboardLayout({
     const { isAuth } = useAuth()
     const { setOpen } = useAuthModal()
     const router = useRouter()
+    const searchParams = useSearchParams()
+
+    const param = useMemo(() => {
+        return searchParams.get('q')
+    }, [searchParams])
 
     // State to track loading status
     const [loading, setLoading] = useState(true);
@@ -30,11 +36,20 @@ export default function BusinessDashboardLayout({
         skip: !isAuth
     })
 
+    useEffect(() => {
+        if (param && param === 'failed') {
+            toast.error("Somehow payment for this feature is failed, Please try again letter")
+        }
+    }, [param])
+
+
     if (loading) {
         return <div className="flex items-center justify-center h-screen">
             <div className="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
         </div>; // Show a loading indicator or placeholder while checking auth
     }
+
+
     return (
         <div>
             <MobileBusinessSidebar />

@@ -21,6 +21,7 @@ interface IBusiness {
     question: string;
     answer: string;
   };
+  youtubeVideo: string;
   website: string;
   openingHours: OpeningHour[];
   tradeLicenseExpireDate: Date;

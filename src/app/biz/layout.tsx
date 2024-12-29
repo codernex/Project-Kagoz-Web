@@ -8,10 +8,12 @@ export const meta: Metadata = {
   },
 }
 
-export default function Layout() {
+export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <div>
-      <BusinessDashboardLayout />
+      <BusinessDashboardLayout>
+        {children}
+      </BusinessDashboardLayout>
     </div>
   )
 }

@@ -1,27 +1,26 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { extractYouTubeVideoId } from "@/lib/utils";
+import { useGetVideoFeedbacksQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import { FeatureType } from "@/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
-import Player from "react-player/youtube";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { Autoplay, Navigation } from "swiper/modules";
 import { type Swiper as SwiperType } from "swiper/types";
-import { extractYouTubeVideoId } from "@/lib/utils";
-import { useParams } from "next/navigation";
-import { useGetVideoFeedbacksQuery, useIsFeatureActiveQuery } from "@/redux/api";
-import { FeatureType } from "@/types";
+import { YtPlayerModal } from "./yt-player-modal";
+import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 
 export const CustomerFeedback = () => {
   const swiperRef = useRef<SwiperType>();
   const { slug } = useParams() as { slug: string }
-  const [videoUrl, setVideoUrl] = useState("");
-  const [openPlayer, setOpenPlayer] = useState(false);
+  const { setOpen } = useVideoPalyerModal()
   /**
    * Get Is Feature Active
    */
@@ -103,10 +102,7 @@ export const CustomerFeedback = () => {
                     <div className="bg-[#00000080] z-20 relative w-full h-full" />
                     <div
                       onClick={() => {
-                        setOpenPlayer(true);
-                        setVideoUrl(
-                          video.videoUrl,
-                        );
+                        setOpen(true, video.videoUrl);
                       }}
                       className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 cursor-pointer"
                     >
@@ -151,18 +147,7 @@ export const CustomerFeedback = () => {
             </button>
           </div>
         </div>
-        <Dialog open={openPlayer} onOpenChange={setOpenPlayer}>
-          <DialogContent className="max-w-7xl p-0 rounded-md overflow-hidden border-none h-1/2 bg-[#00000080]">
-            <DialogTitle className="hidden">Title</DialogTitle>
-            <Player
-              width={"100%"}
-              height={"100%"}
-              controls
-              playing={openPlayer}
-              url={videoUrl}
-            />
-          </DialogContent>
-        </Dialog>
+        <YtPlayerModal />
       </div>
       <hr className="border-[#EEEDED]" />
     </>
