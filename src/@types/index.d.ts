@@ -39,6 +39,14 @@ interface IBusiness {
   updatedAt: string;
 }
 
+interface ISocial {
+  id: number;
+  facebook: string;
+  twitter: string;
+  linkedin: string;
+  instagram: string;
+}
+
 interface TimeRange {
   id: number;
   fromHours: string;

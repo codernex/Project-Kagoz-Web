@@ -1,7 +1,8 @@
 import React from "react";
-import FooterOne from "../widget/footer-1";
 import FooterTwo from "../widget/footer-2";
 import FooterFour from "../widget/footer-4";
+import dynamic from "next/dynamic";
+const FooterOne= dynamic(()=>import('../widget/footer-1'))
 
 const Footer = () => {
   return (
