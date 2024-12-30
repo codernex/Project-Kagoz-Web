@@ -28,6 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch (error) {
     return {
       title: "Home | KAGOZ",
+      alternates: {
+        canonical: '/'
+      },
       openGraph: {
         images: ["/images/logo.png"],
         countryName: "Bangladesh"
