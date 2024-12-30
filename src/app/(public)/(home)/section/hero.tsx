@@ -1,24 +1,15 @@
 "use client";
 import Search from "@/components/shared/search";
-import Image from "next/image";
-// import Swiper core and required modules
-import { Autoplay, Parallax } from "swiper/modules";
-
-import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
+import { useLazyGetBusinessQuery } from "@/redux/api";
+import { useLazyGetCategoriesQuery } from "@/redux/api/category";
 import Fuse from "fuse.js";
 import { ChevronRight } from "lucide-react";
-import { useGetCategoriesQuery, useLazyGetCategoriesQuery } from "@/redux/api/category";
-import { useGetBusinessQuery, useLazyGetBusinessQuery } from "@/redux/api";
 import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type SearchResult = {
   id: string;
@@ -161,48 +152,6 @@ const Hero = () => {
             </div>
           </div>
         </div>
-        {
-          <div className="w-full py-[8rem] max-w-[70%] mx-auto">
-            <Swiper
-              slidesPerView={9}
-              className="mb-2"
-              autoplay
-              modules={[Parallax, Autoplay]}
-              breakpoints={{
-                320: {
-                  slidesPerView: 2,
-                },
-                768: {
-                  slidesPerView: 5,
-                },
-                1024: {
-                  slidesPerView: 7,
-                },
-                1280: {
-                  slidesPerView: 9,
-                },
-              }}
-            >
-              {Array.from({ length: 20 }).map((_, index) => {
-                return (
-                  <SwiperSlide key={index}>
-                    <div className="flex justify-center w-full">
-                      <div className="relative rounded-full w-full h-[8rem] max-w-[8rem] overflow-hidden">
-                        <Image
-                          alt="Logo"
-                          src={"/images/featured/logo.png"}
-                          fill
-                          sizes="100%"
-                        />
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-            <p className="font-normal text-center">Featured Business</p>
-          </div>
-        }
       </div>
     </section>
   );
