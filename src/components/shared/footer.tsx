@@ -2,7 +2,7 @@ import React from "react";
 import FooterTwo from "../widget/footer-2";
 import FooterFour from "../widget/footer-4";
 import dynamic from "next/dynamic";
-const FooterOne= dynamic(()=>import('../widget/footer-1'))
+const FooterOne = dynamic(() => import('../widget/footer-1'))
 
 const Footer = () => {
   return (
@@ -17,7 +17,7 @@ const Footer = () => {
       </div>
       <div className="py-12 bg-[#130921]">
         <p className="text-xs md:text-sm text-white text-center">
-          &copy; 2004-2024 KAGOZ LTD. KAGOZ, and related marks are registered
+          &copy; 2024-{new Date().getFullYear()} KAGOZ LTD. KAGOZ, and related marks are registered
           trademarks of KAGOZ.
         </p>
       </div>

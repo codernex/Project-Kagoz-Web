@@ -27,6 +27,10 @@ const staticPages = [
   { url: "/", lastModified: new Date().toISOString() },
   { url: "/about", lastModified: new Date().toISOString() },
   { url: "/contact", lastModified: new Date().toISOString() },
+  { url: "/blogs", lastModified: new Date().toISOString() },
+  { url: "/privacy-policy", lastModified: new Date().toISOString() },
+  { url: "/tos", lastModified: new Date().toISOString() },
+  { url: "/ads-policy", lastModified: new Date().toISOString() },
   // Add any other static pages here
 ];
 
@@ -65,7 +69,7 @@ export async function GET() {
   const businessPage = business.map((category) => ({
     url: `/business/${category.slug}`,
     lastModified: category.updatedAt,
-    images:[category.logoUrl]
+    images: [category.logoUrl],
   }));
 
   // Combine static and dynamic pages
