@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       title: `${data.title} | KAGOZ`,
       alternates: {
-        canonical: '/contact-us',
+        canonical: data.canonical
       },
       openGraph: {
         images: [appendApi(data.seo_image)],
@@ -24,7 +24,11 @@ export async function generateMetadata(): Promise<Metadata> {
         description: data.description
       },
       description: data.description,
-      keywords: data.keyword
+      keywords: data.keyword,
+      robots: {
+        index: data.index === 'index',
+        follow: data.follow === 'follow'
+      }
     }
   } catch (error) {
     return {

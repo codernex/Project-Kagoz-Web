@@ -19,11 +19,19 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
         title: `${data.name} | KAGOZ`,
         description: data.about
       },
-      keywords: ['kagoz']
+      keywords: ['kagoz'],
+      robots: {
+        index: true,
+        follow: true
+      }
     };
   } catch (error) {
     return {
       title: "Category not found",
+      robots: {
+        index: true,
+        follow: true
+      }
     };
   }
 }

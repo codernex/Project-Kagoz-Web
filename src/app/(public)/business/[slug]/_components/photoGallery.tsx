@@ -15,7 +15,7 @@ export default function PhotoGallery() {
     <>
       <div className="space-y-sm">
         <h2 className="text-mdx font-bold text-black">Our Photo Gallery</h2>
-        <div className="gap-sm flex">
+        <div className="gap-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {data?.slice(0, 4).map((file, index) => {
             return (
               <div

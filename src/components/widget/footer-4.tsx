@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function FooterFour() {
   return (
-    <div className="space-y-md">
+    <div className="space-y-md col-span-2">
       <h2 className="text-md font-bold">Head Office</h2>
-      <div className="space-y-[2rem] flex flex-col">
+      <div className="gap-y-[2rem] grid grid-cols-1 md:grid-cols-2">
         <div className="flex space-x-sm items-center">
           <svg
             width="36"
@@ -41,7 +41,7 @@ export default function FooterFour() {
           </svg>
           <p>59 Main street, USA</p>
         </div>
-        <div className="flex space-x-sm items-center">
+        <div className="flex space-x-sm items-center !mt-0">
           <svg
             width="36"
             height="36"
@@ -75,7 +75,6 @@ export default function FooterFour() {
               </clipPath>
             </defs>
           </svg>
-
           <p>+012(345) 78 93</p>
         </div>
         <div className="flex space-x-sm items-center">

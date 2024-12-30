@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
         return {
             title: `${data.title} | KAGOZ`,
             alternates: {
-                canonical: '/tos'
+                canonical: data.canonical || process.env.NEXT_PUBLIC_BASE_URL + '/tos'
             },
             openGraph: {
                 images: [appendApi(data.seo_image)],
@@ -24,11 +24,18 @@ export async function generateMetadata(): Promise<Metadata> {
                 description: data.description
             },
             description: data.description,
-            keywords: data.keyword
+            keywords: data.keyword,
+            robots: {
+                index: data.index === 'index',
+                follow: data.follow === 'follow'
+            }
         }
     } catch (error) {
         return {
             title: "Terms Of Service | KAGOZ",
+            alternates: {
+                canonical: process.env.NEXT_PUBLIC_BASE_URL + '/tos'
+            },
             openGraph: {
                 images: ["/images/logo.png"],
                 countryName: "Bangladesh"
@@ -36,6 +43,10 @@ export async function generateMetadata(): Promise<Metadata> {
             twitter: {
                 card: "summary",
                 images: ["/images/logo.png"],
+            },
+            robots: {
+                index: true,
+                follow: true
             }
         }
     }
