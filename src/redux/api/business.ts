@@ -223,6 +223,21 @@ const business = baseApi.injectEndpoints({
     getBusiness: builder.query<IBusiness[], void>({
       query: () => ({ url: "/business" }),
     }),
+    claimBusiness: builder.mutation<any, any>({
+      query: ({ slug, ...data }) => ({
+        url: `/business/claim/${slug}`,
+        data,
+        method: "POST",
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          successMessage(
+            "Your request is submitted, we will contact you soon."
+          );
+        } catch (error) {}
+      },
+    }),
   }),
 });
 
@@ -250,4 +265,5 @@ export const {
   useGetBusinessByQueryQuery,
   useGetBusinessQuery,
   useLazyGetBusinessQuery,
+  useClaimBusinessMutation,
 } = business;

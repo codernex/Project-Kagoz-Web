@@ -33,10 +33,12 @@ const MobileBusinessSidebar: React.FC = () => {
   const { setOpen } = useAddBusinessModal()
   const [isOpen, setIsOpen] = useState(false);
   const path = usePathname();
-  const { logout } = useAuth()
+  const { logout, isAuth, user } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink()
-  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined);
+  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined, {
+    skip: !isAuth
+  });
   const memorizePath = useMemorizedPath(path)
   const { setOpen: setOpenUserProfile } = userUserProfile()
   /**
@@ -65,7 +67,6 @@ const MobileBusinessSidebar: React.FC = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isOpen]);
-  const { isAuth, user } = useAuth()
 
   useEffect(() => {
     if (isAuth) {
@@ -86,13 +87,15 @@ const MobileBusinessSidebar: React.FC = () => {
             className="text-muted lg:hidden"
           />
 
-          <img
-            src={"/images/logo.png"}
-            alt="Logo"
-            width={80}
-            height={80}
-            className="object-contain"
-          />
+          <Link href={'/'}>
+            <Image
+              src={"/images/logo.png"}
+              alt="Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+          </Link>
 
           <h2 className="hidden italic font-bold text-black lg:block">
             For Business

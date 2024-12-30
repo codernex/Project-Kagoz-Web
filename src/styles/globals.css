@@ -55,6 +55,31 @@ body {
   .contact_box {
     box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.08);
   }
+
+  .editor {
+    @apply text-muted;
+    & h1 {
+      @apply !text-lg text-black;
+    }
+
+    & h2 {
+      @apply !text-[3.2rem] text-black;
+    }
+
+    & h3 {
+      @apply !text-[2.6rem] text-black;
+    }
+    & p {
+      @apply text-sm text-muted;
+    }
+
+    & ul {
+      @apply list-disc ml-3 pl-10;
+    }
+    & ol {
+      @apply list-decimal ml-3 pl-10;
+    }
+  }
 }
 
 .hero_gradient {

@@ -12,7 +12,7 @@ export default function FAQ() {
 
   useFetchOnVisible(ref, action)
   return (
-    <section className="bg-white section section_padding">
+    <section ref={ref} className="bg-white section section_padding">
       <div className="container">
         <div className="flex items-center flex-col md:flex-row lg:space-x-[12rem]">
           <div className="md:w-1/2 py-6 w-full">

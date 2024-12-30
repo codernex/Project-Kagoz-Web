@@ -85,7 +85,7 @@ export default function FeaturedOffer() {
         activeFeature({ slug, type: FeatureType.FEATURED_OFFER })
           .then(res => {
             if (res.data?.url) {
-              window.open(res.data.url)
+              window.open(res.data.url,'_blank','width=600,height=400')
             }
           })
       }} feature={data} />

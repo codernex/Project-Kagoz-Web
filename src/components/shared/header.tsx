@@ -11,6 +11,7 @@ import { CustomButton } from "./custom-button";
 import MobileNav from "./mobile-nav";
 import NavSearch from "./nav-search";
 import { useDynamicNavLink } from "@/app/biz/_components/dynamic-nav";
+import Image from "next/image";
 
 const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -51,7 +52,7 @@ const Header = () => {
         {/* Logo */}
         <Link href={"/"}>
           <div className="flex items-center">
-            <img
+            <Image
               src="/images/logo.png"
               alt="logo"
               className="object-contain"

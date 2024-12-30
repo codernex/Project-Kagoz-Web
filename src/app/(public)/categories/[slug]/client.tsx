@@ -3,19 +3,29 @@ import { AdSpace } from "@/components/shared/ad-space";
 import { BlogWidget } from "@/components/shared/blog-widget";
 import { Loader } from "@/components/shared/loader";
 import { Pagination } from "@/components/shared/pagination";
-import { useGetBusinessByQueryQuery } from "@/redux/api";
+import { useGetBusinessByQueryQuery, useLazyGetSocialMediaQuery } from "@/redux/api";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
 import { SearchItem } from "./_components/search-item";
 import { SponsoredBusiness } from "./_components/sponsored-business";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
 const Categories = dynamic(() => import('./_components/categories').then(m => m.Categories), { ssr: false })
+import Dompurify from "dompurify";
 
 export default function CategoriesSearchPage({ slug, category }: { slug: string, category: ICategory }) {
+    const [action, { data: socialData }] = useLazyGetSocialMediaQuery()
+    const sectionRef = useRef<HTMLElement>(null)
+
+    useFetchOnVisible(sectionRef, action)
+
+    const sanitizedConent = useMemo(() => {
+        return Dompurify.sanitize(socialData?.content || '')
+    }, [socialData])
 
     const [page, setPage] = useState(1)
     const router = useRouter()
@@ -37,9 +47,9 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
         limit: 20,
         page
     })
-    useEffect(() => {
-        window.scrollTo(0, 0); // Scroll to the top of the page on reload
-    }, []);
+    // useEffect(() => {
+    //     window.scrollTo(0, 0); // Scroll to the top of the page on reload
+    // }, []);
 
     if (isLoading) {
         return <Loader />
@@ -113,47 +123,10 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
             </section>
             <Pagination currentPage={data?.currentPage ?? 1} totalPages={data?.totalPages ?? 0} page={page} setPage={setPage} />
 
-            <section className="py-[6rem] lg:py-[10rem] bg-[#00000005]">
-                <div className="container ">
-                    <h2 className="text-lg font-bold text-black">Title Goes Here</h2>
-                    <p className="text-muted space-y-[2rem]">
-                        <span className="inline-block">
-                            Lorem ipsum dolor sit amet consectetur. Odio orci euismod non eget
-                            vulputate. Pellentesque fringilla et sit sed auctor. Sit mattis
-                            arcu massa massa vivamus eget et. Potenti lorem sed dictumst
-                            gravida justo nisl congue. Sit nec sed porttitor cursus mauris
-                            purus eget sit. Nam amet velit lacus mi massa integer duis
-                            faucibus suspendisse. Sem sit ut vulputate molestie elementum
-                            cras. Enim suspendisse varius sem rutrum. Aliquet ultrices lectus
-                            urna sed bibendum. Tortor enim cum odio donec sed pharetra sapien
-                            eget facilisis.
-                        </span>
-
-                        <span className="inline-block">
-                            Cras consequat dui sodales enim. Sodales ornare viverra dictumst
-                            nisl lectus eu. Odio enim tellus amet feugiat sed potenti sit erat
-                            pharetra. Morbi tortor pellentesque metus praesent eu amet nisl.
-                            Nulla vestibulum quam vitae elementum sem in eget elementum. Urna
-                            turpis ornare pretium in. Morbi sed ac faucibus habitasse ut
-                            gravida eu. Eu ultrices senectus ullamcorper porttitor. Imperdiet
-                            varius tellus tristique ultrices ac. Quis dictum eget pellentesque
-                            quam sagittis fringilla tortor orci. Maecenas lacus adipiscing
-                            diam ac justo mi purus. Tincidunt egestas aliquet bibendum ac
-                            vitae aliquam sit at.
-                        </span>
-
-                        <span className="inline-block">
-                            Ut faucibus egestas sollicitudin leo vivamus amet ultricies.
-                            Dapibus enim vitae lectus cursus facilisi tortor nibh. Augue non
-                            laoreet ante lobortis vulputate arcu. Sit tellus vestibulum eget
-                            rutrum sit in erat odio. Proin id vestibulum consectetur sit morbi
-                            ullamcorper pellentesque nullam. Fermentum convallis velit
-                            vestibulum mauris eu orci ac egestas. At est nulla eget sit mi
-                            cras in. Senectus eu scelerisque netus commodo quisque at ultrices
-                            vitae ut. Accumsan nullam feugiat sit lacinia eget ut lobortis.
-                            Tellus facilisi nam ac nisl.
-                        </span>
-                    </p>
+            <section ref={sectionRef} className="py-[6rem] lg:py-[10rem] bg-[#00000005]">
+                <div className="container editor" dangerouslySetInnerHTML={{
+                    __html: sanitizedConent
+                }}>
                 </div>
             </section>
 

@@ -11,6 +11,9 @@ export async function generateMetadata(): Promise<Metadata> {
     const data = response.data.data as ISeo
     return {
       title: `${data.title} | KAGOZ`,
+      alternates: {
+        canonical: '/'
+      },
       openGraph: {
         images: [appendApi(data.seo_image)],
         type: "website",

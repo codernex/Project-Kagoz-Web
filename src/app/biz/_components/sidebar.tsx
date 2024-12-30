@@ -16,13 +16,16 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 export const Sidebar = () => {
+  const { isAuth } = useAuth()
   const path = usePathname();
   const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink();
-  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined);
+  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined, {
+    skip: !isAuth
+  });
   const memorizePath = useMemorizedPath(path)
   const { setOpen } = useAddBusinessModal()
 
-  const { isAuth } = useAuth()
+
 
   useEffect(() => {
     if (isAuth) {

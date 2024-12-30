@@ -11,6 +11,9 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     return {
       title: `${data.name} | KAGOZ`,
       description: data.about,
+      alternates: {
+        canonical: `/categories/${slug}`,
+      },
       openGraph: {
         type: 'website',
         title: `${data.name} | KAGOZ`,

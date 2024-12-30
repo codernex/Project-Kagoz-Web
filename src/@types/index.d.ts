@@ -45,6 +45,7 @@ interface ISocial {
   twitter: string;
   linkedin: string;
   instagram: string;
+  content: string;
 }
 
 interface TimeRange {

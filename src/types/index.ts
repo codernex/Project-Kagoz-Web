@@ -12,4 +12,5 @@ export enum PageType {
   CONTACT = "CONTACT",
   PrivacyPolicy = "PrivacyPolicy",
   TermsOfService = "TermsOfService",
+  AdsPolicy = "AdsPolicy",
 }

@@ -65,7 +65,7 @@ export default function BusinessFeaturedClients() {
           console.log(res);
 
           if (res.data?.url) {
-            window.open(res.data.url)
+            window.open(res.data.url,'_blank','width=600,height=400')
           }
 
         })
