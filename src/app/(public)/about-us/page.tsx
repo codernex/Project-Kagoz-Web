@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const data = response.data.data as ISeo
     return {
       title: `${data.title} | KAGOZ`, alternates: {
-        canonical: data.canonical
+        canonical: data.canonical || process.env.NEXT_PUBLIC_BASE_URL + '/about-us'
       },
       openGraph: {
         images: [appendApi(data.seo_image)],
@@ -23,13 +23,16 @@ export async function generateMetadata(): Promise<Metadata> {
       description: data.description,
       keywords: data.keyword,
       robots: {
-        index: data.index === 'index',
-        follow: data.follow === 'follow'
+        index: data.index,
+        follow: data.follow
       }
     }
   } catch (error) {
     return {
       title: "About Us | KAGOZ",
+      alternates: {
+        canonical: process.env.NEXT_PUBLIC_BASE_URL + '/about-us'
+      },
       openGraph: {
         images: ["/images/logo.png"],
         countryName: "Bangladesh"

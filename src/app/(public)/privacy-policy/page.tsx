@@ -26,8 +26,8 @@ export async function generateMetadata(): Promise<Metadata> {
             description: data.description,
             keywords: data.keyword,
             robots: {
-                index: data.index === 'index',
-                follow: data.follow === 'follow'
+                index: data.index,
+                follow: data.follow
             }
         }
     } catch (error) {

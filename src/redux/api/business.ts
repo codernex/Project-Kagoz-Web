@@ -238,6 +238,11 @@ const business = baseApi.injectEndpoints({
         } catch (error) {}
       },
     }),
+    getRelatedBusiness: builder.query<IBusiness[], string>({
+      query: (slug) => ({
+        url: `/business/related/${slug}`,
+      }),
+    }),
   }),
 });
 
@@ -266,4 +271,5 @@ export const {
   useGetBusinessQuery,
   useLazyGetBusinessQuery,
   useClaimBusinessMutation,
+  useGetRelatedBusinessQuery,
 } = business;

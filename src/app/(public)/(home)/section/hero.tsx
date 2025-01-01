@@ -132,7 +132,7 @@ const Hero = () => {
                   categoryAction()
                   businessAction()
                 }} searchTerm={searchTerm} setSearchTerm={setSearchTerm} ref={searchRef} />
-                {searchDropdown && (
+                {searchDropdown && searchTerm.length ? (
                   <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem] z-[99] grid !gap-y-3">
                     {
                       loading && (
@@ -156,7 +156,7 @@ const Hero = () => {
                       <div className="text-muted text-center">No results found</div>
                     )}
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

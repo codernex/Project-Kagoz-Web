@@ -9,10 +9,6 @@ import {
 import FilterWrapper from "./filter-wrapper";
 
 interface MobileFilterProps {
-  activeSearchType: "Business" | "Category";
-  setActiveSearchType: React.Dispatch<
-    React.SetStateAction<"Business" | "Category">
-  >;
   setLisenceType: React.Dispatch<
     React.SetStateAction<"KAGOZ" | "Verified Lisence" | "None">
   >;
@@ -21,55 +17,39 @@ interface MobileFilterProps {
   >;
   lisenceType: "KAGOZ" | "Verified Lisence" | "None";
   avalibility: "Now Open" | "Now Closed";
+  sortBy: string,
+  setSortBy: React.Dispatch<React.SetStateAction<string>>
 }
 
 const sortBy = [
   {
-    name: "Relevance",
-    value: "Relevance",
-  },
-  {
     name: "Recommended",
-    value: "Recommended",
+    value: "recommended",
   },
   {
     name: "Newest",
-    value: "Newest",
+    value: "newest",
+  }, {
+    name: "Oldest",
+    value: "oldest",
   },
   {
     name: "Ratings",
-    value: "Ratings",
+    value: "ratings",
   },
 ];
 
 export const OtherFilter: React.FC<MobileFilterProps> = ({
-  activeSearchType,
-  setActiveSearchType,
   lisenceType,
   setLisenceType,
   setAvalibility,
   avalibility,
+  setSortBy,
+  sortBy: sortValue
 }) => {
   return (
     <div className="hidden md:flex py-[3rem] flex-wrap md:space-x-0 gap-x-4 gap-y-6">
-      {/* <FilterWrapper title="Search Type">
-        <button
-          className={cn(
-            "px-[2rem] py-[1.2rem]  text-muted rounded-full",
-            activeSearchType === "Category" ? "bg-primary text-white" : "",
-          )}
-        >
-          Categories
-        </button>
-        <button
-          className={cn(
-            "px-[2rem] py-[1.2rem]  text-muted rounded-full",
-            activeSearchType === "Business" ? "bg-primary text-white" : "",
-          )}
-        >
-          Business
-        </button>
-      </FilterWrapper> */}
+
       <FilterWrapper title="Licensed & Trusted">
         <div className="flex items-center py-[1.2rem] px-[2rem] text-muted space-x-2">
           <Checkbox
@@ -126,7 +106,10 @@ export const OtherFilter: React.FC<MobileFilterProps> = ({
 
       <FilterWrapper title="Sort By">
         <div className="px-[2rem] py-[1.2rem] w-full">
-          <Select defaultValue="Recommended">
+          <Select
+            value={sortValue}
+            onValueChange={setSortBy}
+          >
             <SelectTrigger className="border-none bg-transparent min-w-[15rem] text-muted">
               <SelectValue
                 placeholder="Sort By"

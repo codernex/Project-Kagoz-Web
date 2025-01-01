@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       title: `${data.title} | KAGOZ`,
       alternates: {
-        canonical: data.canonical
+        canonical: data.canonical || process.env.NEXT_PUBLIC_BASE_URL + '/contact-us'
       },
       openGraph: {
         images: [appendApi(data.seo_image)],
@@ -26,13 +26,16 @@ export async function generateMetadata(): Promise<Metadata> {
       description: data.description,
       keywords: data.keyword,
       robots: {
-        index: data.index === 'index',
-        follow: data.follow === 'follow'
+        index: data.index,
+        follow: data.follow
       }
     }
   } catch (error) {
     return {
       title: "Contact Us | KAGOZ",
+      alternates: {
+        canonical: process.env.NEXT_PUBLIC_BASE_URL + '/contact-us'
+      },
       openGraph: {
         images: ["/images/logo.png"],
         countryName: "Bangladesh"

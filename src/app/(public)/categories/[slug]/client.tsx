@@ -3,19 +3,19 @@ import { AdSpace } from "@/components/shared/ad-space";
 import { BlogWidget } from "@/components/shared/blog-widget";
 import { Loader } from "@/components/shared/loader";
 import { Pagination } from "@/components/shared/pagination";
+import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
 import { useGetBusinessByQueryQuery, useLazyGetSocialMediaQuery } from "@/redux/api";
+import Dompurify from "dompurify";
 import { ChevronRight } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
 import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
 import { SearchItem } from "./_components/search-item";
 import { SponsoredBusiness } from "./_components/sponsored-business";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
 const Categories = dynamic(() => import('./_components/categories').then(m => m.Categories), { ssr: false })
-import Dompurify from "dompurify";
 
 export default function CategoriesSearchPage({ slug, category }: { slug: string, category: ICategory }) {
     const [action, { data: socialData }] = useLazyGetSocialMediaQuery()
@@ -23,10 +23,16 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
 
     useFetchOnVisible(sectionRef, action)
 
+    /**
+     * Filtering DOM Content
+     */
     const sanitizedConent = useMemo(() => {
         return Dompurify.sanitize(socialData?.content || '')
     }, [socialData])
 
+    /**
+     * Filtering & Sorting Result With pagination
+     */
     const [page, setPage] = useState(1)
     const router = useRouter()
     const [activeSearchType, setActiveSearchType] = useState<
@@ -38,6 +44,11 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
     const [avalibility, setAvalibility] = useState<"Now Open" | "Now Closed">(
         "Now Open",
     );
+    const [sortBy, setSortBy] = useState('recommended')
+
+    /**
+     * Fethcing Results
+     */
     const { data, isLoading } = useGetBusinessByQueryQuery({
         category: slug,
         isOpen: avalibility === 'Now Open',
@@ -45,11 +56,9 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
         isTrusted: lisenceType === 'KAGOZ',
         isVerified: lisenceType === 'Verified Lisence',
         limit: 20,
-        page
+        page,
+        sortBy
     })
-    // useEffect(() => {
-    //     window.scrollTo(0, 0); // Scroll to the top of the page on reload
-    // }, []);
 
     if (isLoading) {
         return <Loader />
@@ -72,21 +81,21 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
 
             <section className="container">
                 <OtherFilter
-                    activeSearchType={activeSearchType}
+                    setSortBy={setSortBy}
+                    sortBy={sortBy}
                     avalibility={avalibility}
                     lisenceType={lisenceType}
                     setAvalibility={setAvalibility}
                     setLisenceType={setLisenceType}
-                    setActiveSearchType={setActiveSearchType}
                 />
 
                 <MobileFilter
-                    activeSearchType={activeSearchType}
                     avalibility={avalibility}
                     lisenceType={lisenceType}
                     setAvalibility={setAvalibility}
                     setLisenceType={setLisenceType}
-                    setActiveSearchType={setActiveSearchType}
+                    setSortBy={setSortBy}
+                    sortBy={sortBy}
                 />
             </section>
 
@@ -114,8 +123,8 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
                 </div>
                 <div className="col-span-6 md:col-span-2 space-y-[4rem]">
                     <BlogWidget />
-                    <AdSpace />
-                    <AdSpace />
+                    {/* <AdSpace />
+                    <AdSpace /> */}
                 </div>
             </section>
             <section className="bg-bgPrimaryShade border border-borderColor">

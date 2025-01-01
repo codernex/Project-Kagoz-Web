@@ -31,7 +31,7 @@ export default function KagozAds() {
           console.log(res);
 
           if (res.data?.url) {
-            window.open(res.data.url,'_blank','width=600,height=400')
+            window.open(res.data.url)
           }
 
         })

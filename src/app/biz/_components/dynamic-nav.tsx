@@ -9,6 +9,7 @@ import {
   ListVideo,
   type LucideIcon,
   Megaphone,
+  MinusCircle,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -49,6 +50,11 @@ export const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
     name: "KAGOZ Ads",
     href: "/biz/dashboard/ads",
     icon: Megaphone,
+  },
+  {
+    name: "Remove Ads",
+    href: "/biz/dashboard/remove-ads",
+    icon: MinusCircle,
   },
 ];
 

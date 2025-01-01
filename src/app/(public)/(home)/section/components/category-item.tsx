@@ -29,7 +29,7 @@ const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
         dangerouslySetInnerHTML={{
           __html: sanitizedData,
         }}
-        className="h-[6rem] w-[6rem] lg:h-[8rem] lg:w-[8rem] rounded-full bg-[#6F00FF0D] flex items-center justify-center border-[1px] border-[#6F00FF33] hover:stroke-primary transition-colors ease-linear delay-300"
+        className="h-[6rem] w-[6rem] lg:h-[8rem] lg:w-[8rem] p-6 rounded-full bg-[#6F00FF0D] flex items-center justify-center border-[1px] border-[#6F00FF33] hover:stroke-primary transition-colors ease-linear delay-300"
         role="presentation"
         aria-hidden="true"
       />

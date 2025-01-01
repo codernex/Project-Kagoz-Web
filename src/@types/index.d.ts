@@ -147,8 +147,8 @@ interface ISeo {
   description: string;
   seo_image: string;
   canonical: string;
-  index: "noindex" | "index";
-  follow: "nofollow" | "follow";
+  index: boolean;
+  follow: boolean;
   createdAt: Date | string | number;
   updatedAt: Date | string | number;
 }

@@ -1,7 +1,10 @@
-import dynamic from "next/dynamic";
+import { Loader } from "@/components/shared/loader";
 import { NotFound } from "@/components/shared/not-found";
 import { appendApi } from "@/lib/utils";
+import { axiosInstance } from "@/redux/api";
 import axios from "axios";
+import { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { cookies } from 'next/headers';
 import { AboutBusiness } from "./_components/aboutBusiness";
 import { BusinessFacilities } from "./_components/businessFacilities";
@@ -10,9 +13,7 @@ import { FaqBusinessWrapper } from "./_components/FaqWrapper";
 import { FeaturedCustomer } from "./_components/featuredCustomer";
 import { FeaturedOffer } from "./_components/featuredOffer";
 import { OwnerText } from "./_components/ownerText";
-import { axiosInstance } from "@/redux/api";
-import { Loader } from "@/components/shared/loader";
-import { Metadata } from "next";
+import RelatedItemWrapper from "./_components/related-item-wrapper";
 const AdSpace = dynamic(() => import('@/components/shared/ad-space').then(m => m.AdSpace))
 const License = dynamic(() => import('./_components/license'))
 const Sidebar = dynamic(() => import('./_components/sidebar'))
@@ -40,12 +41,15 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     return {
       title: data.name + ' | KAGOZ',
       description: data.about,
+      alternates: {
+        canonical: process.env.NEXT_PUBLIC_BASE_URL + `/business/${slug}`
+      },
       openGraph: {
         title: data.name + ' | KAGOZ',
         description: data.about,
         images: appendApi(data.logoUrl),
         type: "website",
-        url:`https://localhost:3000/business/${data.slug}`
+        url: `https://localhost:3000/business/${data.slug}`
       },
       twitter: {
         card: 'summary_large_image',
@@ -119,21 +123,15 @@ export default async function SingleBusiness({ params }: any) {
           {
             isLoading ? <Loader /> : <div className="col-span-6 lg:col-span-2 ">
               <Sidebar />
-              <div className="mt-[4rem] space-y-[4rem]">
+              {/* <div className="mt-[4rem] space-y-[4rem]">
                 <AdSpace />
                 <AdSpace />
-              </div>
+              </div> */}
             </div>
           }
         </div>
-        <div className="space-y-[1.6rem] container mb-[6rem]">
-          <h2 className="text-mdx font-bold text-black">Related Business</h2>
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[3rem]">
-            {Array.from({ length: 2 }).map((_, index) => {
-              return <FeaturedItem key={index}  business={}/>;
-            })}
-          </div> */}
-        </div>
+        <RelatedItemWrapper />
+
       </div>
     </>
   )

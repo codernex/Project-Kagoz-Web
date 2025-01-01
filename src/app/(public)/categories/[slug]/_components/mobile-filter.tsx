@@ -1,25 +1,20 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { FilterIcon } from "lucide-react";
 import FilterWrapper from "./filter-wrapper";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface MobileFilterProps {
-  activeSearchType: "Business" | "Category";
-  setActiveSearchType: React.Dispatch<
-    React.SetStateAction<"Business" | "Category">
-  >;
   setLisenceType: React.Dispatch<
     React.SetStateAction<"KAGOZ" | "Verified Lisence" | "None">
   >;
@@ -28,24 +23,25 @@ interface MobileFilterProps {
   >;
   lisenceType: "KAGOZ" | "Verified Lisence" | "None";
   avalibility: "Now Open" | "Now Closed";
+  sortBy: string,
+  setSortBy: React.Dispatch<React.SetStateAction<string>>
 }
 
 const sortBy = [
   {
-    name: "Relevance",
-    value: "Relevance",
-  },
-  {
     name: "Recommended",
-    value: "Recommended",
+    value: "recommended",
   },
   {
     name: "Newest",
-    value: "Newest",
+    value: "newest",
+  }, {
+    name: "Oldest",
+    value: "oldest",
   },
   {
     name: "Ratings",
-    value: "Ratings",
+    value: "ratings",
   },
 ];
 
@@ -54,6 +50,8 @@ export const MobileFilter: React.FC<MobileFilterProps> = ({
   setLisenceType,
   setAvalibility,
   avalibility,
+  setSortBy,
+  sortBy: sortValue
 }) => {
   return (
     <div className="md:hidden w-full my-4">
@@ -121,7 +119,7 @@ export const MobileFilter: React.FC<MobileFilterProps> = ({
 
           <FilterWrapper title="Sort By">
             <div className="px-[1rem] py-[.6rem] w-full">
-              <Select defaultValue="Recommended">
+              <Select value={sortValue} onValueChange={setSortBy} defaultValue="Recommended">
                 <SelectTrigger className="border-none bg-transparent text-muted flex w-full !justify-between">
                   <SelectValue
                     placeholder="Sort By"
