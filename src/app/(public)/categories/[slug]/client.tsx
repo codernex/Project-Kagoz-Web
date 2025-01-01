@@ -10,7 +10,7 @@ import { ChevronRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
 import { SearchItem } from "./_components/search-item";
@@ -20,6 +20,7 @@ const Categories = dynamic(() => import('./_components/categories').then(m => m.
 export default function CategoriesSearchPage({ slug, category }: { slug: string, category: ICategory }) {
     const [action, { data: socialData }] = useLazyGetSocialMediaQuery()
     const sectionRef = useRef<HTMLElement>(null)
+    const [location, setLocation] = useState<{ latitude: null | number; longitude: null | number }>({ latitude: null, longitude: null })
 
     useFetchOnVisible(sectionRef, action)
 
@@ -35,9 +36,6 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
      */
     const [page, setPage] = useState(1)
     const router = useRouter()
-    const [activeSearchType, setActiveSearchType] = useState<
-        "Category" | "Business"
-    >("Category");
     const [lisenceType, setLisenceType] = useState<"KAGOZ" | "Verified Lisence" | "None">(
         "None",
     );
@@ -46,9 +44,24 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
     );
     const [sortBy, setSortBy] = useState('recommended')
 
+
+
+    useEffect(() => {
+        if (!navigator.geolocation) {
+            return
+        }
+
+        navigator.geolocation.getCurrentPosition(pos => {
+            if (pos) {
+                const { latitude, longitude } = pos.coords
+                setLocation({ latitude, longitude })
+            }
+        })
+    }, [])
+
     /**
-     * Fethcing Results
-     */
+    * Fethcing Results
+    */
     const { data, isLoading } = useGetBusinessByQueryQuery({
         category: slug,
         isOpen: avalibility === 'Now Open',
@@ -57,8 +70,10 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
         isVerified: lisenceType === 'Verified Lisence',
         limit: 20,
         page,
-        sortBy
+        sortBy,
+        ...location
     })
+
 
     if (isLoading) {
         return <Loader />

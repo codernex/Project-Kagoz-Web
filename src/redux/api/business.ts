@@ -213,6 +213,8 @@ const business = baseApi.injectEndpoints({
         isClosed?: boolean;
         page: number;
         limit: number;
+        latitude: number | null;
+        longitude: number | null;
       }
     >({
       query: (query) => ({

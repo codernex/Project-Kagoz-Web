@@ -1,7 +1,7 @@
 "use client"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { TextInput } from "@/components/shared/text-input";
-import { Form } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Flex } from "@/components/shared/flex";
 import FileUploadDropdown from "@/components/shared/file-upload-dropdown";
 import { useEffect, useState } from "react";
@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { CustomButton } from "@/components/shared/custom-button";
 import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api";
 import { useParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { InfoIcon } from "lucide-react";
 
 type GeneralInfoInput = {
     name: string
@@ -78,9 +80,37 @@ export const GeneralInfo = () => {
                         <TextInput name="postalCode" placeholder="Enter Postal Code" control={generalInfoForm.control} label="Postal Code" />
                     </Flex>
                     <Flex className="gap-x-[2rem]">
-                        <TextInput name="streetAddress" placeholder="Enter Street Address" control={generalInfoForm.control} label="Street Address" />
-                        <TextInput required disabled={!!defaultValues.startingDate} name="startingDate" type="date" placeholder="Enter Business Starting Date" control={generalInfoForm.control} label="Business Starting Date" />
+                        <FormField
+                            control={generalInfoForm.control}
+                            name="streetAddress"
+                            render={({ field }) => {
+                                return (
+                                    <FormItem className="w-full">
+                                        <FormLabel>
+                                            Street Adress
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder="Khan IT, 123 Road No. 7, Dhaka 1207" />
+                                        </FormControl>
+                                        <FormMessage>
+                                            This address will show users nearest business.
+                                            This address will be used to calculate the distance between your business and the {"user's"} location.
+                                            <div className="flex gap-2 items-center text-red-600">
+                                                <InfoIcon />
+                                                <span>
+                                                    Better you copy your google business address.
+                                                </span>
+                                            </div>
+
+                                        </FormMessage>
+
+                                    </FormItem>
+                                )
+                            }}
+                        />
+
                     </Flex>
+                    <TextInput required disabled={!!defaultValues.startingDate} name="startingDate" type="date" placeholder="Enter Business Starting Date" control={generalInfoForm.control} label="Business Starting Date" />
                     <Flex>
                         <TextInput name="website" control={generalInfoForm.control} placeholder="https://yourbusiness.com" label="Busines Website" />
                         <TextInput name="youtubeVideo" control={generalInfoForm.control} placeholder="https://www.youtube.com/watch?v=Cs2g2VFWtbo" label="Youtube Introduction Video" />
