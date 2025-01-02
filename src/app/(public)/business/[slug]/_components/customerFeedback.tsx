@@ -1,13 +1,15 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 import { extractYouTubeVideoId } from "@/lib/utils";
 import { useGetVideoFeedbacksQuery, useIsFeatureActiveQuery } from "@/redux/api";
 import { FeatureType } from "@/types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -15,7 +17,6 @@ import "swiper/css/scrollbar";
 import { Autoplay, Navigation } from "swiper/modules";
 import { type Swiper as SwiperType } from "swiper/types";
 import { YtPlayerModal } from "./yt-player-modal";
-import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 
 export const CustomerFeedback = () => {
   const swiperRef = useRef<SwiperType>();
@@ -43,20 +44,20 @@ export const CustomerFeedback = () => {
           <h2 className="text-[2.4rem] font-bold text-black">
             Customer Feedback
           </h2>
-          {/* <TooltipProvider>
-                    <Tooltip
-                        delayDuration={200}
-                    >
-                        <TooltipTrigger asChild>
-                            <button>
-                                <Info className="text-muted" />
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent className="w-[30rem] px-6 text-muted border-none font-bold">
-                            Information provided here not verified by KAGOZ
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider> */}
+          <TooltipProvider>
+            <Tooltip
+              delayDuration={200}
+            >
+              <TooltipTrigger asChild>
+                <button>
+                  <Info className="text-muted" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="w-[30rem] px-6 text-muted border-none font-bold">
+                Information provided here not verified by KAGOZ
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex items-center gap-x-[1.6rem]">
           <div className="w-fit">
