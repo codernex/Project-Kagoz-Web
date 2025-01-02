@@ -3,7 +3,6 @@
 import { CustomButton } from "@/components/shared/custom-button"
 import { Loader } from "@/components/shared/loader"
 import SvgInline from "@/components/shared/svg-inline"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { appendApi, cn } from "@/lib/utils"
 import { useAddFacilityMutation, useGetBusinessBySlugQuery, useGetFacilitiesQuery } from "@/redux/api"
@@ -19,11 +18,9 @@ export const BusinessFacilities = () => {
     })
     const { data: facilities } = useGetFacilitiesQuery()
     const { data, isLoading } = useGetBusinessBySlugQuery(slug)
-
     const toggleFacility = (facility: number) => {
         form.setValue('facilities', form.watch('facilities').includes(facility) ? form.watch('facilities').filter((f: number) => f !== facility) : [...form.watch('facilities'), facility])
     }
-
     const [addfacility] = useAddFacilityMutation()
 
     if (isLoading) {
@@ -45,7 +42,7 @@ export const BusinessFacilities = () => {
                                 <span className="text-muted">
                                     {f.name}
                                 </span>
-                                <SvgInline className="w-10 h-10 hover:stroke-primary transition-colors ease-linear" url={appendApi(f.iconUrl)} />
+                                <SvgInline className="w-10 h-10 hover:stroke-primary transition-colors ease-linear" url={appendApi(f?.iconUrl)} />
                             </div>
                         )
                     })

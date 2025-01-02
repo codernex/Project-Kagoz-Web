@@ -29,7 +29,7 @@ export const BusinessFacilities = () => {
             <div key={index} className="flex items-center space-x-xs">
               <CheckCircle2 size={20} className="text-green-500" />
               <div className="flex space-x-xxs text-black font-medium items-center">
-                <SvgInline className="h-16 w-16 hover:stroke-orange-500 " url={appendApi(f.iconUrl)} />
+                <SvgInline className="h-16 w-16 hover:stroke-orange-500 " url={appendApi(f?.iconUrl)} />
                 <p>Walk-ins Welcome</p>
               </div>
             </div>
