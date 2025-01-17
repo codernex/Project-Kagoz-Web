@@ -1,6 +1,6 @@
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
-import { appendApi, cn } from "@/lib/utils";
+import { appendApi, cn, trimToWordCount } from "@/lib/utils";
 import { useGetReviewQuery } from "@/redux/api";
 import { differenceInDays, differenceInYears } from "date-fns";
 import { Clock3 } from "lucide-react";
@@ -108,7 +108,7 @@ export const SponsoredBusinessItem: React.FC<SponsoredBusinessItemProps> = ({
         </div>
       </div>
       <p className="text-xsm lg:text-sm text-muted">
-        {business.about}
+        {trimToWordCount(business.about, 10)}
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:grid-cols-4">

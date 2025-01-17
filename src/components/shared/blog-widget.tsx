@@ -8,6 +8,9 @@ import Link from "next/link";
 
 export const BlogWidget = () => {
   const { data } = useGetPostsQuery()
+  if (!data) {
+    return null
+  }
   return (
     <div>
       <h2 className="text-md md:text-[2.8rem] font-semibold pb-[2.4rem] text-black">

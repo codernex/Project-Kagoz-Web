@@ -4,7 +4,7 @@ import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
-import { appendApi, cn } from "@/lib/utils";
+import { appendApi, cn, trimToWordCount } from "@/lib/utils";
 import { useGetReviewQuery } from "@/redux/api";
 import { differenceInDays, differenceInYears } from "date-fns";
 import { Clock3 } from "lucide-react";
@@ -107,7 +107,7 @@ const RelatedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
                 </div>
             </div>
             <p className="text-xsm lg:text-sm text-muted">
-                {business?.about}
+                {trimToWordCount(business?.about,16)}
             </p>
         </div>
     );

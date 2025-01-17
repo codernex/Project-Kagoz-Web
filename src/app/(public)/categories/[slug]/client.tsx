@@ -113,10 +113,7 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
                     sortBy={sortBy}
                 />
             </section>
-
-            <section className="bg-bgPrimaryShade border border-borderColor">
-                <SponsoredBusiness />
-            </section>
+            <SponsoredBusiness />
 
             <section className="container py-[6rem] grid grid-cols-6 gap-x-[6rem] gap-y-[4rem]">
                 <div className="w-full col-span-6 md:col-span-4 space-y-[3rem] ">
@@ -142,9 +139,7 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
                     <AdSpace /> */}
                 </div>
             </section>
-            <section className="bg-bgPrimaryShade border border-borderColor">
-                <SponsoredBusiness />
-            </section>
+            <SponsoredBusiness />
             <Pagination currentPage={data?.currentPage ?? 1} totalPages={data?.totalPages ?? 0} page={page} setPage={setPage} />
 
             <section ref={sectionRef} className="py-[6rem] lg:py-[10rem] bg-[#00000005]">
