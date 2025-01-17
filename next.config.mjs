@@ -12,6 +12,17 @@ const nextConfig = {
         protocol: "https",
         hostname: "img.youtube.com",
       },
+      {
+        protocol: 'http',
+        hostname: "88.222.241.93",
+        port: "9000",
+        pathname: "/api/v1/uploads/**"
+      },
+      {
+        protocol: 'http',
+        hostname: "88.222.241.93",
+        pathname: "/api/v1/uploads/**"
+      }
     ],
   },
   reactStrictMode: true,
