@@ -36,9 +36,28 @@ export default function BusinessDashboardLayout({
         skip: !isAuth
     })
 
+    const showToastByParam = (param: string) => {
+        switch (param) {
+            case 'needs_attention':
+                toast.error("Payments are in pending state, We will verify and give your requested access")
+                break;
+            case 'success':
+                toast.success("Congratulations you have access to this features")
+                break;
+            case 'user_cancelled':
+                toast.success("Attention: You have cancelled the payment")
+                break;
+            case 'error':
+                toast.success("Something went wrong")
+                break;
+            default:
+                break;
+        }
+    }
+
     useEffect(() => {
-        if (param && param === 'failed') {
-            toast.error("Somehow payment for this feature is failed, Please try again letter")
+        if (param) {
+            showToastByParam(param)
         }
     }, [param])
 
