@@ -21,8 +21,7 @@ export default function FooterOne() {
         />
       </div>
       <p className="text-sm leading-md text-white">
-        Lorem Ipsum is simply dummy text of the printing industry, Lorem Ipsum
-        has been the {"industry's"}.
+        Kagoz is Bangladesh's local business directory, empowering entrepreneurs with comprehensive listings, guest posting, and digital visibility since 2022.
       </p>
       <div className="flex space-x-sm">
         {

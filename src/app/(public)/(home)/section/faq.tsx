@@ -20,10 +20,7 @@ export default function FAQ() {
               Frequently Asked Questions
             </h2>
             <p className="text-muted leading-md pt-[1.6rem]">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              complicated master eiusmod tempor incididunt ut labore et dolore
-              magna aliqua. Quiser amerodes ipsum suspendisse dolors ultrices
-              gravid risus commodo.
+              Explore our FAQ section to learn more about KAGOZ, how to list your business, guest posting opportunities, and the features we offer to support and empower local businesses in Bangladesh.
             </p>
             <Button
               asChild

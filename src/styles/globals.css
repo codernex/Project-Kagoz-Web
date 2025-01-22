@@ -101,3 +101,14 @@ body {
 .instagram {
   background: linear-gradient(180deg, #7028ce 0%, #ed2a7c 50%, #f9cb35 100%);
 }
+
+.about-bg {
+  background-image: url("/images/about.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+.about-bottom-bg {
+  background-image: url("/images/about-bottom.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+}
