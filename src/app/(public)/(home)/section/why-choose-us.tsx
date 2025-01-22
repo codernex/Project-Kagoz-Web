@@ -21,7 +21,7 @@ const WhyChooseUs = () => {
             <div>
               <h2 className="section_title pt-4 text-left">Why Choose us</h2>
               <p className="text-muted text-xsm pt-[2.4rem] leading-md">
-                Kagoz offers reliable listings, advanced search, guest posting, and dedicated support to boost your business's online presence.
+                Kagoz offers reliable listings, advanced search, guest posting, and dedicated support to boost your {"business's"} online presence.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 border border-muted border-r-0 border-l-0">

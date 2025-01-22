@@ -15,7 +15,7 @@ const AboutUs = () => {
             Modern business must include <br /> it as a crucial element.
           </h2>
           <p className="text-muted text-xsm pt-[2.4rem]">
-          KAGOZ is Bangladesh's premier business directory, bridging businesses and customers while empowering entrepreneurs with digital tools to grow and succeed.
+            KAGOZ is Bangladesh{"'"}s premier business directory, bridging businesses and customers while empowering entrepreneurs with digital tools to grow and succeed.
           </p>
 
           <div className="space-y-[2rem] py-[5.2rem]">
@@ -69,7 +69,7 @@ const AboutUs = () => {
                   Our Ambitions
                 </h3>
                 <p className="text-muted text-xsm lg:text-sm lg:leading-[3rem]">
-                  To be Bangladesh’s leading business directory, empowering entrepreneurs with digital visibility and fostering growth through innovation and connection.
+                  To be Bangladesh{'’'}s leading business directory, empowering entrepreneurs with digital visibility and fostering growth through innovation and connection.
                 </p>
               </div>
             </div>
@@ -123,7 +123,7 @@ const AboutUs = () => {
                   Digital Marketing
                 </h3>
                 <p className="text-muted text-xsm lg:leading-[3rem]">
-                KAGOZ enhances visibility, connects businesses with customers, offers guest posting, ensures updated information, and provides tools for growth.
+                  KAGOZ enhances visibility, connects businesses with customers, offers guest posting, ensures updated information, and provides tools for growth.
                 </p>
               </div>
             </div>

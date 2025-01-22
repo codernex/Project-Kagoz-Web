@@ -21,7 +21,7 @@ export default function FooterOne() {
         />
       </div>
       <p className="text-sm leading-md text-white">
-        Kagoz is Bangladesh's local business directory, empowering entrepreneurs with comprehensive listings, guest posting, and digital visibility since 2022.
+        Kagoz is {"Bangladesh's"} local business directory, empowering entrepreneurs with comprehensive listings, guest posting, and digital visibility since 2022.
       </p>
       <div className="flex space-x-sm">
         {
