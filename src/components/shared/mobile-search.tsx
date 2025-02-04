@@ -114,7 +114,7 @@ const MobileSearch: React.FC = React.memo(() => {
                     onFocus={() => {
                         setSearchDropdown(true)
                         categoryAction()
-                        businessAction()
+                        businessAction({ name: searchTerm })
                     }}
                     className="h-fit text-muted outline-none focus:outline-none ring-0 border-none selection:bg-primary selection:text-white"
                 />
