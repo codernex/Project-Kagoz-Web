@@ -36,7 +36,7 @@ const MobileBusinessSidebar: React.FC = () => {
   const { logout, isAuth, user } = useAuth()
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink()
-  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined, {
+  const { data: business, refetch } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: 1 }, {
     skip: !isAuth
   });
   const memorizePath = useMemorizedPath(path)
@@ -148,7 +148,7 @@ const MobileBusinessSidebar: React.FC = () => {
         <div className="h-full px-3 overflow-y-auto ">
           <div className="relative space-y-4">
             <div className="w-[90%] py-10">
-              {business?.map((b) => {
+              {business?.business?.map((b) => {
                 return (
                   <Link
                     key={b.id}

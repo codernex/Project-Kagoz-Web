@@ -73,7 +73,7 @@ export const getDynamicNavLink = (slug: string) => {
 // Custom hook to manage business selection and dynamic navigation
 export const useDynamicNavLink = () => {
   const { isAuth } = useAuth()
-  const { data: businesses, isLoading } = useGetBusinessByCurrentUserQuery(undefined, {
+  const { data: businesses, isLoading } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: 1 }, {
     skip: !isAuth
   })
   const { selectedSlug, setSelectedSlug, loadSelectedSlug } = useBusinessStore();
@@ -92,10 +92,10 @@ export const useDynamicNavLink = () => {
   }, [selectedSlug, router, isAuth, pathName])
 
   useEffect(() => {
-    if (selectedSlug === 'null' && businesses?.length && !isLoading) {
+    if (selectedSlug === 'null' && businesses?.business?.length && !isLoading) {
       // If no business is selected, default to the first business
-      setSelectedSlug(businesses[0]?.slug || '');
-      router.push(`/biz/${businesses[0]?.slug}/dashboard`)
+      setSelectedSlug(businesses?.business[0]?.slug || '');
+      router.push(`/biz/${businesses?.business[0]?.slug}/dashboard`)
     }
   }, [selectedSlug, businesses, setSelectedSlug, isLoading, router]);
 

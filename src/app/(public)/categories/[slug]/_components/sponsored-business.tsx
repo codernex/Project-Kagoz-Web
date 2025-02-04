@@ -22,7 +22,7 @@ export const SponsoredBusiness = () => {
       <Loader />
     )
   }
-  if (!data) {
+  if (!data?.length) {
     return null
   }
   return (

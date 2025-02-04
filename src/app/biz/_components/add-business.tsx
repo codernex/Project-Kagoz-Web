@@ -31,7 +31,7 @@ export default function AddBusiness({
   /**
    * Current Users Business
    */
-  const { data } = useGetBusinessByCurrentUserQuery()
+  const { data } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: 1 })
 
   /**
    * Form Initialization
@@ -58,7 +58,7 @@ export default function AddBusiness({
             <form
               onSubmit={form.handleSubmit((d) => {
                 registerBusiness(d).then(res => {
-                  if (res.data || data?.length) {
+                  if (res.data || data?.business?.length) {
                     setOpen(false)
                     form.reset()
                   }

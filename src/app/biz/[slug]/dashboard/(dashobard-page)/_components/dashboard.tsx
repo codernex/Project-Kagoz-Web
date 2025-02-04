@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 export function BusinessDashboard() {
     const { slug } = useParams() as { slug: string }
     const { setOpen } = useAddBusinessModal()
-    const { data } = useGetBusinessByCurrentUserQuery()
+    const { data } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: 1 })
     const { data: business } = useGetBusinessBySlugQuery(slug, {
         skip: slug === 'null'
     })
@@ -17,7 +17,7 @@ export function BusinessDashboard() {
     const { data: reviews } = useGetReviewQuery(slug)
     const { data: dailyPageViews } = useGetDailyPageViewsQuery(slug)
 
-    if (!data?.length) {
+    if (!data?.business?.length) {
         return (
             <div className="flex items-center justify-center text-black font-semibold flex-col gap-3">
                 <p className="text-md">Look like you {"don't have a business"}, Try to create one</p>

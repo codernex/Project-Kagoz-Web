@@ -32,7 +32,7 @@ export default function BusinessDashboardLayout({
         }
     }, [isAuth, setOpen, router, loading]);
 
-    const { data, isLoading, isSuccess } = useGetBusinessByCurrentUserQuery(undefined, {
+    const { data, isLoading, isSuccess } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: 1 }, {
         skip: !isAuth
     })
 
@@ -77,7 +77,7 @@ export default function BusinessDashboardLayout({
                 <main className="w-full px-">{children}</main>
             </div>
             <AddBusiness onOpenChange={
-                !!data?.length
+                !!data?.business?.length
             } />
             <UserProfile />
         </div>

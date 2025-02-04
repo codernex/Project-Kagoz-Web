@@ -2,6 +2,18 @@ import { successMessage } from "@/lib/utils";
 import { toast } from "sonner";
 import { baseApi } from "./base";
 
+type BusinessQuery = {
+  page: number;
+  limit: number;
+  all: boolean;
+};
+
+type PaginatedBusinessResponse = {
+  business: IBusiness[];
+  currentPage: number;
+  totalPages: number;
+};
+
 const business = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     registerBusiness: builder.mutation<any, any>({
@@ -11,23 +23,18 @@ const business = baseApi.injectEndpoints({
         data,
       }),
       onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
-        const { data } = await queryFulfilled;
-
-        dispatch(
-          business.util.updateQueryData(
-            "getBusinessByCurrentUser",
-            undefined,
-            (draft) => [...draft, data]
-          )
-        );
-
+        await queryFulfilled;
         toast.success("new business registered, successfully");
       },
       invalidatesTags: ["CurrentUsersBusiness"],
     }),
-    getBusinessByCurrentUser: builder.query<IBusiness[], void>({
-      query: () => ({
+    getBusinessByCurrentUser: builder.query<
+      PaginatedBusinessResponse,
+      BusinessQuery | undefined
+    >({
+      query: (params) => ({
         url: "/business/me",
+        params,
       }),
       providesTags: ["CurrentUsersBusiness"],
     }),
@@ -222,8 +229,8 @@ const business = baseApi.injectEndpoints({
         params: query,
       }),
     }),
-    getBusiness: builder.query<IBusiness[], void>({
-      query: () => ({ url: "/business" }),
+    getBusiness: builder.query<IBusiness[], { name: string }>({
+      query: (params) => ({ url: "/business", params }),
     }),
     claimBusiness: builder.mutation<any, any>({
       query: ({ slug, ...data }) => ({

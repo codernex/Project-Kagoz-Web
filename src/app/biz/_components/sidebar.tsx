@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 import { useMemorizedPath } from "@/hooks/memorizeCurrentPath";
-import { cn } from "@/lib/utils";
+import { cn, trimToWordCount } from "@/lib/utils";
 import {
   useGetBusinessByCurrentUserQuery
 } from "@/redux/api/business";
@@ -12,20 +12,21 @@ import {
   SquareArrowOutUpRight
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useDynamicNavLink } from "./dynamic-nav";
+import { Pagination } from "./pagination";
 export const Sidebar = () => {
   const { isAuth } = useAuth()
   const path = usePathname();
   const { dynamicNavLinks, setSelectedSlug, selectedSlug } = useDynamicNavLink();
-  const { data: business, refetch } = useGetBusinessByCurrentUserQuery(undefined, {
+  const searchParams = useSearchParams()
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const { data: business, refetch } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page }, {
     skip: !isAuth
   });
   const memorizePath = useMemorizedPath(path)
   const { setOpen } = useAddBusinessModal()
-
-
 
   useEffect(() => {
     if (isAuth) {
@@ -41,7 +42,7 @@ export const Sidebar = () => {
       <div className="h-full px-3 overflow-y-auto ">
         <div className="relative space-y-4">
           <div className="w-[90%] py-10">
-            {business?.map((b) => {
+            {business?.business?.map((b) => {
               return (
                 <Link
                   key={b.id}
@@ -54,11 +55,12 @@ export const Sidebar = () => {
                     )
                   }
                 >
-                  {b?.name}
+                  {trimToWordCount(b?.name, 2)}
                   <ChevronRightIcon />
                 </Link>
               );
             })}
+            <Pagination setPage={setPage} currentPage={page} totalPages={business?.totalPages} />
           </div>
           <div
             className="absolute top-0 right-0 cursor-pointer text-secondary"

@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export const BlogWidget = () => {
   const { data } = useGetPostsQuery()
-  if (!data) {
+  if (!data?.length) {
     return null
   }
   return (

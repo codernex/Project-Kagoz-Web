@@ -33,6 +33,9 @@ export function extractYouTubeVideoId(url: string): string {
 export const TK_SYMBOL = "৳";
 
 export function trimToWordCount(str: string, wordCount: number) {
+  if (!str) {
+    return "";
+  }
   // Split the string into words
   const words = str.split(" ");
 
@@ -40,5 +43,5 @@ export function trimToWordCount(str: string, wordCount: number) {
   const trimmedWords = words.slice(0, wordCount);
 
   // Join the words back into a string
-  return trimmedWords.join(" ")+'...';
+  return trimmedWords.join(" ") + "...";
 }

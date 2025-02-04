@@ -33,7 +33,7 @@ const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
         role="presentation"
         aria-hidden="true"
       />
-      <h3 className=" text-sm lg:text-md font-semibold leading-[25.41px] text-black">
+      <h3 className=" text-sm lg:text-md font-semibold text-center leading-[25.41px] text-black">
         {category.name}
       </h3>
       <div className="border-[1px] border-[#6F00FF33] rounded-xl bg-[#6F00FF0D] w-[5rem] lg:w-[6.8rem] text-center h-[2.4rem] lg:h-[3.4rem] flex items-center justify-center">

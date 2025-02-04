@@ -26,6 +26,9 @@ type SearchResult = {
   slug: string
 };
 
+
+
+
 const Hero = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -130,7 +133,7 @@ const Hero = () => {
                 <Search handleFocus={() => {
                   setSearchDropdown(true)
                   categoryAction()
-                  businessAction()
+                  businessAction({ name: searchTerm })
                 }} searchTerm={searchTerm} setSearchTerm={setSearchTerm} ref={searchRef} />
                 {searchDropdown && searchTerm.length ? (
                   <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem] z-[99] grid !gap-y-3">
