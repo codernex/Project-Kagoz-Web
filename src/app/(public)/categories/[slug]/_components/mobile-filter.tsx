@@ -19,10 +19,10 @@ interface MobileFilterProps {
     React.SetStateAction<"KAGOZ" | "Verified Lisence" | "None">
   >;
   setAvalibility: React.Dispatch<
-    React.SetStateAction<"Now Open" | "Now Closed">
+    React.SetStateAction<"Now Open" | "Now Closed" | "N/A">
   >;
   lisenceType: "KAGOZ" | "Verified Lisence" | "None";
-  avalibility: "Now Open" | "Now Closed";
+  avalibility: "Now Open" | "Now Closed" | "N/A";
   sortBy: string,
   setSortBy: React.Dispatch<React.SetStateAction<string>>
 }
@@ -100,7 +100,13 @@ export const MobileFilter: React.FC<MobileFilterProps> = ({
                 className="w-8 h-8 rounded-[.4rem] border-muted"
                 checked={avalibility === "Now Open"}
                 onCheckedChange={(e) => {
-                  setAvalibility("Now Open");
+                  setAvalibility(prev => {
+                    if (prev === "Now Open") {
+                      return "N/A"
+                    } else {
+                      return "Now Open"
+                    }
+                  });
                 }}
               />
               <p>Now Open</p>
@@ -110,7 +116,7 @@ export const MobileFilter: React.FC<MobileFilterProps> = ({
                 className="w-8 h-8 rounded-[.4rem] border border-muted"
                 checked={avalibility === "Now Closed"}
                 onCheckedChange={(e) => {
-                  setAvalibility("Now Closed");
+                  setAvalibility(prev => prev === "Now Closed" ? "N/A" : "Now Closed");
                 }}
               />
               <p>Now Closed</p>

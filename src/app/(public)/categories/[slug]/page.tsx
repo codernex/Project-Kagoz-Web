@@ -1,7 +1,7 @@
+import { NotFound } from "@/components/shared/not-found";
+import { axiosInstance } from "@/redux/api";
 import { Metadata } from "next";
 import CategoriesSearchPage from "./client";
-import { axiosInstance } from "@/redux/api";
-import { NotFound } from "@/components/shared/not-found";
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { slug } = await params;

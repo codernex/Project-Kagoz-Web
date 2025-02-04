@@ -9,7 +9,7 @@ import Dompurify from "dompurify";
 import { ChevronRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
@@ -31,16 +31,17 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
         return Dompurify.sanitize(socialData?.content || '')
     }, [socialData])
 
+    const searchParams = useSearchParams()
     /**
      * Filtering & Sorting Result With pagination
      */
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useState(1 || Number(searchParams.get('page')))
     const router = useRouter()
     const [lisenceType, setLisenceType] = useState<"KAGOZ" | "Verified Lisence" | "None">(
         "None",
     );
-    const [avalibility, setAvalibility] = useState<"Now Open" | "Now Closed">(
-        "Now Open",
+    const [avalibility, setAvalibility] = useState<"Now Open" | "Now Closed" | "N/A">(
+        "N/A",
     );
     const [sortBy, setSortBy] = useState('recommended')
 
@@ -68,7 +69,7 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
         isClosed: avalibility === 'Now Closed',
         isTrusted: lisenceType === 'KAGOZ',
         isVerified: lisenceType === 'Verified Lisence',
-        limit: 20,
+        limit: 10,
         page,
         sortBy,
         ...location
@@ -140,7 +141,7 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
                 </div>
             </section>
             <SponsoredBusiness />
-            <Pagination currentPage={data?.currentPage ?? 1} totalPages={data?.totalPages ?? 0} page={page} setPage={setPage} />
+            <Pagination page={page} setPage={setPage} totalPages={data?.totalPages || 1} />
 
             <section ref={sectionRef} className="py-[6rem] lg:py-[10rem] bg-[#00000005]">
                 <div className="container editor" dangerouslySetInnerHTML={{

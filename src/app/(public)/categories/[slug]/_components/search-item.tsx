@@ -4,7 +4,7 @@ import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
-import { appendApi, cn } from "@/lib/utils";
+import { appendApi, cn, trimToWordCount } from "@/lib/utils";
 import { useGetReviewQuery } from "@/redux/api";
 import { differenceInDays, differenceInYears } from "date-fns";
 import { Clock3 } from "lucide-react";
@@ -31,11 +31,10 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
         <div className="flex space-x-[2rem] lg:space-x-[1rem] xl:space-x-[1rem] 2xl:space-x-[2rem]">
           <div className="w-[10rem] h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
             <div className="relative w-full h-full">
-              <Image
+              <img
                 src={appendApi(business.logoUrl)}
-                alt={business.name}
-                className="rounded-xs object-contain"
-                fill
+                alt={trimToWordCount(business.name, 1)}
+                className="rounded-xs object-contain w-[10rem] h-[10rem] placeholder:line-clamp-3"
               />
             </div>
           </div>

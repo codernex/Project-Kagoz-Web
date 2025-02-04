@@ -67,7 +67,7 @@ export default function TopSection() {
                         </div>
                         <div className="space-y-[.6rem] lg:space-y-[1.6rem] flex-1">
                             <div className="relative w-fit">
-                                <h3 className="text-md lg:text-[3.2rem] xl:text-lg font-bold leading-md text-black">
+                                <h3 className="text-md lg:text-[3.2rem] xl:text-lg font-bold text-black leading-tight capitalize">
                                     {data?.name}
                                 </h3>
                                 {

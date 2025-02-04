@@ -15,7 +15,7 @@ async function fetchCategories() {
 async function fetchBusiness() {
   try {
     const response = await axiosInstance.get("/business");
-    return response.data.data as IBusiness[];
+    return response.data.data.business as IBusiness[];
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];

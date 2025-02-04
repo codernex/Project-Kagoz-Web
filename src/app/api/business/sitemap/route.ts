@@ -4,8 +4,12 @@ import { axiosInstance } from "@/redux/api";
 // Helper function to fetch categories
 async function fetchCategories() {
   try {
-    const response = await axiosInstance.get("/business");
-    return response.data.data as IBusiness[];
+    const response = await axiosInstance.get("/business", {
+      params: {
+        all: true,
+      },
+    });
+    return response.data.data.business as IBusiness[];
   } catch (error) {
     console.error("Error fetching Business:", error);
     return [];
@@ -13,10 +17,7 @@ async function fetchCategories() {
 }
 
 // Generate XML sitemap
-function generateSitemap(
-  categories: IBusiness[],
-  baseUrl: string
-): string {
+function generateSitemap(categories: IBusiness[], baseUrl: string): string {
   const urls = categories.map(
     (category) => `
     <url>
