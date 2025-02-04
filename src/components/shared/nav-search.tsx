@@ -79,10 +79,10 @@ const NavSearch: React.FC = React.memo(() => {
     setSearchDropdown(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log("Running under mobile view");
-    
-  },[])
+
+  }, [])
   return (
     <div
       className="bg-white rounded-xl h-[4rem] lg:h-[5rem] flex items-center pl-[3.2rem] pr-[.8rem] w-full shadow-none z-10 relative"
@@ -124,7 +124,7 @@ const NavSearch: React.FC = React.memo(() => {
           onFocus={() => {
             setSearchDropdown(true);
             categoryAction()
-            businessAction()
+            businessAction({ name: searchTerm })
           }}
           className="h-fit text-muted outline-none focus:outline-none ring-0 border-none"
         />
