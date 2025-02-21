@@ -23,23 +23,22 @@ const RelatedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
     return (
         <div className="p-[2.4rem] shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem]">
             <div className="flex space-x-[2rem] lg:space-x-[1rem] xl:space-x-[1rem] 2xl:space-x-[2rem]">
-                <div className="w-[10rem] h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
-                    <div className="relative w-full h-full">
-                        <Image
-                            src={appendApi(business?.logoUrl)}
-                            alt="Featured Brand"
-                            className="rounded-xs"
-                            sizes="100%"
-                            fill
-                        />
-                    </div>
+                <div className="w-[10rem] h-[10rem] rounded-xs border border-borderColor relative  p-[1.2rem]">
+                    <Image
+                        src={business?.logoUrl ? appendApi(business?.logoUrl) : '/images/default.png'}
+                        alt="Featured Brand"
+                        className="rounded-xs"
+                        sizes="100%"
+                        fill
+                    />
                 </div>
                 <div>
                     <div className="relative w-fit">
-                        <Link href={`/business/${business.slug}`}>
-                            <h3 className="font-bold text-black text-smd lg:text-md leading-md">
-                                {business?.name}
-                            </h3></Link>
+                        <h3 className="font-bold text-black text-smd lg:text-md leading-md">
+                            <Link href={`/business/${business.slug}`}>
+                                {trimToWordCount(business?.name, 4)}
+                            </Link>
+                        </h3>
                         {
                             business?.isTrusted ? <VerifiedBadge className="absolute top-0 -right-8" /> : ''
                         }
@@ -87,7 +86,7 @@ const RelatedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
                         }
                     </div>
 
-                    <div className="flex space-x-1 items-center py-2">
+                    {/* <div className="flex space-x-1 items-center py-2">
                         <Clock3
                             size={18}
                             className={cn(
@@ -103,11 +102,11 @@ const RelatedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
                         >
                             {isOpen ? "Open Now" : "Closed"}
                         </p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <p className="text-xsm lg:text-sm text-muted">
-                {trimToWordCount(business?.about,16)}
+                {trimToWordCount(business?.about, 16)}
             </p>
         </div>
     );

@@ -86,10 +86,10 @@ export default function CategoriesSearchPage({ slug, category }: { slug: string,
                     <div className="flex items-center text-muted">
                         <Link href={"/"}>Home</Link>
                         <ChevronRight size={18} />
-                        <span>Movers</span>
+                        <span>{slug}</span>
                     </div>
                     <h1 className="text-md lg:text-lg text-muted font-bold">
-                        Top {data?.items.length} <span className="text-black capitalize">{`"${slug}"`}</span> in{" "}
+                        Top {data?.items.length} <span className="text-black capitalize">{`${slug.split('-').join(' ')}`}</span> in{" "}
                         <span className="text-black">Dhaka</span>
                     </h1>
                 </div>

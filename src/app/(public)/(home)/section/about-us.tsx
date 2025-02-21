@@ -8,12 +8,12 @@ const AboutUs = () => {
     <section id="about" className="container bg-white section_padding">
       <div className="flex flex-col md:flex-row md:space-x-[2rem] lg:space-x-[8.7rem] items-center">
         <div className="w-full lg:w-1/2">
-          <p className="text-primary text-smd lg:text-[2.1rem] font-medium">
+          <h2 className="text-primary text-smd lg:text-[2.1rem] font-medium">
             About us
-          </p>
-          <h2 className="section_title pt-4 text-left">
-            Modern business must include <br /> it as a crucial element.
           </h2>
+          <h3 className="section_title pt-4 text-left">
+            Modern business must include <br /> it as a crucial element.
+          </h3>
           <p className="text-muted text-xsm pt-[2.4rem]">
             KAGOZ is Bangladesh{"'"}s premier business directory, bridging businesses and customers while empowering entrepreneurs with digital tools to grow and succeed.
           </p>

@@ -26,7 +26,7 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
         <div className="w-[10rem] h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
           <div className="relative w-full h-full">
             <Image
-              src={appendApi(business?.logoUrl)}
+              src={business?.logoUrl ? appendApi(business?.logoUrl) : '/images/default.png'}
               alt="Featured Brand"
               className="rounded-xs"
               sizes="100%"
@@ -87,7 +87,7 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
             }
           </div>
 
-          <div className="flex space-x-1 items-center py-2">
+          {/* <div className="flex space-x-1 items-center py-2">
             <Clock3
               size={18}
               className={cn(
@@ -103,7 +103,7 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
             >
               {isOpen ? "Open Now" : "Closed"}
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
       <p className="text-xsm lg:text-sm text-muted">

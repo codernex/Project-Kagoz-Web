@@ -39,25 +39,39 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     const categories = [data?.primaryCategory?.name, ...data?.subcategories?.map(s => s.name)]
 
     return {
-      title: data.name + ' | KAGOZ',
+      title: data.name + '- Services and contact information - KAGOZ',
       description: data.about,
       alternates: {
         canonical: process.env.NEXT_PUBLIC_BASE_URL + `/business/${slug}`
       },
       openGraph: {
-        title: data.name + ' | KAGOZ',
+        title: data.name + '- Services and contact information - KAGOZ',
         description: data.about,
         images: appendApi(data.logoUrl),
         type: "website",
-        url: `https://localhost:3000/business/${data.slug}`
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}/business/${data.slug}`
       },
       twitter: {
         card: 'summary_large_image',
-        title: data.name + ' | KAGOZ',
+        title: data.name + '- Services and contact information - KAGOZ',
         description: data.about,
         images: appendApi(data.logoUrl),
       },
-      keywords: categories.join(',')
+      keywords: categories.join(','),
+      robots: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
+      }
     };
   } catch (error) {
     return {}

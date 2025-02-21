@@ -33,9 +33,13 @@ export const AboutBusiness = () => {
                 {
                   data?.primaryCategory ? (
                     <div className="flex items-center space-x-xsm">
-                      <div className="h-[4rem] w-[4rem] border border-borderColor rounded-full flex items-center justify-center">
-                        <Image src={appendApi(data?.primaryCategory?.iconUrl || '')} alt={data?.primaryCategory?.name || ''} width={24} height={24} />
-                      </div>
+                      {
+                        data?.primaryCategory?.iconUrl ? (
+                          <div className="h-[4rem] w-[4rem] border border-borderColor rounded-full flex items-center justify-center">
+                            <Image src={appendApi(data?.primaryCategory?.iconUrl || '')} alt={''} width={24} height={24} />
+                          </div>
+                        ) : ''
+                      }
                       <div>
                         <h3 className="font-bold text-black text-smd">{data?.primaryCategory?.name}</h3>
                         <p className="text-muted">
@@ -49,7 +53,7 @@ export const AboutBusiness = () => {
                   return (
                     <div key={index} className="flex items-center space-x-xsm">
                       <div className="h-[4rem] w-[4rem] border border-borderColor rounded-full flex items-center justify-center">
-                        <Image src={appendApi(c?.iconUrl || '')} alt={c?.name || ''} width={24} height={24} />
+                        <Image src={appendApi(c?.iconUrl || '')} alt={''} width={24} height={24} />
                       </div>
                       <div>
                         <h3 className="font-bold text-black text-smd">{c?.name}</h3>

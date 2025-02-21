@@ -27,7 +27,17 @@ export async function generateMetadata(): Promise<Metadata> {
             keywords: data.keyword,
             robots: {
                 index: data.index,
-                follow: data.follow
+                follow: data.follow,
+                "max-image-preview": "large",
+                "max-snippet": -1,
+                "max-video-preview": -1,
+                googleBot: {
+                    index: data.index,
+                    follow: data.follow,
+                    "max-image-preview": "large",
+                    "max-snippet": -1,
+                    "max-video-preview": -1,
+                },
             }
         }
     } catch (error) {
@@ -46,7 +56,17 @@ export async function generateMetadata(): Promise<Metadata> {
             },
             robots: {
                 index: true,
-                follow: true
+                follow: true,
+                "max-image-preview": "large",
+                "max-snippet": -1,
+                "max-video-preview": -1,
+                googleBot: {
+                    index: true,
+                    follow: true,
+                    "max-image-preview": "large",
+                    "max-snippet": -1,
+                    "max-video-preview": -1,
+                },
             }
         }
     }

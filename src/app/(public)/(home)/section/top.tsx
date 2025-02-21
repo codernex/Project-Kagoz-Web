@@ -11,7 +11,7 @@ import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 import { appendApi, cn } from "@/lib/utils";
 import { useClaimBusinessMutation, useGetBusinessBySlugQuery, useGetReviewQuery, useHasLikedBusinessQuery, useLikeBusinessMutation } from "@/redux/api";
-import { differenceInDays, differenceInYears } from 'date-fns';
+import { differenceInDays, differenceInYears, formatDate, subYears } from 'date-fns';
 import { Clock3, Heart, PlayIcon, PlusIcon, Share2Icon, Star, TwitterIcon } from "lucide-react";
 import millify from "millify";
 import Image from "next/image";
@@ -62,21 +62,21 @@ export default function TopSection() {
                     <div className="flex space-x-[2.4rem] items-start">
                         <div className=" w-[10rem] h-[10rem] md:!w-[12rem] md:!h-[12rem] p-[1.2rem] border border-borderColor rounded-xs">
                             <div className="relative w-full h-full ">
-                                <Image src={appendApi(data?.logoUrl)} className="object-contain" alt="" fill />
+                                <Image src={data?.logoUrl ? appendApi(data?.logoUrl) : '/images/default.png'} className="object-contain" alt="" fill />
                             </div>
                         </div>
                         <div className="space-y-[.6rem] lg:space-y-[1.6rem] flex-1">
                             <div className="relative w-fit">
-                                <h3 className="text-md lg:text-[3.2rem] xl:text-lg font-bold text-black leading-tight capitalize">
+                                <h1 className="text-md lg:text-[3.2rem] xl:text-lg font-bold text-black leading-tight capitalize">
                                     {data?.name}
-                                </h3>
+                                </h1>
                                 {
                                     data?.isTrusted ? (
                                         <VerifiedBadge className="absolute -top-4 -right-8" />
                                     ) : null
                                 }
                             </div>
-                            <div className="flex space-x-1 items-center py-2">
+                            {/* <div className="flex space-x-1 items-center py-2">
                                 <Clock3
                                     size={18}
                                     className={cn(
@@ -92,7 +92,7 @@ export default function TopSection() {
                                 >
                                     {isOpen ? "Open Now" : "Closed"}
                                 </p>
-                            </div>
+                            </div> */}
                             <div className="flex flex-wrap gap-x-[3rem]">
                                 <p className="text-smtext-xs text-muted items-center flex space-x-[0.8rem]">
                                     <svg
@@ -111,7 +111,7 @@ export default function TopSection() {
                                             fill="#6E6777"
                                         />
                                     </svg>
-                                    <span>{differenceInYears(new Date(), data.startingDate)} years in business</span>
+                                    <span>{differenceInYears(new Date(), data.startingDate || subYears(new Date(), 1))} years in business</span>
                                 </p>
                                 <p className="text-sm text-muted flex items-center space-x-[0.8rem]">
                                     <Calendar />

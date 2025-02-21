@@ -29,14 +29,14 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
     <div className="p-[2.4rem] drop-shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem] bg-white flex flex-col md:flex-row items-end h-fit relative w-full">
       <div className="w-full md:w-[60%]">
         <div className="flex space-x-[2rem] lg:space-x-[1rem] xl:space-x-[1rem] 2xl:space-x-[2rem]">
-          <div className="w-[10rem] h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
-            <div className="relative w-full h-full">
-              <img
-                src={appendApi(business.logoUrl)}
-                alt={trimToWordCount(business.name, 1)}
-                className="rounded-xs object-contain w-[10rem] h-[10rem] placeholder:line-clamp-3"
-              />
-            </div>
+          <div className="w-[10rem] relative h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
+            <Image
+              src={business?.logoUrl ? appendApi(business?.logoUrl) : '/images/default.png'}
+              alt="Featured Brand"
+              className="rounded-xs"
+              sizes="100%"
+              fill
+            />
           </div>
           <div>
             <div className="relative w-fit">
@@ -49,7 +49,7 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
                 ) : null
               }
             </div>
-            <div className="flex space-x-1 items-center py-2">
+            {/* <div className="flex space-x-1 items-center py-2">
               <Clock3
                 size={18}
                 className={cn(
@@ -65,8 +65,8 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
               >
                 {isOpen ? "Open Now" : "Closed"}
               </p>
-            </div>
-            <div className="flex flex-col gap-y-2 md:flex-row md:gap-x-[3rem]">
+            </div> */}
+            <div className="flex flex-col gap-y-2 md:flex-row md:gap-x-[3rem] mt-2">
               <p className="text-xs text-muted flex space-x-[0.8rem]">
                 <svg
                   width="14"

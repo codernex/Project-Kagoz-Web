@@ -9,28 +9,49 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     const response = await axiosInstance.get<{ data: ICategory }>(`/categories/info/${slug}`);
     const data = response.data.data;
     return {
-      title: `${data.name} | KAGOZ`,
+      title: `Top 10 Best ${data.name} in Dhaka - KAGOZ`,
       description: data.about,
       alternates: {
         canonical: `/categories/${slug}`,
       },
       openGraph: {
         type: 'website',
-        title: `${data.name} | KAGOZ`,
+        title: `Top 10 Best ${data.name} in Dhaka - KAGOZ`,
         description: data.about
       },
       keywords: ['kagoz'],
       robots: {
         index: true,
-        follow: true
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
       }
     };
   } catch (error) {
     return {
       title: "Category not found",
+      description: "Category not found",
       robots: {
         index: true,
-        follow: true
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
       }
     };
   }
