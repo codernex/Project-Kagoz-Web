@@ -6,7 +6,7 @@ import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import { appendApi, cn, trimToWordCount } from "@/lib/utils";
 import { useGetReviewQuery } from "@/redux/api";
-import { differenceInDays, differenceInYears } from "date-fns";
+import { differenceInDays, differenceInYears, subYears } from "date-fns";
 import { Clock3 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,7 +45,8 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
             }
           </div>
           <div className="flex flex-wrap md:space-x-[3rem] mt-2">
-            <p className="text-xs text-muted flex space-x-[0.8rem]">
+            business.startingDate ? (
+            <p className="text-xs text-muted items-center flex space-x-[0.8rem]">
               <svg
                 width="14"
                 height="15"
@@ -62,8 +63,9 @@ const FeaturedItem: React.FC<{ business: IBusiness }> = ({ business }) => {
                   fill="#6E6777"
                 />
               </svg>
-              <span>{differenceInYears(new Date(), business?.startingDate)} years in business</span>
+              <span>{differenceInYears(new Date(), business.startingDate || subYears(new Date(), 1))} years in business</span>
             </p>
+            ) : null
             <p className="text-xs text-muted flex space-x-[0.8rem]">
               <Calendar />
               <span>{Math.round(differenceInDays(new Date(), business?.createdAt) / 30)} Month with KAGOZ</span>
