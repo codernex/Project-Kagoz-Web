@@ -7,7 +7,6 @@ import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import { appendApi, cn, trimToWordCount } from "@/lib/utils";
 import { useGetReviewQuery } from "@/redux/api";
 import { differenceInDays, differenceInYears, subYears } from "date-fns";
-import { Clock3 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";

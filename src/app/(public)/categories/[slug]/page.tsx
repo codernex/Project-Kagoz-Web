@@ -6,20 +6,22 @@ import CategoriesSearchPage from "./client";
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const response = await axiosInstance.get<{ data: ICategory }>(`/categories/info/${slug}`);
+    const response = await axiosInstance.get<{ data: ICategory }>(
+      `/categories/info/${slug}`,
+    );
     const data = response.data.data;
     return {
       title: `Top 10 Best ${data.name} in Dhaka - KAGOZ`,
       description: data.about,
       alternates: {
-        canonical: `/categories/${slug}`,
+        canonical: `/categories/${slug?.replace("-in-dhaka", "")}`,
       },
       openGraph: {
-        type: 'website',
+        type: "website",
         title: `Top 10 Best ${data.name} in Dhaka - KAGOZ`,
-        description: data.about
+        description: data.about,
       },
-      keywords: ['kagoz'],
+      keywords: ["kagoz"],
       robots: {
         index: true,
         follow: true,
@@ -33,7 +35,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
           "max-snippet": -1,
           "max-video-preview": -1,
         },
-      }
+      },
     };
   } catch (error) {
     return {
@@ -52,21 +54,21 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
           "max-snippet": -1,
           "max-video-preview": -1,
         },
-      }
+      },
     };
   }
 }
 
 export default async function Page({ params }: any) {
-  const { slug } = await params
+  const { slug } = await params;
   let data: ICategory | null;
   try {
-    const response = await axiosInstance.get<{ data: ICategory }>(`/categories/info/${slug}`);
+    const response = await axiosInstance.get<{ data: ICategory }>(
+      `/categories/info/${slug?.replace("-in-dhaka", "")}`,
+    );
     data = response.data.data;
   } catch (error) {
-    return <NotFound />
+    return <NotFound />;
   }
-  return (
-    <CategoriesSearchPage slug={slug} category={data!} />
-  )
+  return <CategoriesSearchPage slug={slug} category={data!} />;
 }

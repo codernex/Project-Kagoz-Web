@@ -1,10 +1,10 @@
 "use client";
-import { useGetBusinessQuery, useLazyGetBusinessQuery } from "@/redux/api";
-import { useGetCategoriesQuery, useLazyGetCategoriesQuery } from "@/redux/api/category";
+import { useLazyGetBusinessQuery } from "@/redux/api";
+import { useLazyGetCategoriesQuery } from "@/redux/api/category";
 import Fuse from "fuse.js";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -18,26 +18,27 @@ import {
 type SearchResult = {
   id: string;
   name: string;
-  slug: string
+  slug: string;
 };
-
-
 
 const NavSearch: React.FC = React.memo(() => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState("Dhaka");
   const [searchTerm, setSearchTerm] = useState("");
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [selectedTab, setSelectedTab] = useState<"categories" | "business">("categories");
+  const [selectedTab, setSelectedTab] = useState<"categories" | "business">(
+    "categories",
+  );
   const [searchDropdown, setSearchDropdown] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [categoryAction, { data: categories }] = useLazyGetCategoriesQuery()
-  const [businessAction, { data: business }] = useLazyGetBusinessQuery()
+  const [categoryAction, { data: categories }] = useLazyGetCategoriesQuery();
+  const [businessAction, { data: business }] = useLazyGetBusinessQuery();
 
   // Debounced search term to reduce excessive filtering
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(searchTerm);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] =
+    useState<string>(searchTerm);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -53,17 +54,26 @@ const NavSearch: React.FC = React.memo(() => {
       keys: ["name"],
       threshold: 0.3, // Adjust for more or less fuzzy matching
     }),
-    []
+    [],
   );
 
-  const fuseCategories = useMemo(() => new Fuse(categories || [], fuseOptions), [categories, fuseOptions]);
-  const fuseBusiness = useMemo(() => new Fuse(business || [], fuseOptions), [business, fuseOptions]);
+  const fuseCategories = useMemo(
+    () => new Fuse(categories || [], fuseOptions),
+    [categories, fuseOptions],
+  );
+  const fuseBusiness = useMemo(
+    () => new Fuse(business || [], fuseOptions),
+    [business, fuseOptions],
+  );
 
   useEffect(() => {
     if (debouncedSearchTerm) {
       setLoading(true); // Start loading
       const fuse = selectedTab === "categories" ? fuseCategories : fuseBusiness;
-      const results = fuse.search(debouncedSearchTerm).slice(0, 5).map(result => result.item);
+      const results = fuse
+        .search(debouncedSearchTerm)
+        .slice(0, 5)
+        .map((result) => result.item);
       setSearchResults(results as any[]);
       setLoading(false); // Stop loading
     } else {
@@ -73,7 +83,10 @@ const NavSearch: React.FC = React.memo(() => {
   }, [debouncedSearchTerm, selectedTab, fuseCategories, fuseBusiness]);
 
   const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-    if (dropdownRef.current && dropdownRef.current.contains(event.relatedTarget as Node)) {
+    if (
+      dropdownRef.current &&
+      dropdownRef.current.contains(event.relatedTarget as Node)
+    ) {
       return; // Prevent hiding when clicking inside the dropdown
     }
     setSearchDropdown(false);
@@ -81,15 +94,14 @@ const NavSearch: React.FC = React.memo(() => {
 
   useEffect(() => {
     console.log("Running under mobile view");
-
-  }, [])
+  }, []);
   return (
     <div
-      className="bg-white rounded-xl h-[4rem] lg:h-[5rem] flex items-center pl-[3.2rem] pr-[.8rem] w-full shadow-none z-10 relative"
+      className="relative z-10 flex h-[4rem] w-full items-center rounded-xl bg-white pl-[3.2rem] pr-[.8rem] shadow-none lg:h-[5rem]"
       onBlur={handleBlur}
       tabIndex={-1} // Ensure focusable behavior for blur handling
     >
-      <div className="h-full w-full flex items-center space-x-2">
+      <div className="flex h-full w-full items-center space-x-2">
         <svg
           width="21"
           height="20"
@@ -123,21 +135,21 @@ const NavSearch: React.FC = React.memo(() => {
           placeholder="Search..."
           onFocus={() => {
             setSearchDropdown(true);
-            categoryAction()
-            businessAction({ name: searchTerm })
+            categoryAction();
+            businessAction({ name: searchTerm });
           }}
-          className="h-fit text-muted outline-none focus:outline-none ring-0 border-none"
+          className="h-fit border-none text-muted outline-none ring-0 focus:outline-none"
         />
       </div>
 
-      <div className="w-[1px] h-[40%] border-r-[1px solid] bg-[#6E6777] relative z-10" />
+      <div className="border-r-[1px solid] relative z-10 h-[40%] w-[1px] bg-[#6E6777]" />
 
       <Select
         value={location}
         defaultValue={location}
         onValueChange={(e) => setLocation(e)}
       >
-        <SelectTrigger className="text-muted border-0">
+        <SelectTrigger className="border-0 text-muted">
           <SelectValue placeholder="Location" />
         </SelectTrigger>
         <SelectContent>
@@ -145,19 +157,20 @@ const NavSearch: React.FC = React.memo(() => {
         </SelectContent>
       </Select>
 
-      {
-        /**
+      {/**
          *  <div className="w-fit h-full flex items-center justify-center">
           <Button className="h-[4rem] w-[4rem] md:h-[5rem] md:w-[5rem] rounded-full p-0">
             <ArrowRight />
           </Button>
         </div>
-         */
-      }
+         */}
 
       {searchDropdown && (
-        <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem]">
-          <div className="flex mb-4 py-2 gap-2 border-b border-[#ededed]">
+        <div
+          ref={dropdownRef}
+          className="absolute left-0 top-[120%] max-h-[30rem] w-full overflow-y-scroll rounded-xs bg-white p-[2rem] shadow-md"
+        >
+          <div className="mb-4 flex gap-2 border-b border-[#ededed] py-2">
             <Button
               variant={selectedTab === "categories" ? "default" : "outline"}
               className="rounded-xs"
@@ -173,26 +186,24 @@ const NavSearch: React.FC = React.memo(() => {
               By Business
             </Button>
           </div>
-          {
-            loading && (
-              <div>
-                loading
-              </div>
-            )
-          }
+          {loading && <div>loading</div>}
           {!loading && searchResults.length > 0 ? (
             searchResults.map((result) => (
               <Link
-                href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}`}
+                href={
+                  selectedTab === "business"
+                    ? `/business/${result.slug}`
+                    : `/categories/${result.slug}-in-dhaka`
+                }
                 key={result.id}
-                className="cursor-pointer py-3 px-4 hover:bg-gray-50 bg-gray-50 rounded-[.6rem] border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
+                className="flex cursor-pointer items-center justify-between rounded-[.6rem] border-b border-b-[#ededed] bg-gray-50 px-4 py-3 font-medium text-black last:border-b-0 hover:bg-gray-50"
               >
                 {result.name}
                 <ChevronRight />
               </Link>
             ))
           ) : (
-            <div className="text-muted text-center">No results found</div>
+            <div className="text-center text-muted">No results found</div>
           )}
         </div>
       )}
@@ -201,4 +212,4 @@ const NavSearch: React.FC = React.memo(() => {
 });
 
 export default NavSearch;
-NavSearch.displayName = "NavSearch"
+NavSearch.displayName = "NavSearch";
