@@ -49,7 +49,7 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
                 ) : null
               }
             </div>
-            {/* <div className="flex space-x-1 items-center py-2">
+            <div className="flex space-x-1 items-center py-2">
               <Clock3
                 size={18}
                 className={cn(
@@ -65,7 +65,7 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
               >
                 {isOpen ? "Open Now" : "Closed"}
               </p>
-            </div> */}
+            </div>
             <div className="flex flex-col gap-y-2 md:flex-row md:gap-x-[3rem] mt-2">
               {
                 business.startingDate ? (

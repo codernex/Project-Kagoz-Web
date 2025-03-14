@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { CommonSearchLink } from "./common-search-link";
+import { locationData } from "../location";
 
 type SearchResult = {
   id: string;
@@ -84,6 +86,14 @@ const MobileSearch: React.FC = React.memo(() => {
     }
   }, [debouncedSearchTerm, selectedTab, fuseCategories, fuseBusiness]);
 
+  useEffect(() => {
+    if (selectedTab === 'categories') {
+      categoryAction();
+    } else {
+      businessAction({ name: searchTerm, location });
+    }
+  }, [debouncedSearchTerm])
+
   return (
     <div
       className="relative z-10 flex h-[5rem] w-full items-center rounded-xl bg-white pl-[3.2rem] pr-[.8rem] shadow-none"
@@ -123,8 +133,6 @@ const MobileSearch: React.FC = React.memo(() => {
           placeholder="Search..."
           onFocus={() => {
             setSearchDropdown(true);
-            categoryAction();
-            businessAction({ name: searchTerm });
           }}
           className="h-fit border-none text-muted outline-none ring-0 selection:bg-primary selection:text-white focus:outline-none"
         />
@@ -141,7 +149,15 @@ const MobileSearch: React.FC = React.memo(() => {
           <SelectValue placeholder="Location" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="Dhaka">Dhaka</SelectItem>
+          {
+            locationData.map(l => {
+              return (
+                <SelectItem className="cursor-pointer" value={l}>
+                  {l}
+                </SelectItem>
+              )
+            })
+          }
         </SelectContent>
       </Select>
 
@@ -177,19 +193,7 @@ const MobileSearch: React.FC = React.memo(() => {
           {loading && <div>loading</div>}
           {!loading && searchResults.length > 0 ? (
             searchResults.map((result) => (
-              <Link
-                onClick={() => setOpen(false)}
-                href={
-                  selectedTab === "business"
-                    ? `/business/${result.slug}`
-                    : `/categories/${result.slug}-in-dhaka`
-                }
-                key={result.id}
-                className="flex cursor-pointer items-center justify-between rounded-[.6rem] border-b border-b-[#ededed] bg-gray-50 px-4 py-3 font-medium text-black last:border-b-0 hover:bg-gray-50"
-              >
-                {result.name}
-                <ChevronRight />
-              </Link>
+              <CommonSearchLink setOpen={setSearchDropdown} location={location} selectedTab={selectedTab} result={result} key={result.id} />
             ))
           ) : (
             <div className="text-center text-muted">No results found</div>

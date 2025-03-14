@@ -26,7 +26,7 @@ const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
 
   return (
     <Link
-      href={`/categories/${category.slug}-in-dhaka`}
+      href={`/categories/${category.slug}-in-dhaka?location=dhaka`}
       className="flex flex-col items-center gap-y-[.5rem] rounded-sm bg-white px-[2.4rem] py-[1rem] lg:gap-y-[2rem] lg:py-[3.2rem]"
     >
       <div

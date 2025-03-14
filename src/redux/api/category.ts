@@ -4,7 +4,7 @@ const category = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategories: builder.query<ICategory[], void>({
       query: () => ({
-        url: "/categories",
+        url: `/categories`,
       }),
     }),
     getSubcategories: builder.query<ICategory[], number>({

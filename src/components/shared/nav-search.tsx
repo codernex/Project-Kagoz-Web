@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { locationData } from "../location";
+import { normalizeLocation } from "@/lib/utils";
 
 type SearchResult = {
   id: string;
@@ -33,8 +35,8 @@ const NavSearch: React.FC = React.memo(() => {
   const [searchDropdown, setSearchDropdown] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [categoryAction, { data: categories }] = useLazyGetCategoriesQuery();
-  const [businessAction, { data: business }] = useLazyGetBusinessQuery();
+  const [categoryAction, { data: categories, isLoading: categoryLoading }] = useLazyGetCategoriesQuery();
+  const [businessAction, { data: business, isLoading: businessLoading }] = useLazyGetBusinessQuery();
 
   // Debounced search term to reduce excessive filtering
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
@@ -92,9 +94,7 @@ const NavSearch: React.FC = React.memo(() => {
     setSearchDropdown(false);
   };
 
-  useEffect(() => {
-    console.log("Running under mobile view");
-  }, []);
+
   return (
     <div
       className="relative z-10 flex h-[4rem] w-full items-center rounded-xl bg-white pl-[3.2rem] pr-[.8rem] shadow-none lg:h-[5rem]"
@@ -136,7 +136,7 @@ const NavSearch: React.FC = React.memo(() => {
           onFocus={() => {
             setSearchDropdown(true);
             categoryAction();
-            businessAction({ name: searchTerm });
+            businessAction({ name: searchTerm, location });
           }}
           className="h-fit border-none text-muted outline-none ring-0 focus:outline-none"
         />
@@ -150,10 +150,18 @@ const NavSearch: React.FC = React.memo(() => {
         onValueChange={(e) => setLocation(e)}
       >
         <SelectTrigger className="border-0 text-muted">
-          <SelectValue placeholder="Location" />
+          <SelectValue placeholder="Select Location" className="!text-black"/>
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Dhaka">Dhaka</SelectItem>
+        <SelectContent className="text-black">
+          {
+            locationData.map(l => {
+              return (
+                <SelectItem key={l} className="cursor-pointer" value={l}>
+                  {l}
+                </SelectItem>
+              )
+            })
+          }
         </SelectContent>
       </Select>
 
@@ -186,25 +194,25 @@ const NavSearch: React.FC = React.memo(() => {
               By Business
             </Button>
           </div>
-          {loading && <div>loading</div>}
-          {!loading && searchResults.length > 0 ? (
-            searchResults.map((result) => (
-              <Link
-                href={
-                  selectedTab === "business"
-                    ? `/business/${result.slug}`
-                    : `/categories/${result.slug}-in-dhaka`
-                }
-                key={result.id}
-                className="flex cursor-pointer items-center justify-between rounded-[.6rem] border-b border-b-[#ededed] bg-gray-50 px-4 py-3 font-medium text-black last:border-b-0 hover:bg-gray-50"
-              >
-                {result.name}
-                <ChevronRight />
-              </Link>
-            ))
-          ) : (
-            <div className="text-center text-muted">No results found</div>
-          )}
+          {(categoryLoading || businessLoading) ? <div>loading</div>
+            : searchResults.length > 0 ? (
+              searchResults.map((result) => (
+                <Link
+                  href={
+                    selectedTab === "business"
+                      ? `/business/${result.slug}`
+                      : `/categories/${result.slug}-in-${normalizeLocation(location)}?location=${normalizeLocation(location)}`
+                  }
+                  key={result.id}
+                  className="flex cursor-pointer items-center justify-between rounded-[.6rem] border-b border-b-[#ededed] bg-gray-50 px-4 py-3 font-medium text-black last:border-b-0 hover:bg-gray-50"
+                >
+                  {result.name}
+                  <ChevronRight />
+                </Link>
+              ))
+            ) : (
+              <div className="text-center text-muted">No results found</div>
+            )}
         </div>
       )}
     </div>

@@ -222,6 +222,7 @@ const business = baseApi.injectEndpoints({
         limit: number;
         latitude: number | null;
         longitude: number | null;
+        location?: string | null;
       }
     >({
       query: (query) => ({
@@ -229,9 +230,16 @@ const business = baseApi.injectEndpoints({
         params: query,
       }),
     }),
-    getBusiness: builder.query<IBusiness[], { name: string }>({
-      query: (params) => ({ url: "/business", params }),
-    }),
+    getBusiness: builder.query<IBusiness[], { name: string; location: string }>(
+      {
+        query: (params) => {
+          return {
+            url: "/business",
+            params,
+          };
+        },
+      }
+    ),
     claimBusiness: builder.mutation<any, any>({
       query: ({ slug, ...data }) => ({
         url: `/business/claim/${slug}`,

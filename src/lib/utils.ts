@@ -45,3 +45,7 @@ export function trimToWordCount(str: string, wordCount: number) {
   // Join the words back into a string
   return trimmedWords.join(" ") + "...";
 }
+
+export const normalizeLocation = (location: string) => {
+  return location.toLowerCase().split(" ").join("-");
+};

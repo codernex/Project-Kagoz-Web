@@ -8,16 +8,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { locationData } from "../location";
 
 type SearchProps = {
   searchTerm: string;
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   ref?: React.LegacyRef<HTMLDivElement> | undefined;
-  handleFocus: () => void
+  handleFocus: () => void;
+  location: string
+  setLocation: React.Dispatch<React.SetStateAction<string>>
 };
-const Search: React.FC<SearchProps> = React.memo(({ ref, searchTerm, setSearchTerm, handleFocus }) => {
+const Search: React.FC<SearchProps> = React.memo(({ ref, searchTerm, setSearchTerm, handleFocus, location, setLocation }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const [location, setLocation] = useState("Dhaka");
   return (
     <div
       onClick={() => {
@@ -98,9 +100,15 @@ const Search: React.FC<SearchProps> = React.memo(({ ref, searchTerm, setSearchTe
           </div>
         </SelectTrigger>
         <SelectContent className="rounded-[8px] border-purple-500 py-2 md:py-8 px-6">
-          <SelectItem className="cursor-pointer" value="Dhaka">
-            Dhaka
-          </SelectItem>
+          {
+            locationData.map(l => {
+              return (
+                <SelectItem key={l} className="cursor-pointer" value={l}>
+                  {l}
+                </SelectItem>
+              )
+            })
+          }
         </SelectContent>
       </Select>
     </div>

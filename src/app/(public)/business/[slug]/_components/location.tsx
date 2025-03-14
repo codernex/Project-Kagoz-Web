@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { Clock } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function LocationAndHours() {
   const { slug } = useParams() as { slug: string }
@@ -50,11 +50,13 @@ export default function LocationAndHours() {
           </div>
           <div className="flex flex-col gap-y-smd">
             <div className="rounded-smd overflow-hidden">
-              <GoogleMapComponent />
+              <GoogleMapComponent cid={data.cid} isLoading={false} lat={data.latitude ? Number(data.latitude) : 0} lng={data.longitude ? Number(data.longitude) : 0} />
             </div>
             <div className="flex justify-between items-center text-black">
-              <h2 className="text-md font-semibold">Gulshan, Dhaka 1206</h2>
-              <Button className="h-[4.5rem] px-[3.4rem]">Get Direction</Button>
+              <h2 className="text-md font-semibold">{data.streetAddress}</h2>
+              <Button onClick={() => {
+                window.open(`https://www.google.com/maps/dir/?cid=${data.cid}`, "_blank")
+               }} className="h-[4.5rem] px-[3.4rem]">Get Direction</Button>
             </div>
           </div>
         </div>

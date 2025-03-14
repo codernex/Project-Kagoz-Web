@@ -47,6 +47,7 @@ const Sidebar = () => {
         {data?.website && (
           <Link
             rel="nofollow"
+            target="_blank"
             href={data.website}
             className="flex items-center justify-between rounded-xl border-none bg-[#6E67770D] p-[2rem] font-medium text-primary"
           >

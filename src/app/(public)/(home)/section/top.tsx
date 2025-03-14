@@ -27,6 +27,7 @@ import {
 } from "@/redux/api";
 import { differenceInDays, differenceInYears, subYears } from "date-fns";
 import {
+  Clock3,
   Globe,
   Heart,
   PlayIcon,
@@ -60,7 +61,7 @@ export default function TopSection() {
     if (!reviews) return 0;
     return (
       reviews?.reduce((a, b) => a + parseFloat(b.rating), 0) /
-        reviews?.length || 0
+      reviews?.length || 0
     );
   }, [reviews]);
   const generateStarRating = useStarRatings(averageRatings, 20);
@@ -105,23 +106,23 @@ export default function TopSection() {
                   <VerifiedBadge className="absolute -right-8 -top-4" />
                 ) : null}
               </div>
-              {/* <div className="flex space-x-1 items-center py-2">
-                                <Clock3
-                                    size={18}
-                                    className={cn(
-                                        "fill-secondary text-white",
-                                        !isOpen ? "fill-[#FA5151]" : "fill-secondary",
-                                    )}
-                                />
-                                <p
-                                    className={cn(
-                                        "text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold",
-                                        !isOpen ? "text-[#FA5151]" : "",
-                                    )}
-                                >
-                                    {isOpen ? "Open Now" : "Closed"}
-                                </p>
-                            </div> */}
+              <div className="flex space-x-1 items-center py-2">
+                <Clock3
+                  size={18}
+                  className={cn(
+                    "fill-secondary text-white",
+                    !isOpen ? "fill-[#FA5151]" : "fill-secondary",
+                  )}
+                />
+                <p
+                  className={cn(
+                    "text-secondary text-[1rem] lg:text-[1.1rem] 2xl:text-xs font-semibold",
+                    !isOpen ? "text-[#FA5151]" : "",
+                  )}
+                >
+                  {isOpen ? "Open Now" : "Closed"}
+                </p>
+              </div>
               <div className="flex flex-wrap gap-x-[3rem]">
                 {data.startingDate ? (
                   <p className="text-smtext-xs flex items-center space-x-[0.8rem] text-muted">

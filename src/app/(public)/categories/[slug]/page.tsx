@@ -3,22 +3,23 @@ import { axiosInstance } from "@/redux/api";
 import { Metadata } from "next";
 import CategoriesSearchPage from "./client";
 
-export async function generateMetadata({ params }: any): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: any): Promise<Metadata> {
   const { slug } = await params;
+  const { location } = await searchParams
   try {
     const response = await axiosInstance.get<{ data: ICategory }>(
-      `/categories/info/${slug}`,
+      `/categories/info/${slug.replace(`-in-${location}`, "")}`,
     );
     const data = response.data.data;
     return {
-      title: `Top 10 Best ${data.name} in Dhaka - KAGOZ`,
+      title: `Top 10 Best ${data.name} in ${location} - KAGOZ`,
       description: data.about,
       alternates: {
-        canonical: `/categories/${slug?.replace("-in-dhaka", "")}`,
+        canonical: `/categories/${slug?.replace(`-in-${location}`, "")}`,
       },
       openGraph: {
         type: "website",
-        title: `Top 10 Best ${data.name} in Dhaka - KAGOZ`,
+        title: `Top 10 Best ${data.name} in ${location} - KAGOZ`,
         description: data.about,
       },
       keywords: ["kagoz"],
@@ -59,16 +60,19 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   }
 }
 
-export default async function Page({ params }: any) {
+export default async function Page({ params, searchParams }: any) {
   const { slug } = await params;
+  const { location } = await searchParams
   let data: ICategory | null;
+  const modifiedSlug = slug?.replace(`-in-${location}`, "");
+  console.log(modifiedSlug)
   try {
     const response = await axiosInstance.get<{ data: ICategory }>(
-      `/categories/info/${slug?.replace("-in-dhaka", "")}`,
+      `/categories/info/${slug?.replace(`-in-${location}`, "")}`,
     );
     data = response.data.data;
   } catch (error) {
     return <NotFound />;
   }
-  return <CategoriesSearchPage slug={slug} category={data!} />;
+  return <CategoriesSearchPage slug={slug} category={data!} searchLocation={location} />;
 }

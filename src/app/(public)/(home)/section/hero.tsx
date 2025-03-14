@@ -8,11 +8,11 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, normalizeLocation } from "@/lib/utils";
 import { useLazyGetBusinessQuery } from "@/redux/api";
 import { useLazyGetCategoriesQuery } from "@/redux/api/category";
 import Fuse from "fuse.js";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Loader } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "swiper/css";
@@ -36,10 +36,11 @@ const Hero = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [selectedTab, setSelectedTab] = useState<'categories' | 'business'>('categories')
   const [searchDropdown, setSearchDropdown] = useState(false)
+  const [location, setLocation] = useState('Dhaka')
   const searchRef = useRef<HTMLDivElement>(null)
 
-  const [categoryAction, { data: categories }] = useLazyGetCategoriesQuery()
-  const [businessAction, { data: business }] = useLazyGetBusinessQuery()
+  const [categoryAction, { data: categories, isLoading: categoryLoading }] = useLazyGetCategoriesQuery()
+  const [businessAction, { data: business, isLoading: businessLoading }] = useLazyGetBusinessQuery()
 
   // Debounced search term to reduce excessive filtering
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(searchTerm);
@@ -47,7 +48,7 @@ const Hero = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300); // Adjust debounce delay as needed
+    }, 500); // Adjust debounce delay as needed
 
     return () => clearTimeout(handler);
   }, [searchTerm]);
@@ -92,6 +93,14 @@ const Hero = () => {
     }
   }, [searchTerm])
 
+  useEffect(() => {
+    if (selectedTab === 'categories') {
+      categoryAction()
+    } else {
+      businessAction({ name: searchTerm, location })
+    }
+  }, [debouncedSearchTerm])
+
   return (
     <section id="hero" className="container ">
       <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md px-4">
@@ -127,34 +136,31 @@ const Hero = () => {
                 </Button>
               </div>
               <div className="relative">
-                <Search handleFocus={() => {
-                  setSearchDropdown(true)
-                  categoryAction()
-                  businessAction({ name: searchTerm })
-                }} searchTerm={searchTerm} setSearchTerm={setSearchTerm} ref={searchRef} />
+                <Search
+                  handleFocus={() => {
+                    setSearchDropdown(true)
+                  }} searchTerm={searchTerm} setSearchTerm={setSearchTerm} ref={searchRef} location={location} setLocation={setLocation} />
                 {searchDropdown && searchTerm.length ? (
                   <div ref={dropdownRef} className="absolute left-0 top-[120%] w-full bg-white rounded-xs p-[2rem] shadow-md overflow-y-scroll max-h-[30rem] z-[99] grid !gap-y-3">
                     {
-                      loading && (
-                        <div>
-                          loading
+                      (loading || categoryLoading || businessLoading) ? (
+                        <div className="w-full h-full flex justify-center items-center">
+                          <Loader className="animate-spin" />
                         </div>
-                      )
-                    }
-                    {!loading && searchResults.length > 0 ? (
-                      searchResults.map((result) => (
-                        <Link
-                          href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}`}
-                          key={result.id}
-                          className="cursor-pointer py-3 px-4 hover:bg-gray-50 bg-gray-50 rounded-[.6rem] border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
-                        >
-                          {result.name}
-                          <ChevronRight />
-                        </Link>
-                      ))
-                    ) : (
-                      <div className="text-muted text-center">No results found</div>
-                    )}
+                      ) : searchResults.length > 0 ? (
+                        searchResults.map((result) => (
+                          <Link
+                            href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}-in-${normalizeLocation(location)}?location=${normalizeLocation(location)}`}
+                            key={result.id}
+                            className="cursor-pointer py-3 px-4 hover:bg-gray-50 bg-gray-50 rounded-[.6rem] border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
+                          >
+                            {result.name}
+                            <ChevronRight />
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="text-muted text-center">No results found</div>
+                      )}
                   </div>
                 ) : null}
               </div>

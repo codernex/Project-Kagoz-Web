@@ -31,6 +31,11 @@ interface IBusiness {
   instagram: string;
   twitter: string;
   youtube: string;
+  latitude: string;
+  longitude: string;
+  cid: string;
+  fid: string;
+  placedId: string;
   likes: number;
   tradeLicenseUrl: string;
   isTrusted: boolean;

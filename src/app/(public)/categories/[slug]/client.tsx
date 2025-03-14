@@ -25,9 +25,11 @@ const Categories = dynamic(
 export default function CategoriesSearchPage({
   slug,
   category,
+  searchLocation
 }: {
   slug: string;
   category: ICategory;
+  searchLocation?: string;
 }) {
   const [action, { data: socialData }] = useLazyGetSocialMediaQuery();
   const sectionRef = useRef<HTMLElement>(null);
@@ -76,13 +78,14 @@ export default function CategoriesSearchPage({
    * Fethcing Results
    */
   const { data, isLoading } = useGetBusinessByQueryQuery({
-    category: slug.replace("-in-dhaka", ""),
+    category: slug.replace(`-in-${searchParams.get('location')}`, ""),
     isOpen: avalibility === "Now Open",
     isClosed: avalibility === "Now Closed",
     isTrusted: lisenceType === "KAGOZ",
     isVerified: lisenceType === "Verified Lisence",
     limit: 10,
     page,
+    location: searchParams.get('location'),
     sortBy,
     ...location,
   });
@@ -101,8 +104,8 @@ export default function CategoriesSearchPage({
           </div>
           <h1 className="text-md font-bold text-muted lg:text-lg">
             Top {data?.items.length}{" "}
-            <span className="capitalize text-black">{`${slug.replace("-in-dhaka", "").split("-").join(" ")}`}</span>{" "}
-            in <span className="text-black">Dhaka</span>
+            <span className="capitalize text-black">{`${slug.replace(`-in-${searchLocation}`, "").split("-").join(" ")}`}</span>{" "}
+            in <span className="text-black capitalize">{searchLocation?.split('-').join(' ')}</span>
           </h1>
         </div>
       </section>
