@@ -1,6 +1,4 @@
 "use client";
-import "leaflet/dist/leaflet.css";
-import { Loader } from "lucide-react";
 
 // Component to handle map centering dynamically
 
@@ -10,8 +8,8 @@ const Map: React.FC<{
   lat: number;
   lng: number;
   isLoading: boolean;
-  cid:string
-}> = ({ lat, lng, isLoading,cid }) => {
+  cid: string
+}> = ({ lat, lng, isLoading, cid }) => {
   return (
     <div className="w-full h-[40vh]">
       <div

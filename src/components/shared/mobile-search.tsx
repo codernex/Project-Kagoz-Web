@@ -152,7 +152,7 @@ const MobileSearch: React.FC = React.memo(() => {
           {
             locationData.map(l => {
               return (
-                <SelectItem className="cursor-pointer" value={l}>
+                <SelectItem key={l} className="cursor-pointer" value={l}>
                   {l}
                 </SelectItem>
               )
