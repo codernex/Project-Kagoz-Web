@@ -105,7 +105,9 @@ export default function CategoriesSearchPage({
           <h1 className="text-md font-bold text-muted lg:text-lg">
             Top {data?.items.length}{" "}
             <span className="capitalize text-black">{`${slug.replace(`-in-${searchLocation}`, "").split("-").join(" ")}`}</span>{" "}
-            in <span className="text-black capitalize">{searchLocation?.split('-').join(' ')}</span>
+            {
+              searchLocation ?<><span>in</span> <span className="text-black capitalize">{searchLocation?.split('-').join(' ')}</span></> : null
+            }
           </h1>
         </div>
       </section>
