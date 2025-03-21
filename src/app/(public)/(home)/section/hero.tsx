@@ -150,7 +150,7 @@ const Hero = () => {
                       ) : searchResults.length > 0 ? (
                         searchResults.map((result) => (
                           <Link
-                            href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}-in-${normalizeLocation(location)}?location=${normalizeLocation(location)}`}
+                            href={selectedTab === 'business' ? `/business/${result.slug}` : `/categories/${result.slug}-in-${normalizeLocation(location)}`}
                             key={result.id}
                             className="cursor-pointer py-3 px-4 hover:bg-gray-50 bg-gray-50 rounded-[.6rem] border-b border-b-[#ededed] text-black font-medium flex justify-between items-center last:border-b-0"
                           >

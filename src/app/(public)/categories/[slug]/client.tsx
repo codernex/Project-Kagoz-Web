@@ -78,14 +78,14 @@ export default function CategoriesSearchPage({
    * Fethcing Results
    */
   const { data, isLoading } = useGetBusinessByQueryQuery({
-    category: slug.replace(`-in-${searchParams.get('location')}`, ""),
+    category: slug.replace(`-in-${searchLocation}`, ""),
     isOpen: avalibility === "Now Open",
     isClosed: avalibility === "Now Closed",
     isTrusted: lisenceType === "KAGOZ",
     isVerified: lisenceType === "Verified Lisence",
     limit: 10,
     page,
-    location: searchParams.get('location'),
+    location: searchLocation,
     sortBy,
     ...location,
   });

@@ -5,7 +5,7 @@ import CategoriesSearchPage from "./client";
 
 export async function generateMetadata({ params, searchParams }: any): Promise<Metadata> {
   const { slug } = await params;
-  const { location } = await searchParams
+  const location = slug.split('-in-')[1];
   try {
     const response = await axiosInstance.get<{ data: ICategory }>(
       `/categories/info/${slug.replace(`-in-${location}`, "")}`,
@@ -62,10 +62,8 @@ export async function generateMetadata({ params, searchParams }: any): Promise<M
 
 export default async function Page({ params, searchParams }: any) {
   const { slug } = await params;
-  const { location } = await searchParams
+  const location = slug.split('-in-')[1];
   let data: ICategory | null;
-  const modifiedSlug = slug?.replace(`-in-${location}`, "");
-  console.log(modifiedSlug)
   try {
     const response = await axiosInstance.get<{ data: ICategory }>(
       `/categories/info/${slug?.replace(`-in-${location}`, "")}`,
