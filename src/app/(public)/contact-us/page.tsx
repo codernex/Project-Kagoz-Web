@@ -78,7 +78,9 @@ export default function Contact() {
       <div className="text-center text-black">
         <h1 className="text-[4.4rem] font-bold">Contact Us</h1>
         <p className="text-muted text-[2rem] font-normal max-w-7xl mx-auto">
-          We value every connection at KAGOZ– Bangladesh’s leading business directory and are always here to assist you. Whether you're a business owner looking to get listed on Bangladesh's trusted business directory or a customer seeking more information, our team is ready to help.
+          {
+            "We value every connection at KAGOZ– Bangladesh’s leading business directory and are always here to assist you. Whether you're a business owner looking to get listed on Bangladesh's trusted business directory or a customer seeking more information, our team is ready to help."
+          }
         </p>
       </div>
 
