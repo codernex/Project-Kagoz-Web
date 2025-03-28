@@ -11,7 +11,7 @@ export default function FooterTwo() {
         <Link rel="nofollow" href={"/contact-us"}>
           Contact Us
         </Link>
-        <Link rel="nofollow" href={"/blog"}>
+        <Link rel="nofollow" href={"/blogs"}>
           Press
         </Link>
         <Link rel="nofollow" href={"/privacy-policy"}>
