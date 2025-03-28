@@ -32,18 +32,21 @@ export function extractYouTubeVideoId(url: string): string {
 
 export const TK_SYMBOL = "৳";
 
-export function trimToWordCount(str: string, wordCount: number) {
-  if (!str) {
+export function trimToWordCount(str: string, wordCount: number): string {
+  if (!str || wordCount <= 0) {
     return "";
   }
-  // Split the string into words
-  const words = str.split(" ");
 
-  // Slice the array to get the first 'wordCount' words
-  const trimmedWords = words.slice(0, wordCount);
+  // Trim and normalize spaces
+  const words = str.trim().split(/\s+/);
 
-  // Join the words back into a string
-  return trimmedWords.join(" ") + "...";
+  // If the string has fewer words than wordCount, return it as is
+  if (words.length <= wordCount) {
+    return str.trim();
+  }
+
+  // Slice and join the words
+  return words.slice(0, wordCount).join(" ") + "...";
 }
 
 export const normalizeLocation = (location: string) => {
