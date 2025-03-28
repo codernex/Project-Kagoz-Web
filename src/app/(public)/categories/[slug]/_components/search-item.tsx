@@ -29,7 +29,7 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
     <div className="p-[2.4rem] drop-shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem] bg-white flex flex-col md:flex-row items-end h-fit relative w-full">
       <div className="w-full md:w-[60%]">
         <div className="flex space-x-[2rem] lg:space-x-[1rem] xl:space-x-[1rem] 2xl:space-x-[2rem]">
-          <div className="w-[10rem] relative h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
+          <div className="w-[10rem] relative h-[10rem] min-w-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
             <Image
               src={business?.logoUrl ? appendApi(business?.logoUrl) : '/images/default.png'}
               alt="Featured Brand"

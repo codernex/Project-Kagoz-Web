@@ -29,21 +29,23 @@ export const SponsoredBusinessItem: React.FC<SponsoredBusinessItemProps> = ({
   return (
     <div className="p-[1.2rem] md:p-[2.4rem] shadow-lg rounded-smd space-y-[2rem] xl:space-y-[3rem] bg-white">
       <div className="flex gap-x-[1rem] justify-between lg:gap-x-[1rem] xl:gap-x-[1rem] 2xl:gap-x-[2rem]">
-        <div className="!w-[10rem] !h-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
+        <div className="!w-[10rem] !h-[10rem] min-w-[10rem] rounded-xs border border-borderColor  p-[1.2rem]">
           <div className="relative !w-full h-full">
             <Image
-              src={appendApi(business.logoUrl)}
+              src={business.logoUrl ? appendApi(business.logoUrl) : '/images/default.png'}
               alt={business.name}
               className="rounded-xs w-full"
               fill
             />
           </div>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <div className="relative w-fit">
-            <h3 className="text-smd lg:text-md font-bold leading-md text-black">
-              {business.name}
-            </h3>
+            <Link href={`/business/${business.slug}`}>
+              <h3 className="text-smd lg:text-md font-bold leading-md text-black">
+                {trimToWordCount(business.name, 8)}
+              </h3>
+            </Link>
             {business.isTrusted ? <VerifiedBadge className="absolute top-0 -right-8" /> : ''}
           </div>
           <div className="flex space-x-1 items-center py-2">
@@ -81,7 +83,10 @@ export const SponsoredBusinessItem: React.FC<SponsoredBusinessItemProps> = ({
                   fill="#6E6777"
                 />
               </svg>
-              <span>{differenceInYears(new Date(), business.startingDate)} years in business</span>
+              {
+                business.startingDate ? <span>{differenceInYears(new Date(), business.startingDate)} years in business</span> : ''
+              }
+
             </p>
             <p className="text-xs text-muted flex space-x-[0.8rem]">
               <Calendar />

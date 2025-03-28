@@ -12,14 +12,14 @@ export async function generateMetadata({ params, searchParams }: any): Promise<M
     );
     const data = response.data.data;
     return {
-      title: `Top 10 Best ${data.name} in ${location} - KAGOZ`,
+      title: location ? `Top 10 Best ${data.name} in ${location} - KAGOZ` : `Top 10 Best ${data.name} - KAGOZ`,
       description: data.about,
       alternates: {
         canonical: `/categories/${slug?.replace(`-in-${location}`, "")}`,
       },
       openGraph: {
         type: "website",
-        title: `Top 10 Best ${data.name} in ${location} - KAGOZ`,
+        title: location ? `Top 10 Best ${data.name} in ${location} - KAGOZ` : `Top 10 Best ${data.name} - KAGOZ`,
         description: data.about,
       },
       keywords: ["kagoz"],
