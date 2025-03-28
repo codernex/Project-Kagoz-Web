@@ -8,7 +8,13 @@ const Footer = () => {
   return (
     <footer className="bg-[#190C2B]">
       <div className="container py-[7rem]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-y-[6rem] gap-x-8 text-white items-start">
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-[6rem] gap-x-8 text-white items-start">
+          <FooterOne />
+          <FooterTwo />
+          <FooterFour />
+        </div>
+
+        <div className="flex flex-col md:hidden gap-y-[6rem] gap-x-8 text-white items-start">
           <FooterOne />
           <FooterTwo />
           <FooterFour />
@@ -16,7 +22,7 @@ const Footer = () => {
       </div>
       <div className=" bg-[#130921]">
         <div className="py-12 container flex-col items-center flex lg:flex-row lg:justify-between gap-8 ">
-          <p className="text-xs md:text-sm text-white text-center">
+          <p className="text-[1.4rem] md:text-sm text-white text-center">
             &copy; 2024-{new Date().getFullYear()} KAGOZ LTD. KAGOZ, and related marks are registered
             trademarks of KAGOZ.
           </p>

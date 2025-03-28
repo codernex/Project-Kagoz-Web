@@ -109,14 +109,14 @@ const Hero = () => {
             Welcome to KAGOZ –
             The Best Free Business Directory in Bangladesh
           </h1>
-          <p className="text-xs md:text-sm text-white md:leading-[3rem] mt-[1.6rem]">
+          <p className="text-[1.4rem] md:text-sm text-white md:leading-[3rem] mt-[1.6rem]">
             We are here to help businesses grow and connect with more customers. Our platform is built with experience, expertise, and trust. Whether you are a small business owner, a service provider, or a customer looking for the best options, we make it easy for you.
           </p>
 
           {/**Tabs */}
           <div className="mt-[4rem]">
             <div onBlur={handleBlur}>
-              <div className="bg-black pt-6 px-4 pb-0 rounded-b-none w-[80%] mx-auto md:bg-transparent md:space-y-0 flex flex-col justify-center items-center md:flex-row md:!space-x-4 mb-0 md:pt-0 h-fit">
+              <div className="bg-black pt-6 px-4 pb-0 rounded-t-xs rounded-b-none w-[80%] mx-auto md:bg-transparent md:space-y-0 flex flex-col justify-center items-center md:flex-row md:!space-x-4 mb-0 md:pt-0 h-fit">
                 <Button onClick={() => {
                   setSelectedTab('categories')
                   searchRef.current?.click()

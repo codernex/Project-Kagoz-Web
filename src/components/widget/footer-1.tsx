@@ -10,7 +10,7 @@ export default function FooterOne() {
   const ref = useRef<HTMLDivElement>(null)
   useFetchOnVisible(ref, action)
   return (
-    <div ref={ref} className="space-y-[1.6rem]">
+    <div ref={ref} className="space-y-[1.6rem] col-span-1">
       <div className="w-[18rem] h-20">
         <Image
           src="/images/logo-white.png"
