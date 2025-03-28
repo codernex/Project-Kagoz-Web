@@ -13,7 +13,7 @@ export default function FooterOne() {
     <div ref={ref} className="space-y-[1.6rem]">
       <div className="w-[18rem] h-20">
         <Image
-          src="/images/logo.png"
+          src="/images/logo-white.png"
           className="w-full h-full object-contain"
           width={200}
           height={100}
