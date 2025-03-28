@@ -3,8 +3,6 @@ import { Metadata } from "next";
 import { appendApi } from "@/lib/utils";
 import { axiosInstance } from "@/redux/api";
 import { PageType } from "@/types";
-import React from "react";
-import Head from "next/head";
 
 export async function generateMetadata(): Promise<Metadata> {
     try {
@@ -75,9 +73,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Page() {
     return (
         <div className="min-h-screen  py-10 px-6 max-w-7xl mx-auto">
-            <Head>
-                <title>Privacy Policy - KAGOZ</title>
-            </Head>
             <div className=" bg-white p-10 shadow-lg rounded-lg">
                 <h1 className="text-lg font-bold text-gray-800 mb-6">Privacy Policy</h1>
                 <p className="text-sm text-gray-500 mb-4">Effective Date: [31-12-2025]</p>
@@ -147,7 +142,7 @@ export default function Page() {
                         <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
                             <li>📞 Phone: +8801534275161</li>
                             <li>📞 Phone: +8801913729867</li>
-                            <li>📧 Email: support@kagoz.com.bd</li>
+                            <li>📧 Email: support@kagoz.com</li>
                             <li>📍 Office Visit: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207</li>
                         </ul>
                     </section>

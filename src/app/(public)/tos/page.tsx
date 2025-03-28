@@ -84,7 +84,7 @@ const TermsOfService = () => {
 
                 <p className="text-gray-700 mb-6 leading-relaxed">
                     Welcome to KAGOZ, Bangladesh’s trusted business directory platform. By accessing or using our website
-                    (<a href="https://www.kagoz.com.bd" className="text-blue-500">www.kagoz.com.bd</a>), you agree to comply with and be bound by the following Terms and Conditions. Please read them carefully before using our services.
+                    (<a href="https://www.kagoz.com" className="text-blue-500">www.kagoz.com</a>), you agree to comply with and be bound by the following Terms and Conditions. Please read them carefully before using our services.
                 </p>
 
                 <div className="space-y-8">
@@ -116,7 +116,7 @@ const TermsOfService = () => {
                         <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
                             <li>📞 Phone: +8801534275161</li>
                             <li>📞 Phone: +8801913729867</li>
-                            <li>📧 Email: support@kagoz.com.bd</li>
+                            <li>📧 Email: support@kagoz.com</li>
                             <li>📍 Office Visit: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207</li>
                         </ul>
                     </section>
@@ -167,7 +167,7 @@ const TermsOfService = () => {
                         <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
                             <li>📞 Phone: +8801534275161</li>
                             <li>📞 Phone: +8801913729867</li>
-                            <li>📧 Email: support@kagoz.com.bd</li>
+                            <li>📧 Email: support@kagoz.com</li>
                             <li>📍 Office Visit: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207</li>
                         </ul>
                     </section>
