@@ -1,17 +1,28 @@
 "use client";
 import { Button } from "@/components/shared/button";
 import { Loader } from "@/components/shared/loader";
-import { useGetBusinessBySlugQuery } from "@/redux/api";
+import { TextInput } from "@/components/shared/text-input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
+import { useClaimBusinessMutation, useGetBusinessBySlugQuery } from "@/redux/api";
 import { ArrowRight, Edit2, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 const Sidebar = () => {
   const { slug } = useParams() as { slug: string };
   const { data, isLoading } = useGetBusinessBySlugQuery(slug);
-
+  const [claimModal, setClaimModal] = useState(false);
   const [mobile, setMobile] = useState("");
-
+  const [claimBusiness] = useClaimBusinessMutation();
+  const claimForm = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+    },
+  });
   useEffect(() => {
     if (data?.mobile) {
       setMobile(data.mobile.substring(0, 5) + " xxx xxx");
@@ -23,7 +34,7 @@ const Sidebar = () => {
   }
   return (
     <div className="rounded-smd bg-white px-[2.4rem] py-[3rem] drop-shadow-md">
-      <Button className="flex items-center justify-center space-x-3 rounded-xl p-[2rem] font-medium">
+      <Button onClick={() => setClaimModal(true)} className="flex items-center justify-center space-x-3 rounded-xl p-[2rem] font-medium">
         <Edit2 />
         <span>Suggest an edit</span>
       </Button>
@@ -271,6 +282,52 @@ const Sidebar = () => {
           ) : null}
         </div>
       </div>
+
+      <Dialog open={claimModal} onOpenChange={setClaimModal}>
+        <DialogContent className="max-w-4xl !rounded-xs">
+          <DialogHeader>
+            <DialogTitle className="text-md text-black">
+              Suggest an edit
+            </DialogTitle>
+            <DialogDescription className="text-muted">
+              We will contact you if we need any more information
+            </DialogDescription>
+          </DialogHeader>
+          <hr className="border-muted"/>
+          <Form {...claimForm}>
+            <form
+              className="space-y-4"
+              onSubmit={claimForm.handleSubmit((d) => {
+                claimBusiness({ slug, ...d });
+                setClaimModal(false);
+              })}
+            >
+              <TextInput
+                required
+                control={claimForm.control}
+                label="Your name"
+                name="name"
+                placeholder="eg: John D."
+              />
+              <TextInput
+                required
+                control={claimForm.control}
+                label="Your Email"
+                name="email"
+                placeholder="eg: johnd@example.com"
+              />
+              <TextInput
+                required
+                control={claimForm.control}
+                label="Your Phone"
+                name="phone"
+                placeholder="eg: 018xx xxx xxx"
+              />
+              <Button className="h-16 max-w-[14rem]">Submit</Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

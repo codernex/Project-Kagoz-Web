@@ -159,7 +159,7 @@ export default function Page() {
                 <address className="text-sm text-gray-500">
                     <strong>KAGOZ Advertising Support Team</strong><br />
                     Email: <a href="mailto:support@kagoz.com" className="text-blue-600 hover:underline">support@kagoz.com</a><br />
-                    Address: [Insert Physical Address]
+                    Address: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207
                 </address>
             </section>
         </div>

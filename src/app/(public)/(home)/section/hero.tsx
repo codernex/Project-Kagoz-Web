@@ -106,10 +106,11 @@ const Hero = () => {
       <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md px-4">
         <div className="w-full max-w-2xl md:max-w-5xl lg:max-w-7xl mx-auto pt-[9.6rem] text-center ">
           <h1 className=" text-md md:text-xl text-white font-bold md:leading-[5.56rem] ">
-            Free Business Directory in Bangladesh
+            Welcome to KAGOZ –
+            The Best Free Business Directory in Bangladesh
           </h1>
           <p className="text-xs md:text-sm text-white md:leading-[3rem] mt-[1.6rem]">
-            Your comprehensive directory for businesses across Bangladesh. Explore, discover, connect.
+            We are here to help businesses grow and connect with more customers. Our platform is built with experience, expertise, and trust. Whether you are a small business owner, a service provider, or a customer looking for the best options, we make it easy for you.
           </p>
 
           {/**Tabs */}

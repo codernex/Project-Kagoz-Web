@@ -4,6 +4,7 @@ import { appendApi } from "@/lib/utils";
 import { axiosInstance } from "@/redux/api";
 import { PageType } from "@/types";
 import React from "react";
+import Head from "next/head";
 
 export async function generateMetadata(): Promise<Metadata> {
     try {
@@ -73,92 +74,87 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export default function Page() {
     return (
-        <div className="max-w-7xl mx-auto p-6 sm:p-10">
-            <h1 className="text-3xl font-bold text-black mb-6">Privacy Policy for KAGOZ</h1>
+        <div className="min-h-screen  py-10 px-6 max-w-7xl mx-auto">
+            <Head>
+                <title>Privacy Policy - KAGOZ</title>
+            </Head>
+            <div className=" bg-white p-10 shadow-lg rounded-lg">
+                <h1 className="text-lg font-bold text-gray-800 mb-6">Privacy Policy</h1>
+                <p className="text-sm text-gray-500 mb-4">Effective Date: [31-12-2025]</p>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">1. Information We Collect</h2>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                    At KAGOZ, the trusted Bangladesh business directory, we are committed to protecting the privacy of our users, businesses, and visitors. This Privacy Policy outlines how we collect, use, disclose, and safeguard the information provided to us. By accessing or using our website, you agree to the terms outlined below.
+                </p>
 
-                <h3 className="text-2xl font-medium text-black mb-2">a. Information You Provide to Us:</h3>
-                <ul className="list-disc list-inside text-muted mb-4">
-                    <li><strong>Account Information</strong>: When you create an account, we collect your name, email address, business details, and payment information (if applicable).</li>
-                    <li><strong>Content</strong>: Any business information, descriptions, or media you upload to your directory profile.</li>
-                </ul>
+                <div className="space-y-8">
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">1. Information We Collect</h2>
+                        <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
+                            <li><strong>Business Information:</strong> Business Name, Business Address, Contact Details, Website URL, Business Category, Social Media Links, Images, Logos, and Videos.</li>
+                            <li><strong>Personal Information:</strong> Name, Email Address, Phone Number, and any additional voluntarily provided information.</li>
+                            <li><strong>Automatically Collected Information:</strong> IP Address, Browser Type, Operating System, Pages Viewed, Time Spent on Site, Cookies, and similar tracking technologies.</li>
+                        </ul>
+                    </section>
 
-                <h3 className="text-2xl font-medium text-black mb-2">b. Information We Collect Automatically:</h3>
-                <ul className="list-disc list-inside text-muted mb-4">
-                    <li><strong>Usage Data</strong>: Information about how you interact with our application, including pages visited, features used, and time spent.</li>
-                    <li><strong>Device Information</strong>: Details such as IP address, browser type, operating system, and device type.</li>
-                    <li><strong>Cookies and Tracking</strong>: We use cookies and similar technologies to enhance user experience and analyze usage.</li>
-                </ul>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">2. How We Use Information</h2>
+                        <p className="text-gray-700 leading-relaxed">We use the collected information to display business listings, enhance user experience, respond to inquiries, send notifications, and improve website security.</p>
+                    </section>
 
-                <h3 className="text-2xl font-medium text-black mb-2">c. Information from Third Parties:</h3>
-                <ul className="list-disc list-inside text-muted">
-                    <li>If you integrate third-party services, we may receive information from those platforms per their privacy policies.</li>
-                </ul>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">3. Source of Business Information</h2>
+                        <p className="text-gray-700 leading-relaxed">KAGOZ gathers business details from publicly available sources such as Google Business Profiles, official websites, third-party directories, and social media.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">2. How We Use Your Information</h2>
-                <ul className="list-disc list-inside text-muted">
-                    <li><strong>To Provide Services</strong>: Delivering and maintaining the functionality of KAGOZ.</li>
-                    <li><strong>To Personalize Your Experience</strong>: Tailoring content and recommendations to your preferences.</li>
-                    <li><strong>To Communicate</strong>: Sending important updates, newsletters, or promotional materials (you can opt out at any time).</li>
-                    <li><strong>To Improve Our Application</strong>: Analyzing user behavior to enhance features and performance.</li>
-                    <li><strong>To Ensure Security</strong>: Detecting and preventing fraud or unauthorized access.</li>
-                </ul>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">4. Disclaimer on Business Information Accuracy</h2>
+                        <p className="text-gray-700 leading-relaxed">While we update listings monthly, we do not guarantee accuracy. Business owners should verify and request corrections if needed.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">3. How We Share Your Information</h2>
-                <ul className="list-disc list-inside text-muted">
-                    <li><strong>With Your Consent</strong>: When you authorize us to share your information.</li>
-                    <li><strong>With Service Providers</strong>: Third-party vendors who assist with operations like hosting, payment processing, or analytics.</li>
-                    <li><strong>For Legal Reasons</strong>: When required to comply with applicable laws or protect our rights and safety.</li>
-                    <li><strong>Business Transfers</strong>: In the event of a merger, acquisition, or sale of assets.</li>
-                </ul>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">5. Compliance with Bangladeshi Law</h2>
+                        <p className="text-gray-700 leading-relaxed">KAGOZ operates under the laws of Bangladesh. No legal claims can be made against KAGOZ for incorrect business information.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">4. Your Choices and Rights</h2>
-                <ul className="list-disc list-inside text-muted">
-                    <li><strong>Access and Update</strong>: Reviewing and updating your account details.</li>
-                    <li><strong>Delete Account</strong>: Requesting the deletion of your account and associated data.</li>
-                    <li><strong>Cookie Preferences</strong>: Adjusting your cookie settings via your browser.</li>
-                    <li><strong>Marketing Opt-Out</strong>: Unsubscribing from promotional communications.</li>
-                </ul>
-                <p className="text-sm text-muted">To exercise any of these rights, contact us at [Insert Contact Email].</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">6. Data Security</h2>
+                        <p className="text-gray-700 leading-relaxed">We implement security measures but cannot guarantee absolute protection. Users acknowledge this risk.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">5. Data Security</h2>
-                <p className="text-sm text-muted">We implement industry-standard measures to protect your data, including encryption, secure servers, and regular security assessments. However, no system is entirely secure, and we cannot guarantee absolute security.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">7. Cookies Policy</h2>
+                        <p className="text-gray-700 leading-relaxed">We use cookies for site functionality, analytics, and user experience improvements. Cookie settings can be managed through browser settings.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">6. Data Retention</h2>
-                <p className="text-sm text-muted">We retain your information for as long as necessary to fulfill the purposes outlined in this Privacy Policy or comply with legal obligations. You can request deletion of your data at any time.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">8. Third-Party Links</h2>
+                        <p className="text-gray-700 leading-relaxed">We are not responsible for privacy practices of external websites linked on our platform.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">7. Children’s Privacy</h2>
-                <p className="text-sm text-muted">KAGOZ is not intended for users under the age of 13, and we do not knowingly collect personal information from children.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">9. Your Rights</h2>
+                        <p className="text-gray-700 leading-relaxed">Users can request access, updates, or removal of business listing information.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">8. Changes to This Privacy Policy</h2>
-                <p className="text-sm text-muted">We may update this Privacy Policy to reflect changes in our practices or legal requirements. We will notify you of significant updates via email or in-app notifications.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">10. Changes to This Privacy Policy</h2>
+                        <p className="text-gray-700 leading-relaxed">KAGOZ reserves the right to update this Privacy Policy. Changes will be reflected on this page.</p>
+                    </section>
 
-            <section>
-                <h2 className="text-2xl font-semibold text-black mb-4">9. Contact Us</h2>
-                <p className="text-sm text-muted">If you have questions or concerns about this Privacy Policy, please contact us:</p>
-                <address className="text-sm text-muted">
-                    <strong>KAGOZ Support Team</strong><br />
-                    Email: [Insert Contact Email]<br />
-                    Address: [Insert Physical Address]
-                </address>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">Contact Us</h2>
+                        <p className="text-gray-700 leading-relaxed">For any inquiries, reach out to:</p>
+                        <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
+                            <li>📞 Phone: +8801534275161</li>
+                            <li>📞 Phone: +8801913729867</li>
+                            <li>📧 Email: support@kagoz.com.bd</li>
+                            <li>📍 Office Visit: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207</li>
+                        </ul>
+                    </section>
+                </div>
+
+                <p className="text-gray-700 mt-8 leading-relaxed">By using KAGOZ, you agree to abide by this Privacy Policy.</p>
+            </div>
         </div>
     )
 }

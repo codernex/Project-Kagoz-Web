@@ -1,6 +1,7 @@
 import { appendApi } from "@/lib/utils";
 import { axiosInstance } from "@/redux/api";
 import { PageType } from "@/types";
+import { Clock3 } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -75,10 +76,9 @@ export default function Contact() {
   return (
     <div className="container py-[10rem] space-y-[4rem]">
       <div className="text-center text-black">
-        <h1 className="text-[4.4rem] font-bold">Reach Us for Assistance</h1>
-        <p className="text-muted text-[2rem] font-normal">
-          Please fill all the necessary information to publish your business to
-          KAGOZ
+        <h1 className="text-[4.4rem] font-bold">Contact Us</h1>
+        <p className="text-muted text-[2rem] font-normal max-w-7xl mx-auto">
+          We value every connection at KAGOZ– Bangladesh’s leading business directory and are always here to assist you. Whether you're a business owner looking to get listed on Bangladesh's trusted business directory or a customer seeking more information, our team is ready to help.
         </p>
       </div>
 
@@ -465,8 +465,55 @@ export default function Contact() {
                 </defs>
               </svg>
               <div className="flex-1">
-                <p className="text-muted">Mobile</p>
-                <p className="text-black font-semibold">(000) 123 456 34</p>
+                <p className="text-muted">General Query</p>
+                <a href="tel:+8801534275161" className="text-black font-semibold">+8801534275161</a>
+              </div>
+            </div>
+            <div className="flex gap-xsm items-center">
+              <svg
+                width="54"
+                height="55"
+                viewBox="0 0 54 55"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  y="0.307617"
+                  width="54"
+                  height="54"
+                  rx="27"
+                  fill="#6F00FF"
+                  fillOpacity="0.03"
+                />
+                <rect
+                  x="0.5"
+                  y="0.807617"
+                  width="53"
+                  height="53"
+                  rx="26.5"
+                  stroke="#6F00FF"
+                  strokeOpacity="0.2"
+                />
+                <g clipPath="url(#clip0_299_4971)">
+                  <path
+                    d="M35.5101 31.5178L32.9982 29.0058C32.101 28.1087 30.5759 28.4676 30.2171 29.6338C29.9479 30.4413 29.0508 30.8899 28.2434 30.7104C26.4491 30.2618 24.0269 27.9293 23.5783 26.0453C23.3092 25.2379 23.8475 24.3408 24.6549 24.0717C25.8211 23.7128 26.18 22.1877 25.2829 21.2906L22.7709 18.7786C22.0532 18.1506 20.9767 18.1506 20.3487 18.7786L18.6441 20.4831C16.9396 22.2774 18.8236 27.0322 23.0401 31.2487C27.2565 35.4652 32.0113 37.4389 33.8056 35.6446L35.5101 33.94C36.1381 33.2223 36.1381 32.1458 35.5101 31.5178Z"
+                    fill="#6F00FF"
+                  />
+                </g>
+                <defs>
+                  <clipPath id="clip0_299_4971">
+                    <rect
+                      width="17.9622"
+                      height="18"
+                      fill="white"
+                      transform="translate(18.0189 18.3076)"
+                    />
+                  </clipPath>
+                </defs>
+              </svg>
+              <div className="flex-1">
+                <p className="text-muted">Business Related Admin Support:</p>
+                <a href="tel:+8801913729867" className="text-black font-semibold">+8801913729867</a>
               </div>
             </div>
             <div className="flex gap-xsm items-center">
@@ -507,7 +554,7 @@ export default function Contact() {
               <div className="flex-1">
                 <p className="text-muted">Email</p>
                 <p className="text-black font-semibold">
-                  creativlobd@gmail.com
+                  support@kagoz.com
                 </p>
               </div>
             </div>
@@ -556,10 +603,23 @@ export default function Contact() {
               </svg>
 
               <div className="flex-1">
-                <p className="text-muted">Location</p>
+                <p className="text-muted">Office Address</p>
                 <p className="text-black font-semibold">
-                  200 Bay St. North Tower, Suite 1200 <br />
-                  Toronto, ON M5J 2J2, Canada
+                  123, Road 7, Mohammadia Housing Ltd <br /> Mohammadpur, Dhaka 1207
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-xsm items-center">
+              <div className="h-[54px] w-[54px] bg-background border border-borderColor rounded-full  flex items-center justify-center">
+                <Clock3 />
+              </div>
+
+              <div className="flex-1">
+                <p className="text-muted">Business Hours:</p>
+                <p className="text-black font-semibold">
+                  Saturday to Thursday: 10:00 AM – 7:00 PM
+                  <br />
+                  Friday: Closed
                 </p>
               </div>
             </div>

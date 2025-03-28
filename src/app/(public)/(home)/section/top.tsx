@@ -45,15 +45,9 @@ import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
 export default function TopSection() {
   const { slug } = useParams() as { slug: string };
   const [openShareModal, setOpenShareModal] = useState(false);
-  const [claimModal, setClaimModal] = useState(false);
+  
   const { data, isLoading } = useGetBusinessBySlugQuery(slug);
-  const claimForm = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-    },
-  });
+ 
   const { data: totalPageViews } = useGetDailyPageViewsQuery(slug);
   const isOpen = useBusinessOpen(data?.openingHours);
   const { data: reviews } = useGetReviewQuery(slug);
@@ -69,7 +63,6 @@ export default function TopSection() {
   const [like] = useLikeBusinessMutation();
   const { data: liked } = useHasLikedBusinessQuery(slug);
   const { open, setOpen } = useVideoPalyerModal();
-  const [claimBusiness] = useClaimBusinessMutation();
 
   if (isLoading) {
     return <Loader />;
@@ -259,13 +252,13 @@ export default function TopSection() {
               </span>
             </div>
           </div>
-          <Button
+          {/* <Button
             onClick={() => setClaimModal(true)}
             className="flex max-w-[22rem] items-center space-x-[.8rem] rounded-xl border border-[#6E67774D] bg-transparent px-[3.2rem] py-[1rem] text-muted md:w-fit md:py-[1.4rem]"
           >
             <PlusIcon size={18} />
             <span>Claim</span>
-          </Button>
+          </Button> */}
         </div>
       </div>
       <ReviewModal open={writeReview} setOpen={setWriteReview} />
@@ -340,48 +333,6 @@ export default function TopSection() {
               </svg>
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={claimModal} onOpenChange={setClaimModal}>
-        <DialogContent className="max-w-4xl !rounded-xs">
-          <DialogHeader>
-            <DialogTitle className="text-md text-black">
-              Claim this business
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...claimForm}>
-            <form
-              className="space-y-4"
-              onSubmit={claimForm.handleSubmit((d) => {
-                claimBusiness({ slug, ...d });
-                setClaimModal(false);
-              })}
-            >
-              <TextInput
-                required
-                control={claimForm.control}
-                label="Your name"
-                name="name"
-                placeholder="eg: John D."
-              />
-              <TextInput
-                required
-                control={claimForm.control}
-                label="Your Email"
-                name="email"
-                placeholder="eg: johnd@example.com"
-              />
-              <TextInput
-                required
-                control={claimForm.control}
-                label="Your Phone"
-                name="phone"
-                placeholder="eg: 018xx xxx xxx"
-              />
-              <Button className="h-16 max-w-[14rem]">Submit</Button>
-            </form>
-          </Form>
         </DialogContent>
       </Dialog>
     </>

@@ -14,6 +14,12 @@ export default function FooterTwo() {
         <Link rel="nofollow" href={"/blog"}>
           Press
         </Link>
+        <Link rel="nofollow" href={"/privacy-policy"}>
+          Privacy Policy
+        </Link>
+        <Link rel="nofollow" href={"/tos"}>
+          Terms of Service
+        </Link>
         <Link rel="nofollow" href={"/ads-policy"}>
           Ad Policy
         </Link>

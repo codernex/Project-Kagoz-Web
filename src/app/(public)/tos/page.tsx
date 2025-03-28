@@ -3,6 +3,7 @@ import { appendApi } from "@/lib/utils";
 import { axiosInstance } from "@/redux/api";
 import { PageType } from "@/types";
 import { Metadata } from "next";
+import Head from "next/head";
 import React from "react";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -73,62 +74,107 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 const TermsOfService = () => {
     return (
-        <div className="max-w-7xl mx-auto p-6 sm:p-10">
-            <h1 className="text-3xl font-bold text-black mb-6">Terms of Service for KAGOZ</h1>
-            <p className="text-sm text-muted mb-6">Effective Date: [Insert Effective Date]</p>
+        <div className="min-h-screen py-10 px-6 max-w-7xl mx-auto">
+            <Head>
+                <title>Terms and Conditions - KAGOZ</title>
+            </Head>
+            <div className="mx-auto bg-white p-10 shadow-lg rounded-lg">
+                <h1 className="text-lg font-bold text-gray-800 mb-6">Terms and Conditions</h1>
+                <p className="text-sm text-gray-500 mb-4">Effective Date: [31-12-2025]</p>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">1. Acceptance of Terms</h2>
-                <p className="text-sm text-muted">By accessing or using KAGOZ, you agree to be bound by these Terms of Service. If you do not agree, you may not use the application.</p>
-            </section>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                    Welcome to KAGOZ, Bangladesh’s trusted business directory platform. By accessing or using our website
+                    (<a href="https://www.kagoz.com.bd" className="text-blue-500">www.kagoz.com.bd</a>), you agree to comply with and be bound by the following Terms and Conditions. Please read them carefully before using our services.
+                </p>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">2. User Responsibilities</h2>
-                <ul className="list-disc list-inside text-muted">
-                    <li>You are responsible for maintaining the confidentiality of your account information.</li>
-                    <li>You agree not to misuse the platform, including but not limited to violating applicable laws or regulations.</li>
-                    <li>You must provide accurate and complete information when creating an account or listing a business.</li>
-                </ul>
-            </section>
+                <div className="space-y-8">
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">1. Acceptance of Terms</h2>
+                        <p className="text-gray-700 leading-relaxed">
+                            By accessing or using KAGOZ, whether as a visitor, business owner, or registered user, you acknowledge and agree to these Terms and Conditions, along with our Privacy Policy.
+                        </p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">3. Prohibited Activities</h2>
-                <ul className="list-disc list-inside text-muted">
-                    <li>Posting false or misleading business information.</li>
-                    <li>Engaging in fraudulent or illegal activities.</li>
-                    <li>Attempting to hack or disrupt the platform.</li>
-                </ul>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">2. Services Provided</h2>
+                        <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
+                            <li>Free business listings</li>
+                            <li>Premium listing packages (optional)</li>
+                            <li>Search and discovery tools for users</li>
+                            <li>Displaying business details collected from public sources</li>
+                        </ul>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">4. Intellectual Property</h2>
-                <p className="text-sm text-muted">All content, trademarks, and other intellectual property on KAGOZ are owned by us or our licensors. You may not use this content without prior permission.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">3. Business Listing Information</h2>
+                        <p className="text-gray-700 leading-relaxed">We collect business information from various sources including Google Business Profiles and business websites. While we strive for accuracy, KAGOZ does not guarantee the correctness or completeness of any business information listed.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">5. Limitation of Liability</h2>
-                <p className="text-sm text-muted">To the fullest extent permitted by law, KAGOZ is not liable for any damages arising out of your use of the platform.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">4. Requesting Edits or Removal</h2>
+                        <p className="text-gray-700 leading-relaxed">Business owners can request corrections, updates, or removal of their listings at any time. Contact us via:</p>
+                        <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
+                            <li>📞 Phone: +8801534275161</li>
+                            <li>📞 Phone: +8801913729867</li>
+                            <li>📧 Email: support@kagoz.com.bd</li>
+                            <li>📍 Office Visit: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207</li>
+                        </ul>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">6. Termination</h2>
-                <p className="text-sm text-muted">We reserve the right to suspend or terminate your access to KAGOZ at our sole discretion, without prior notice.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">5. User Conduct</h2>
+                        <p className="text-gray-700 leading-relaxed">Users must not engage in fraudulent behavior, post misleading information, or misuse our directory for spam or illegal activities.</p>
+                    </section>
 
-            <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-black mb-4">7. Changes to Terms</h2>
-                <p className="text-sm text-muted">We may update these Terms of Service from time to time. Continued use of KAGOZ signifies your acceptance of any changes.</p>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">6. Intellectual Property</h2>
+                        <p className="text-gray-700 leading-relaxed">All content on KAGOZ, including logos and text, are the property of KAGOZ and cannot be used without permission.</p>
+                    </section>
 
-            <section>
-                <h2 className="text-2xl font-semibold text-black mb-4">8. Contact Us</h2>
-                <p className="text-sm text-muted">If you have questions about these Terms of Service, please contact us:</p>
-                <address className="text-sm text-muted">
-                    <strong>KAGOZ Support Team</strong><br />
-                    Email: [Insert Contact Email]<br />
-                    Address: [Insert Physical Address]
-                </address>
-            </section>
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">7. Premium Listings and Payment</h2>
+                        <p className="text-gray-700 leading-relaxed">Businesses can opt for premium packages. Payments are non-refundable unless specified otherwise.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">8. Third-Party Links</h2>
+                        <p className="text-gray-700 leading-relaxed">KAGOZ may contain links to external websites, but we are not responsible for their content or privacy policies.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">9. Limitation of Liability</h2>
+                        <p className="text-gray-700 leading-relaxed">KAGOZ is not liable for any damages resulting from the use of our services.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">10. Compliance with Bangladeshi Law</h2>
+                        <p className="text-gray-700 leading-relaxed">By using our services, you acknowledge that any legal matters fall under Bangladesh’s jurisdiction.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">11. Termination</h2>
+                        <p className="text-gray-700 leading-relaxed">KAGOZ reserves the right to suspend or remove listings if they violate our terms.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">12. Changes to Terms</h2>
+                        <p className="text-gray-700 leading-relaxed">We may update these Terms and Conditions at any time. Users must review them periodically.</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-mdx font-semibold text-gray-800 mb-2">13. Contact Us</h2>
+                        <p className="text-gray-700 leading-relaxed">For any inquiries, reach out to:</p>
+                        <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
+                            <li>📞 Phone: +8801534275161</li>
+                            <li>📞 Phone: +8801913729867</li>
+                            <li>📧 Email: support@kagoz.com.bd</li>
+                            <li>📍 Office Visit: 123, Road 7, Mohammadia Housing Ltd, Mohammadpur, Dhaka 1207</li>
+                        </ul>
+                    </section>
+                </div>
+
+                <p className="text-gray-700 mt-8 leading-relaxed">By using KAGOZ, you agree to abide by these Terms and Conditions.</p>
+            </div>
         </div>
     );
 };
