@@ -24,19 +24,41 @@ async function fetchBusiness() {
 
 // List of static pages
 const staticPages = [
-  { url: "/", lastModified: new Date().toISOString() },
-  { url: "/about", lastModified: new Date().toISOString() },
-  { url: "/contact", lastModified: new Date().toISOString() },
-  { url: "/blogs", lastModified: new Date().toISOString() },
-  { url: "/privacy-policy", lastModified: new Date().toISOString() },
-  { url: "/tos", lastModified: new Date().toISOString() },
-  { url: "/ads-policy", lastModified: new Date().toISOString() },
+  { url: "/", lastModified: new Date().toISOString(), title: "Home" },
+  { url: "/about", lastModified: new Date().toISOString(), title: "About" },
+  { url: "/contact", lastModified: new Date().toISOString(), title: "Contact" },
+  { url: "/blogs", lastModified: new Date().toISOString(), title: "Blogs" },
+  {
+    url: "/privacy-policy",
+    lastModified: new Date().toISOString(),
+    title: "Privacy Policy",
+  },
+  {
+    url: "/tos",
+    lastModified: new Date().toISOString(),
+    title: "Terms of service",
+  },
+  {
+    url: "/ads-policy",
+    lastModified: new Date().toISOString(),
+    title: "Ads Policy",
+  },
+  {
+    url: "/categories/sitemap.xml",
+    lastModified: new Date().toISOString(),
+    title: "Categories Sitemap",
+  },
+  {
+    url: "/categories/sitemap.xml",
+    lastModified: new Date().toISOString(),
+    title: "Business Sitemap",
+  },
   // Add any other static pages here
 ];
 
 // Generate XML sitemap with XSL reference
 function generateSitemap(
-  pages: { url: string; lastModified: string }[],
+  pages: { url: string; lastModified: string; title: string }[],
   baseUrl: string
 ): string {
   const urls = pages.map(
@@ -44,39 +66,33 @@ function generateSitemap(
     <url>
       <loc>${baseUrl}${page.url}</loc>
       <lastmod>${page.lastModified}</lastmod>
+      <title>${page.title}</title>
     </url>
   `
   );
+  const extraPages = `
+  
+  `;
 
-  return `
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  const styleHeader = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="${baseUrl}/index.xsl"?>
+  `;
+
+  return (
+    styleHeader +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       ${urls.join("\n")}
     </urlset>
-    `;
+    `
+  );
 }
 
 // Route handler
 export async function GET() {
-  const categories = await fetchCategories();
-  const business = await fetchBusiness();
-
-  // Add dynamic category pages
-  const categoryPages = categories.map((category) => ({
-    url: `/categories/${category.slug}`,
-    lastModified: category.updatedAt, // Replace with actual modification time if available
-  }));
-
-  const businessPage = business.map((category) => ({
-    url: `/business/${category.slug}`,
-    lastModified: category.updatedAt,
-    images: [category.logoUrl],
-  }));
-
   // Combine static and dynamic pages
-  const allPages = [...staticPages, ...categoryPages, ...businessPage];
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const sitemapXml = generateSitemap(allPages, baseUrl);
+  const sitemapXml = generateSitemap(staticPages, baseUrl);
 
   return new NextResponse(sitemapXml, {
     headers: {

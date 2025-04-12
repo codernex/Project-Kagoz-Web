@@ -19,14 +19,20 @@ function generateSitemap(categories: ICategory[], baseUrl: string): string {
     <url>
       <loc>${baseUrl}/categories/${category.slug}</loc>
       <lastmod>${category.updatedAt}</lastmod>
+      <title>${category.slug}</title>
     </url>
   `
   );
 
-  return `
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>
+  <?xml-stylesheet type="text/xsl" href="${baseUrl}/categories.xsl"?>`;
+
+  return (
+    xmlHeader +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       ${urls.join("\n")}
-    </urlset>`;
+    </urlset>`
+  );
 }
 
 // Route handler
