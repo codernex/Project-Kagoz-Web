@@ -3,7 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useAuthModal } from "@/hooks/loginModal";
 import { cn } from "@/lib/utils";
 import { AnimationProps, motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Lightbulb, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -72,6 +72,13 @@ const Header = () => {
         </div>
         {/* Navigation */}
         <div className="flex items-center md:space-x-8 lg:space-x-14">
+          <Link
+            href={"#"}
+            className="text-xs font-medium text-black lg:text-sm flex"
+          >
+            <span>
+              Tutorial</span> <Lightbulb className="fill-yellow-300 text-yellow-300" />
+          </Link>
           <Link
             href={"/blogs"}
             className="text-xs font-medium text-black lg:text-sm"

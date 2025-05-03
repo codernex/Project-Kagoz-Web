@@ -2,7 +2,6 @@
 import { Button } from "@/components/shared/button";
 import { Loader } from "@/components/shared/loader";
 import { NotFound } from "@/components/shared/not-found";
-import { TextInput } from "@/components/shared/text-input";
 import { Calendar } from "@/components/svgs/calendar";
 import VerifiedBadge from "@/components/svgs/verifed";
 import VerfiedLisence from "@/components/svgs/verified-lisence";
@@ -12,18 +11,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 import { appendApi, cn } from "@/lib/utils";
 import {
-  useClaimBusinessMutation,
   useGetBusinessBySlugQuery,
   useGetDailyPageViewsQuery,
   useGetReviewQuery,
   useHasLikedBusinessQuery,
-  useLikeBusinessMutation,
+  useLikeBusinessMutation
 } from "@/redux/api";
 import { differenceInDays, differenceInYears, subYears } from "date-fns";
 import {
@@ -31,16 +28,14 @@ import {
   Globe,
   Heart,
   PlayIcon,
-  PlusIcon,
   Share2Icon,
   Star,
-  TwitterIcon,
+  TwitterIcon
 } from "lucide-react";
 import millify from "millify";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
 export default function TopSection() {
   const { slug } = useParams() as { slug: string };
@@ -197,7 +192,9 @@ export default function TopSection() {
           {data?.youtubeVideo ? (
             <div className="right-0 top-0 md:absolute">
               <Button
-                onClick={() => setOpen(true, data.youtubeVideo)}
+                onClick={() => {
+                  setOpen(true, data.youtubeVideo)
+                }}
                 className="flex w-[22rem] items-center space-x-[.8rem] rounded-xl bg-[#323031] px-[3.2rem] py-[1rem] md:w-fit md:py-[1.9rem]"
               >
                 <div className="flex h-[2.2rem] w-[2.2rem] items-center justify-center rounded-full bg-white">

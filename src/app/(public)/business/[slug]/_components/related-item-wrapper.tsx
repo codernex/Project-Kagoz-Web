@@ -16,7 +16,7 @@ export default function RelatedItemWrapper() {
         return null
     }
     return (
-        <div className="space-y-[1.6rem] container mb-[6rem]">
+        <div className="space-y-[1.6rem] container mb-[6rem] mt-[4rem]">
             <h2 className="text-mdx font-bold text-black">Related Business</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[3rem]">
                 {

@@ -40,9 +40,9 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
           </div>
           <div>
             <div className="relative w-fit">
-              <h3 className="text-smd lg:text-md font-bold leading-md text-black">
+              <Link href={`/business/${business.slug}`} className="text-smd lg:text-md font-bold leading-md text-black">
                 {business.name}
-              </h3>
+              </Link>
               {
                 business.isTrusted ? (
                   <VerifiedBadge className="absolute top-0 -right-8" />

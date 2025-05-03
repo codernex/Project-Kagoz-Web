@@ -6,6 +6,7 @@ import { useVideoPalyerModal } from "@/hooks/videoPlayerModal"
 
 export const YtPlayerModal = () => {
     const { setOpen, open, url } = useVideoPalyerModal()
+    console.log(url)
     return (
         <Dialog open={open} onOpenChange={open => setOpen(open, '')}>
             <DialogContent className="max-w-7xl p-0 rounded-md overflow-hidden border-none h-1/2 bg-[#00000080]">

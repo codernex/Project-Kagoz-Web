@@ -1,3 +1,4 @@
+import { useMobileSearch } from "@/hooks/mobileSearch";
 import { normalizeLocation } from "@/lib/utils"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
@@ -8,13 +9,17 @@ export const CommonSearchLink: React.FC<{ setOpen: React.Dispatch<React.SetState
     result,
     selectedTab
 }) => {
+    const { setOpen: setSearchOpen } = useMobileSearch();
     return (
         <Link
-            onClick={() => setOpen(false)}
+            onClick={() => {
+                setOpen(false)
+                setSearchOpen(false)
+            }}
             href={
                 selectedTab === "business"
                     ? `/business/${result.slug}`
-                    : `/categories/${result.slug}-in-${normalizeLocation(location)}}`
+                    : `/categories/${result.slug}-in-${normalizeLocation(location).trim()}}`
             }
             key={result.id}
             className="flex cursor-pointer items-center justify-between rounded-[.6rem] border-b border-b-[#ededed] bg-gray-50 px-4 py-3 font-medium text-black last:border-b-0 hover:bg-gray-50"

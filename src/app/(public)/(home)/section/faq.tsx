@@ -22,14 +22,6 @@ export default function FAQ() {
             <p className="text-muted leading-md pt-[1.6rem]">
               Explore our FAQ section to learn more about KAGOZ, how to list your business, guest posting opportunities, and the features we offer to support and empower local businesses in Bangladesh.
             </p>
-            <Button
-              asChild
-              className="rounded-xl h-[4rem] w-[14rem] md:h-[5rem] md:w-[17.5rem] md:text-sm bg-primary text-white mt-[4rem]"
-            >
-              <Link className="text-xsm" href={"/about-us"}>
-                Discover More
-              </Link>
-            </Button>
           </div>
 
           <div className="md:w-1/2 w-full rounded-[2.2rem] bg-bgPrimaryShade py-[1.6rem] md:py-[6.2rem] md:px-[4.8rem]">

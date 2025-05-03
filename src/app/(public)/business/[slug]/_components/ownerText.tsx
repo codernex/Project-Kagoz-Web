@@ -9,14 +9,17 @@ export const OwnerText = () => {
   if (data?.owner?.role === "admin") {
     return null;
   }
+  if (!data?.owner?.ownerText) {
+    return null
+  }
   return (
     <>
       <div className="space-y-sm">
         <h2 className="text-mdx font-bold text-black">Business Owner</h2>
         <div>
-          <h3 className="text-smd font-semibold text-black">
+          {/* <h3 className="text-smd font-semibold text-black">
             {data?.owner?.name || "Unknown"}
-          </h3>
+          </h3> */}
           <p className="text-sm leading-smlg text-muted">
             {data?.owner?.ownerText || ""}
           </p>

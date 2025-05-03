@@ -107,7 +107,7 @@ export default function FooterFour() {
                 </clipPath>
               </defs>
             </svg>
-            <p>+880 1534 275 161</p>
+            <p>+880 1534 275 161 (Admin)</p>
           </Link>
           <Link href={'tel:+8801913729867'} className="flex space-x-sm items-center">
             <svg
@@ -143,7 +143,7 @@ export default function FooterFour() {
                 </clipPath>
               </defs>
             </svg>
-            <p>+880 1913 729 867</p>
+            <p>+880 1913 729 867 (Support)</p>
           </Link>
           <div className="flex space-x-sm items-center">
             <svg

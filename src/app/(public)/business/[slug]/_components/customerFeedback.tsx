@@ -16,7 +16,6 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { Autoplay, Navigation } from "swiper/modules";
 import { type Swiper as SwiperType } from "swiper/types";
-import { YtPlayerModal } from "./yt-player-modal";
 
 export const CustomerFeedback = () => {
   const swiperRef = useRef<SwiperType>();
@@ -148,7 +147,6 @@ export const CustomerFeedback = () => {
             </button>
           </div>
         </div>
-        <YtPlayerModal />
       </div>
       <hr className="border-[#EEEDED]" />
     </>

@@ -51,7 +51,7 @@ export default function Reviews() {
         <div className="grid grid-cols-1 md:grid-cols-3 text-black items-center">
           <div className="space-y-xs">
             <h3 className="text-[2.1rem] font-semibold">Total Reviews</h3>
-            <h1 className="text-[3.6rem] font-bold">{millify(data?.length || 0)}</h1>
+            <h3 className="text-[3.6rem] font-bold">{millify(data?.length || 0)}</h3>
           </div>
           <div className="border border-[#EEEDED] border-t-0 border-b-0 space-y-xs pl-[2rem]">
             <h3 className="text-[2.1rem] font-semibold">Average Rating</h3>

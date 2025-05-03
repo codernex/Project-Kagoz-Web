@@ -20,7 +20,7 @@ export const Categories = () => {
       className="container space-y-[2rem] py-[6rem] lg:py-[10rem]"
     >
       <h2 className="text-[2.8rem] font-bold text-black">Our Categories</h2>
-      <div className="grid grid-cols-2 gap-y-[2rem] md:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-[2rem] md:grid-cols-4">
         {data?.map((category, index) => {
           return (
             <Link

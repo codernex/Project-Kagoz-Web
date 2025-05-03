@@ -9,11 +9,15 @@ import AddBusiness from "./_components/add-business";
 import MobileBusinessSidebar from "./_components/mobile-sidebar";
 import { Sidebar } from "./_components/sidebar";
 import { UserProfile } from "./_components/user-profile";
+import { CustomButton } from "@/components/shared/custom-button";
+import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 export default function BusinessDashboardLayout({
     children,
 }: React.PropsWithChildren) {
     const { isAuth } = useAuth()
     const { setOpen } = useAuthModal()
+
+    const { setOpen: setBusinessOpen } = useAddBusinessModal()
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -69,6 +73,24 @@ export default function BusinessDashboardLayout({
     }
 
 
+    if (!data?.business?.length) {
+        return (
+            <>
+                <MobileBusinessSidebar />
+                <div className="flex items-center justify-center text-black font-semibold flex-col gap-8 h-screen">
+                    <p className="text-md">Look like you {"don't have a business"}, Try to create one</p>
+                    <CustomButton onClick={() => setBusinessOpen(true)} className="rounded-xs bg-black w-full">
+                        Add new business
+                    </CustomButton>
+                </div>
+                <AddBusiness onOpenChange={
+                    true
+                } />
+                <UserProfile />
+            </>
+
+        )
+    }
     return (
         <div>
             <MobileBusinessSidebar />
@@ -77,7 +99,7 @@ export default function BusinessDashboardLayout({
                 <main className="w-full px-">{children}</main>
             </div>
             <AddBusiness onOpenChange={
-                !!data?.business?.length
+                true
             } />
             <UserProfile />
         </div>

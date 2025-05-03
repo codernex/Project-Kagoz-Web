@@ -76,14 +76,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="w-full max-w-[60%] text-black p-[3rem] overflow-y-scroll">
+      <DialogContent className="max-w-3xl max-md:max-w-7xl lg:max-w-[60%] text-black p-[3rem] overflow-y-scroll max-h-[70vh] scrollbar-default">
         <DialogHeader>
-          <DialogTitle className="text-mdx font-bold">
+          <DialogTitle className="text-mdx font-bold my-10">
             Write A Review
           </DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-5 gap-x-2xl">
-          <div className="col-span-3">
+          <div className="col-span-5 lg:col-span-3">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -93,9 +93,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                   render={() => {
                     return (
                       <FormItem>
-                        <FormLabel className="text-sm font-normal">
-                          Rate the products
-                        </FormLabel>
                         <div className="flex items-center">
                           {Array.from({ length: 5 }).map((_, index) => {
                             const starValue = index + 1;
@@ -106,9 +103,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                                 onClick={() => handleStarClick(starValue)}
                               >
                                 {starValue <= selectedStars ? (
-                                  <StarIcon className="text-yellow-500 fill-yellow-500" />
+                                  <StarIcon size={32} className="text-yellow-500 fill-yellow-500" />
                                 ) : (
-                                  <StarIcon className="text-[#EDEDED] fill-[#EDEDED]" />
+                                  <StarIcon size={32} className="text-[#e7e7e7] fill-[#e7e7e7]" />
                                 )}
                               </span>
                             );
@@ -122,13 +119,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                   name="rating"
                 />
 
-                <div className="flex items-center gap-x-[2rem] w-full">
+                <div className="flex flex-col md:flex-row items-center gap-[2rem] w-full">
                   <FormField
                     render={({ field }) => {
                       return (
                         <FormItem className="w-full">
                           <FormLabel className="text-sm font-normal">
-                            Name
+                            Name *
                           </FormLabel>
                           <FormControl>
                             <Input
@@ -137,7 +134,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                               placeholder="Enter your name"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-red-500" />
                         </FormItem>
                       );
                     }}
@@ -150,7 +147,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                       return (
                         <FormItem className="w-full">
                           <FormLabel className="text-sm font-normal">
-                            Phone
+                            Phone *
                           </FormLabel>
                           <FormControl>
                             <Input
@@ -160,7 +157,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                               type="number"
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-red-500" />
                         </FormItem>
                       );
                     }}
@@ -183,7 +180,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                             placeholder="Describe your message in 250 characters"
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-500" />
                       </FormItem>
                     );
                   }}
@@ -212,7 +209,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
               </form>
             </Form>
           </div>
-          <div className="bg-[#FAFAFA] h-fit w-full p-smdlg rounded-smd col-span-2">
+          <div className="bg-[#FAFAFA] h-fit w-full p-smdlg rounded-smd col-span-5 lg:col-span-2">
             <h2 className="text-[2.4rem] font-bold">How to write a Review</h2>
             <p className="text-muted text-sm leading-smlg">
               Oescrbe ycur ce using the VOduct free torm form of nswets to

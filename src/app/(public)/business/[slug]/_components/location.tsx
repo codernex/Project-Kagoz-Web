@@ -26,7 +26,7 @@ export default function LocationAndHours() {
     <>
       <div className="space-y-sm">
         <h2 className="text-mdx font-bold text-black">Location & Hours</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2xl gap-y-12">
           <div className="">
             {Object.entries(openingHours).map(([key, value], index) => {
               console.log(value)

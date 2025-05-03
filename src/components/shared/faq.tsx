@@ -33,7 +33,7 @@ export default function Faq({ faqs = [] }: { faqs?: IBusiness["faqs"][] }) {
                 <span>{f.question}</span>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-xs lg:text-sm text-muted">
+            <AccordionContent className="text-sm text-muted">
               {f.answer}
             </AccordionContent>
           </AccordionItem>

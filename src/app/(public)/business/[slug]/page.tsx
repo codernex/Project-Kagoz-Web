@@ -15,6 +15,7 @@ import { FeaturedCustomer } from "./_components/featuredCustomer";
 import { FeaturedOffer } from "./_components/featuredOffer";
 import { OwnerText } from "./_components/ownerText";
 import RelatedItemWrapper from "./_components/related-item-wrapper";
+import { YtPlayerModal } from "./_components/yt-player-modal";
 const AdSpace = dynamic(() => import('@/components/shared/ad-space').then(m => m.AdSpace))
 const License = dynamic(() => import('./_components/license'))
 const Sidebar = dynamic(() => import('./_components/sidebar'))
@@ -40,13 +41,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     const categories = [data?.primaryCategory?.name, ...data?.subcategories?.map(s => s.name)]
 
     return {
-      title: data.name + '- Services and contact information - KAGOZ',
+      title: data.name,
       description: data.about,
       alternates: {
         canonical: process.env.NEXT_PUBLIC_BASE_URL + `/business/${slug}`
       },
       openGraph: {
-        title: data.name + '- Services and contact information - KAGOZ',
+        title: data.name,
         description: data.about,
         images: appendApi(data.logoUrl),
         type: "website",
@@ -54,7 +55,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       },
       twitter: {
         card: 'summary_large_image',
-        title: data.name + '- Services and contact information - KAGOZ',
+        title: data.name + ' - KAGOZ',
         description: data.about,
         images: appendApi(data.logoUrl),
       },
@@ -121,6 +122,9 @@ export default async function SingleBusiness({ params }: any) {
                  */
               }
               <TopSection />
+              <div className="lg:hidden">
+                <Sidebar />
+              </div>
               <FeaturedCustomer />
               <CustomerFeedback />
               <FeaturedOffer />
@@ -133,10 +137,11 @@ export default async function SingleBusiness({ params }: any) {
               <OwnerText />
               <FaqBusinessWrapper />
               <Reviews />
+              <YtPlayerModal />
             </div>
           </div>
           {
-            isLoading ? <Loader /> : <div className="col-span-6 lg:col-span-2 ">
+            isLoading ? <Loader /> : <div className="col-span-6 lg:col-span-2 hidden lg:block">
               <Sidebar />
               {/* <div className="mt-[4rem] space-y-[4rem]">
                 <AdSpace />

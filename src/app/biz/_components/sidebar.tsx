@@ -41,6 +41,7 @@ export const Sidebar = () => {
     >
       <div className="h-full px-3 overflow-y-auto ">
         <div className="relative space-y-4">
+
           <div className="w-[90%] py-10">
             {business?.business?.map((b) => {
               return (
@@ -73,25 +74,27 @@ export const Sidebar = () => {
         </div>
         <hr className="border-[#ededed] mt-6 mb-3" />
         <ul className="space-y-4 font-medium">
-          {dynamicNavLinks.map(({ name, href, icon: Icon }) => {
-            const isActive = path === href;
-            return (
-              <li key={name}>
-                <Link
-                  href={href}
-                  className={cn(
-                    "flex items-center px-2 py-3 gap-[.5rem] text-base font-normal text-black rounded-[.5rem] hover:bg-[#F5F5F5]",
-                    isActive && "bg-[#F5F5F5]",
-                  )}
-                >
-                  <Icon />
-                  <span className="ml-3 text-sm font-medium leading-2">
-                    {name}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+          {
+            dynamicNavLinks.map(({ name, href, icon: Icon }) => {
+              const isActive = path === href;
+              return (
+                <li key={name}>
+                  <Link
+                    href={href}
+                    className={cn(
+                      "flex items-center px-2 py-3 gap-[.5rem] text-base font-normal text-black rounded-[.5rem] hover:bg-[#F5F5F5]",
+                      isActive && "bg-[#F5F5F5]",
+                    )}
+                  >
+                    <Icon />
+                    <span className="ml-3 text-sm font-medium leading-2">
+                      {name}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })
+          }
         </ul>
         <hr className="border-[#ededed] mt-6 mb-3" />
         <Button onClick={() => setOpen(true)} variant={'outline'} className="text-black border-black rounded-xs">

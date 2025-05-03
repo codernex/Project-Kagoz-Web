@@ -1,11 +1,9 @@
 "use client";
-import { useMobileSearch } from "@/hooks/mobileSearch";
 import { useLazyGetBusinessQuery } from "@/redux/api";
 import { useLazyGetCategoriesQuery } from "@/redux/api/category";
 import Fuse from "fuse.js";
-import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { locationData } from "../location";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -16,7 +14,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { CommonSearchLink } from "./common-search-link";
-import { locationData } from "../location";
 
 type SearchResult = {
   id: string;
@@ -25,7 +22,6 @@ type SearchResult = {
 };
 
 const MobileSearch: React.FC = React.memo(() => {
-  const { setOpen } = useMobileSearch();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState("Dhaka");
   const [searchTerm, setSearchTerm] = useState("");
@@ -143,12 +139,14 @@ const MobileSearch: React.FC = React.memo(() => {
       <Select
         value={location}
         defaultValue={location}
-        onValueChange={(e) => setLocation(e)}
+        onValueChange={(e) => {
+          setLocation(e.trim())
+        }}
       >
         <SelectTrigger className="border-0 text-muted">
           <SelectValue placeholder="Location" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-[9999]">
           {
             locationData.map(l => {
               return (

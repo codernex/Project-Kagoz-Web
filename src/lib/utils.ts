@@ -32,7 +32,10 @@ export function extractYouTubeVideoId(url: string): string {
 
 export const TK_SYMBOL = "৳";
 
-export function trimToWordCount(str: string, wordCount: number): string {
+export function trimToWordCount(
+  str: string | undefined,
+  wordCount: number
+): string {
   if (!str || wordCount <= 0) {
     return "";
   }
@@ -47,6 +50,29 @@ export function trimToWordCount(str: string, wordCount: number): string {
 
   // Slice and join the words
   return words.slice(0, wordCount).join(" ") + "...";
+}
+
+export function trimUrlByScreen(url: string): string {
+  const screenWidth = window.innerWidth;
+
+  let maxLength: number;
+
+  if (screenWidth < 480) {
+    // Mobile
+    maxLength = 25;
+  } else if (screenWidth < 768) {
+    // Tablet
+    maxLength = 40;
+  } else {
+    // Desktop
+    maxLength = 60;
+  }
+
+  if (url.length <= maxLength) {
+    return url;
+  }
+
+  return url.substring(0, maxLength - 3) + '...';
 }
 
 export const normalizeLocation = (location: string) => {

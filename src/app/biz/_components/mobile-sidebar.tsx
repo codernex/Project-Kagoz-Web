@@ -82,10 +82,16 @@ const MobileBusinessSidebar: React.FC = () => {
     >
       <div className="container relative flex items-center justify-between w-full">
         <div className="flex gap-xs">
-          <Menu
-            onClick={() => setIsOpen(true)}
-            className="text-muted lg:hidden"
-          />
+          {
+            !business?.business.length ? (
+              <></>
+            ) : (
+              <Menu
+                onClick={() => setIsOpen(true)}
+                className="text-muted lg:hidden"
+              />
+            )
+          }
 
           <Link href={'/'}>
             <Image
@@ -134,78 +140,84 @@ const MobileBusinessSidebar: React.FC = () => {
         </DropdownMenu>
       </div>
 
-      <motion.div
-        className={cn(
-          "absolute bg-white top-0 left-0 z-50 h-screen w-full max-w-[80%] flex flex-col py-6",
-          !isOpen ? "hidden" : "",
-        )}
-      >
-        {/* <div className={
+      {
+        !business?.business.length ? (
+          <></>
+        ) : (
+          <motion.div
+            className={cn(
+              "absolute bg-white top-0 left-0 z-50 h-screen w-full max-w-[80%] flex flex-col py-6",
+              !isOpen ? "hidden" : "",
+            )}
+          >
+            {/* <div className={
                     cn('fixed top-0 right-[5%] w-[5rem] h-[5rem] shadow-md flex items-center justify-center rounded-full cursor-pointer')
                 } onClick={() => setIsOpen(false)}>
                     <XIcon className='' />
                 </div> */}
-        <div className="h-full px-3 overflow-y-auto ">
-          <div className="relative space-y-4">
-            <div className="w-[90%] py-10">
-              {business?.business?.map((b) => {
-                return (
-                  <Link
-                    key={b.id}
-                    href={`/biz/${b.slug}/dashboard/${memorizePath}`}
-                    onClick={() => setSelectedSlug(b.slug)}
-                    className={
-                      cn(
-                        "font-bold !text-black text-smd flex items-center justify-between border-b border-[#e4e4e4] last:border-none py-2",
+            <div className="h-full px-3 overflow-y-auto ">
+              <div className="relative space-y-4">
+                <div className="w-[90%] py-10">
+                  {business?.business?.map((b) => {
+                    return (
+                      <Link
+                        key={b.id}
+                        href={`/biz/${b.slug}/dashboard/${memorizePath}`}
+                        onClick={() => setSelectedSlug(b.slug)}
+                        className={
+                          cn(
+                            "font-bold !text-black text-smd flex items-center justify-between border-b border-[#e4e4e4] last:border-none py-2",
 
-                        path.includes(b.slug) ? 'bg-[#ededed]' : ''
-                      )
-                    }
-                  >
-                    {b?.name}
-                    <ChevronRightIcon />
-                  </Link>
-                );
-              })}
+                            path.includes(b.slug) ? 'bg-[#ededed]' : ''
+                          )
+                        }
+                      >
+                        {b?.name}
+                        <ChevronRightIcon />
+                      </Link>
+                    );
+                  })}
+                </div>
+                <div
+                  className="absolute top-0 right-0 cursor-pointer text-secondary"
+                  onClick={() => {
+                    window.open(window.location.origin + `/business/${selectedSlug}`)
+                  }}
+                >
+                  <SquareArrowOutUpRight />
+                </div>
+              </div>
+              <hr className="border-[#ededed] mt-6 mb-3" />
+              <ul className="space-y-2 font-medium">
+                {dynamicNavLinks.map(({ name, href, icon: Icon }) => {
+                  const isActive = path === href;
+                  return (
+                    <li key={name}>
+                      <Link
+                        href={href}
+                        className={cn(
+                          "flex items-center px-2 py-3 gap-[.5rem] text-base font-normal text-black rounded-[.5rem] hover:bg-[#F5F5F5]",
+                          isActive && "bg-[#F5F5F5]",
+                        )}
+                      >
+                        <Icon />
+                        <span className="ml-3 text-sm font-semibold">{name}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              <hr className="border-[#ededed] mt-6 mb-3" />
+              <Button onClick={() => {
+                setOpen(true)
+                setIsOpen(false)
+              }} variant={'outline'} className="text-black border-black rounded-xs">
+                Add Business
+              </Button>
             </div>
-            <div
-              className="absolute top-0 right-0 cursor-pointer text-secondary"
-              onClick={() => {
-                window.open(window.location.origin + `/business/${selectedSlug}`)
-              }}
-            >
-              <SquareArrowOutUpRight />
-            </div>
-          </div>
-          <hr className="border-[#ededed] mt-6 mb-3" />
-          <ul className="space-y-2 font-medium">
-            {dynamicNavLinks.map(({ name, href, icon: Icon }) => {
-              const isActive = path === href;
-              return (
-                <li key={name}>
-                  <Link
-                    href={href}
-                    className={cn(
-                      "flex items-center px-2 py-3 gap-[.5rem] text-base font-normal text-black rounded-[.5rem] hover:bg-[#F5F5F5]",
-                      isActive && "bg-[#F5F5F5]",
-                    )}
-                  >
-                    <Icon />
-                    <span className="ml-3 text-sm font-semibold">{name}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <hr className="border-[#ededed] mt-6 mb-3" />
-          <Button onClick={() => {
-            setOpen(true)
-            setIsOpen(false)
-          }} variant={'outline'} className="text-black border-black rounded-xs">
-            Add Business
-          </Button>
-        </div>
-      </motion.div>
+          </motion.div>
+        )
+      }
 
       {/* Backdrop */}
       {isOpen ? (

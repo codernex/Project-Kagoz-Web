@@ -97,7 +97,7 @@ const NavSearch: React.FC = React.memo(() => {
 
   return (
     <div
-      className="relative z-10 flex h-[4rem] w-full items-center rounded-xl bg-white pl-[3.2rem] pr-[.8rem] shadow-none lg:h-[5rem]"
+      className="relative z-10 flex min-h-[4rem] w-full items-center rounded-xl bg-white pl-[3.2rem] pr-[.8rem] shadow-none lg:h-[5rem]"
       onBlur={handleBlur}
       tabIndex={-1} // Ensure focusable behavior for blur handling
     >
@@ -178,7 +178,7 @@ const NavSearch: React.FC = React.memo(() => {
           ref={dropdownRef}
           className="absolute left-0 top-[120%] max-h-[30rem] w-full overflow-y-scroll rounded-xs bg-white p-[2rem] shadow-md"
         >
-          <div className="mb-4 flex gap-2 border-b border-[#ededed] py-2">
+          <div className="mb-4 flex gap-2 border-b border-[#ededed] py-2 text-black">
             <Button
               variant={selectedTab === "categories" ? "default" : "outline"}
               className="rounded-xs"

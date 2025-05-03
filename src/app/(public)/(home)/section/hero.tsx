@@ -2,8 +2,7 @@
 import Search from "@/components/shared/search";
 import Image from "next/image";
 // import Swiper core and required modules
-import { Autoplay, Parallax } from "swiper/modules";
-
+import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
@@ -19,6 +18,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
+import NavSearch from "@/components/shared/nav-search";
 
 type SearchResult = {
   id: string;
@@ -105,16 +105,27 @@ const Hero = () => {
     <section id="hero" className="container ">
       <div className="hero_gradient rounded-[2.8rem] relative text-white w-full shadow-md px-4">
         <div className="w-full max-w-2xl md:max-w-5xl lg:max-w-7xl mx-auto pt-[9.6rem] text-center ">
-          <h1 className=" text-md md:text-xl text-white font-bold md:leading-[5.56rem] ">
-            Welcome to KAGOZ –
-            The Best Free Business Directory in Bangladesh
-          </h1>
-          <p className="text-[1.4rem] md:text-sm text-white md:leading-[3rem] mt-[1.6rem]">
-            We are here to help businesses grow and connect with more customers. Our platform is built with experience, expertise, and trust. Whether you are a small business owner, a service provider, or a customer looking for the best options, we make it easy for you.
-          </p>
+          <div className="hidden md:block">
+            <h1 className=" text-md md:text-xl text-white font-bold md:leading-[5.56rem] ">
+              Welcome to KAGOZ –
+              The Best Free Business Directory in Bangladesh
+            </h1>
+            <p className="text-[1.4rem] md:text-sm text-white md:leading-[3rem] mt-[1.6rem]">
+              We are here to help businesses grow and connect with more customers. Our platform is built with experience, expertise, and trust. Whether you are a small business owner, a service provider, or a customer looking for the best options, we make it easy for you.
+            </p>
+          </div>
+          <div className="md:hidden">
+            <h1 className=" text-md md:text-xl text-white font-bold md:leading-[5.56rem] ">
+              Welcome to KAGOZ <br/>
+              The Best Free Business Directory in Bangladesh
+            </h1>
+          </div>
 
           {/**Tabs */}
-          <div className="mt-[4rem]">
+          <div className="py-lg md:hidden">
+            <NavSearch />
+          </div>
+          <div className="mt-[4rem] hidden lg:block">
             <div onBlur={handleBlur}>
               <div className="bg-black pt-6 px-4 pb-0 rounded-t-xs rounded-b-none w-[80%] mx-auto md:bg-transparent md:space-y-0 flex flex-col justify-center items-center md:flex-row md:!space-x-4 mb-0 md:pt-0 h-fit">
                 <Button onClick={() => {
@@ -169,12 +180,12 @@ const Hero = () => {
           </div>
         </div>
         {
-          <div className="w-full py-[8rem] max-w-[70%] mx-auto">
+          <div className="w-full py-[8rem] max-w-[70%] mx-auto hidden md:block">
             <Swiper
               slidesPerView={9}
               className="mb-2"
               autoplay
-              modules={[Parallax, Autoplay]}
+              modules={[ Autoplay]}
               breakpoints={{
                 320: {
                   slidesPerView: 2,

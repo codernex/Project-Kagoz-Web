@@ -40,7 +40,9 @@ export default function RootLayout({
         <ReduxWrapper>
           <CookiesProvider>
             <AuthProvider>
-              <Toaster richColors position="bottom-right" duration={3000} />
+              <Toaster toastOptions={{
+                className:"text-[18px]"
+              }} richColors position="bottom-right" duration={4000} />
               {children}
               <AuthModal />
             </AuthProvider>

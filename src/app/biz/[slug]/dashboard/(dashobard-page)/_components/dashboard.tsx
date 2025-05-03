@@ -8,26 +8,11 @@ import { useParams } from "next/navigation";
 
 export function BusinessDashboard() {
     const { slug } = useParams() as { slug: string }
-    const { setOpen } = useAddBusinessModal()
-    const { data } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: 1 })
     const { data: business } = useGetBusinessBySlugQuery(slug, {
         skip: slug === 'null'
     })
-    const { data: totalPageViews } = useGetTotalPageViewsQuery(slug)
     const { data: reviews } = useGetReviewQuery(slug)
     const { data: dailyPageViews } = useGetDailyPageViewsQuery(slug)
-
-    if (!data?.business?.length) {
-        return (
-            <div className="flex items-center justify-center text-black font-semibold flex-col gap-3">
-                <p className="text-md">Look like you {"don't have a business"}, Try to create one</p>
-                <CustomButton onClick={() => setOpen(true)} className="rounded-xs bg-black">
-                    Add new
-                </CustomButton>
-            </div>
-        )
-    }
-
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-10">
             <Stats title="Like" number={business?.likes || 0} Icon={HeartIcon} />
