@@ -5,7 +5,7 @@ import { useAuthModal } from "@/hooks/loginModal";
 import { useMobileSearch } from "@/hooks/mobileSearch";
 import { cn } from "@/lib/utils";
 import { type AnimationProps, motion } from "framer-motion";
-import { Menu, Plus, Search, XIcon } from "lucide-react";
+import { Lightbulb, Menu, Plus, Search, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -100,10 +100,23 @@ const MobileNav: React.FC = () => {
             height={100}
           />
         </div>
+
         <div className="flex flex-col items-center justify-center space-y-20">
-          <h2 className="text-sm font-medium text-center text-black">
-            Our Blogs
-          </h2>
+
+          <div className="w-full flex flex-col items-center gap-8">
+            <Link
+              href={"#"}
+              className="text-sm text-center font-medium text-black lg:text-sm flex"
+            >
+              <Lightbulb className="fill-yellow-300 text-yellow-300" />
+              <span>
+                Tutorial</span>
+            </Link>
+            <h2 className="text-sm font-medium text-center text-black">
+              Our Blogs
+            </h2>
+
+          </div>
           <CustomButton onClick={() => {
             if (isAuth) {
               router.push(`/biz/${selectedSlug}/dashboard`)

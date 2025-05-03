@@ -176,10 +176,10 @@ export default function CategoriesSearchPage({
         ></div>
       </section>
 
-      <section
+      {/* <section
         onClick={() => router.push(`/biz/null/dashboard`)}
         className="h-[40rem] cursor-pointer bg-search-add-business"
-      />
+      /> */}
       <Categories />
     </main>
   );
