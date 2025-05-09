@@ -116,6 +116,7 @@ interface ICategory {
   updatedAt: string;
   iconUrl: string;
   about: string;
+  details: string;
 }
 
 interface IFacility {

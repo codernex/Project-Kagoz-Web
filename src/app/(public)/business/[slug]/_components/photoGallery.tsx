@@ -1,18 +1,20 @@
 "use client";
-import { appendApi } from "@/lib/utils";
-import { useGetPhotosQuery } from "@/redux/api";
+import { LockFunctionalities } from "@/components/shared/lock";
+import { appendApi, isBlocked } from "@/lib/utils";
+import { useGetBusinessBySlugQuery, useGetPhotosQuery } from "@/redux/api";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 
 export default function PhotoGallery() {
   const { slug } = useParams() as { slug: string }
+  const { data: busines } = useGetBusinessBySlugQuery(slug)
   const { data } = useGetPhotosQuery(slug)
-
+  const blocked = isBlocked(busines?.updatedAt)
   if (!data?.length) {
     return null
   }
   return (
-    <>
+    <div className="relative">
       <div className="space-y-sm">
         <h2 className="text-mdx font-bold text-black">Our Photo Gallery</h2>
         <div className="gap-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -44,7 +46,8 @@ export default function PhotoGallery() {
         </div>
       </div>
       <hr className="border-[#EEEDED]" />
-    </>
+      <LockFunctionalities locked={blocked} />
+    </div>
 
   );
 };

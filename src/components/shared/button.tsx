@@ -17,7 +17,7 @@ export const Button: React.FC<IButtonProps> = ({
   return (
     <Comp
       className={cn(
-        "w-full min:h-10 bg-primary text-white rounded-md border",
+        "w-full min:h-10 bg-primary text-white rounded-md border disabled:opacity-50 disabled:cursor-not-allowed",
         className,
       )}
       {...props}

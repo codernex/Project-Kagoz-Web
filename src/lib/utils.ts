@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { toast } from "sonner";
+import { format, isBefore, subMonths } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -72,9 +73,13 @@ export function trimUrlByScreen(url: string): string {
     return url;
   }
 
-  return url.substring(0, maxLength - 3) + '...';
+  return url.substring(0, maxLength - 3) + "...";
 }
 
 export const normalizeLocation = (location: string) => {
   return location.toLowerCase().split(" ").join("-");
+};
+
+export const isBlocked = (date: Date | string | undefined) => {
+  return isBefore(new Date(date || new Date()), subMonths(new Date(), 6));
 };

@@ -1,10 +1,11 @@
 "use client";
 import { Button } from "@/components/shared/button";
 import { Loader } from "@/components/shared/loader";
+import { LockFunctionalities } from "@/components/shared/lock";
 import { TextInput } from "@/components/shared/text-input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { trimToWordCount, trimUrlByScreen } from "@/lib/utils";
+import { isBlocked, trimToWordCount, trimUrlByScreen } from "@/lib/utils";
 import { useClaimBusinessMutation, useGetBusinessBySlugQuery } from "@/redux/api";
 import { ArrowRight, Edit2, PhoneCall } from "lucide-react";
 import Link from "next/link";
@@ -29,12 +30,13 @@ const Sidebar = () => {
       setMobile(data.mobile.substring(0, 5) + " xxx xxx");
     }
   }, [data]);
+  const block = isBlocked(data?.updatedAt)
 
   if (isLoading) {
     return <Loader />;
   }
   return (
-    <div className="rounded-smd bg-white lg:px-[2.4rem] lg:py-[3rem] lg:drop-shadow-md">
+    <div className="rounded-smd bg-white lg:px-[2.4rem] lg:py-[3rem] lg:drop-shadow-md relative">
       <Button onClick={() => setClaimModal(true)} className="flex items-center justify-center space-x-3 rounded-xl p-[2rem] font-medium">
         <Edit2 />
         <span>Suggest an edit</span>
@@ -329,6 +331,7 @@ const Sidebar = () => {
           </Form>
         </DialogContent>
       </Dialog>
+      <LockFunctionalities locked={block} />
     </div>
   );
 };

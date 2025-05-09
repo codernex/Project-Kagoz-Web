@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { useCreateReviewMutation } from "@/redux/api";
 import { type CreateReviewInput, createReviewSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +26,29 @@ import { StarIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
+
+const messageObject: Record<number, { text: string; style: string }> = {
+  1: {
+    text: "Very Poor",
+    style: "text-red-600"
+  },
+  2: {
+    text: "Poor",
+    style: "text-red-500"
+  },
+  3: {
+    text: "Average",
+    style: "text-gray-700"
+  },
+  4: {
+    text: "Good",
+    style: "text-green-600"
+  },
+  5: {
+    text: "Very Good",
+    style: "text-green-700"
+  }
+};
 
 interface ReviewModalProps {
   open: boolean;
@@ -93,23 +117,32 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
                   render={() => {
                     return (
                       <FormItem>
-                        <div className="flex items-center">
-                          {Array.from({ length: 5 }).map((_, index) => {
-                            const starValue = index + 1;
-                            return (
-                              <span
-                                key={index}
-                                style={{ cursor: "pointer" }}
-                                onClick={() => handleStarClick(starValue)}
-                              >
-                                {starValue <= selectedStars ? (
-                                  <StarIcon size={32} className="text-yellow-500 fill-yellow-500" />
-                                ) : (
-                                  <StarIcon size={32} className="text-[#e7e7e7] fill-[#e7e7e7]" />
-                                )}
-                              </span>
-                            );
-                          })}
+                        <div className="flex gap-8 items-center">
+                          <div className="flex items-center">
+                            {Array.from({ length: 5 }).map((_, index) => {
+                              const starValue = index + 1;
+                              return (
+                                <span
+                                  key={index}
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleStarClick(starValue)}
+                                >
+                                  {starValue <= selectedStars ? (
+                                    <StarIcon size={32} className="text-yellow-500 fill-yellow-500" />
+                                  ) : (
+                                    <StarIcon size={32} className="text-[#9e9e9e] fill-[#9e9e9e]" />
+                                  )}
+                                </span>
+                              );
+                            })}
+                          </div>
+                          {
+                            messageObject[form.watch('rating')] &&
+                            <p className={cn(
+                              `${messageObject[form.watch('rating')]?.style} font-semibold text-md`
+                            )}>
+                              {messageObject[form.watch('rating')]?.text}
+                            </p>}
                         </div>
                         <FormMessage />
                       </FormItem>
@@ -212,8 +245,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ open, setOpen }) => {
           <div className="bg-[#FAFAFA] h-fit w-full p-smdlg rounded-smd col-span-5 lg:col-span-2">
             <h2 className="text-[2.4rem] font-bold">How to write a Review</h2>
             <p className="text-muted text-sm leading-smlg">
-              Oescrbe ycur ce using the VOduct free torm form of nswets to
-              questions
+              Describe your thaugts
             </p>
 
             <ul className="mt-[2.5rem] lg:mt-[4rem] space-y-smd text-muted list-disc pl-[2rem]">

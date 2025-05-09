@@ -8,8 +8,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { appendApi } from "@/lib/utils";
-import { useGetFeauturedClientsQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import { appendApi, isBlocked } from "@/lib/utils";
+import { useGetBusinessBySlugQuery, useGetFeauturedClientsQuery, useIsFeatureActiveQuery } from "@/redux/api";
 import { FeatureType } from "@/types";
 import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import Image from "next/image";
@@ -21,11 +21,14 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { Autoplay, Navigation } from "swiper/modules";
 import { type Swiper as SwiperType } from "swiper/types";
+import { LockFunctionalities } from "@/components/shared/lock";
 export const FeaturedCustomer = () => {
   const { slug } = useParams() as { slug: string }
+  const { data: business } = useGetBusinessBySlugQuery(slug)
   const { data, isLoading } = useIsFeatureActiveQuery({ slug, type: FeatureType.FEATURED_CLIENT })
   const { data: featuredCustomers, isLoading: featureLoading } = useGetFeauturedClientsQuery(slug, { skip: !data?.hasFeatureActive })
   const swiperRef = useRef<SwiperType>();
+  const block = isBlocked(business?.updatedAt)
 
   if (!data?.hasFeatureActive) {
     return null
@@ -35,7 +38,7 @@ export const FeaturedCustomer = () => {
   }
 
   return (
-    <>
+    <div className="relative">
       <div className="bg-bgPrimaryShade p-[2.4rem] rounded-sm space-y-[2.4rem]">
         <div className="flex space-x-4 items-center">
           <h2 className="text-[2.4rem] font-bold text-black">
@@ -113,7 +116,8 @@ export const FeaturedCustomer = () => {
         }
       </div>
       <hr className="border-[#EEEDED]" />
-    </>
+      <LockFunctionalities locked={block} />
+    </div>
 
   );
 };

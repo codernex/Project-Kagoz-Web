@@ -14,7 +14,7 @@ import {
 import { useStarRatings } from "@/hooks/generate-star-ratings";
 import { useBusinessOpen } from "@/hooks/isBusinessOpen";
 import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
-import { appendApi, cn } from "@/lib/utils";
+import { appendApi, cn, isBlocked } from "@/lib/utils";
 import {
   useGetBusinessBySlugQuery,
   useGetDailyPageViewsQuery,
@@ -27,6 +27,7 @@ import {
   Clock3,
   Globe,
   Heart,
+  MessageCircleIcon,
   PlayIcon,
   Share2Icon,
   Star,
@@ -37,12 +38,13 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ReviewModal } from "../../business/[slug]/_components/reviewModal";
+import Link from "next/link";
 export default function TopSection() {
   const { slug } = useParams() as { slug: string };
   const [openShareModal, setOpenShareModal] = useState(false);
-  
+
   const { data, isLoading } = useGetBusinessBySlugQuery(slug);
- 
+
   const { data: totalPageViews } = useGetDailyPageViewsQuery(slug);
   const isOpen = useBusinessOpen(data?.openingHours);
   const { data: reviews } = useGetReviewQuery(slug);
@@ -58,7 +60,7 @@ export default function TopSection() {
   const [like] = useLikeBusinessMutation();
   const { data: liked } = useHasLikedBusinessQuery(slug);
   const { open, setOpen } = useVideoPalyerModal();
-
+  const blocked = isBlocked(data?.updatedAt)
   if (isLoading) {
     return <Loader />;
   }
@@ -212,6 +214,7 @@ export default function TopSection() {
          */}
         <div className="flex w-fit flex-wrap gap-x-[2rem] gap-y-4">
           <Button
+            disabled={blocked}
             onClick={() => setWriteReview(true)}
             className="flex max-w-[22rem] items-center space-x-[.8rem] rounded-xl px-[3.2rem] py-[1rem] text-white md:w-fit md:py-[1.4rem]"
           >
@@ -219,6 +222,7 @@ export default function TopSection() {
             <span>Write a Review</span>
           </Button>
           <Button
+            disabled={blocked}
             onClick={() => setOpenShareModal(true)}
             className="flex max-w-[22rem] items-center space-x-[.8rem] rounded-xl border border-[#6E67774D] bg-transparent px-[3.2rem] py-[1rem] text-muted md:w-fit md:py-[1.4rem]"
           >
@@ -226,6 +230,7 @@ export default function TopSection() {
             <span>Share</span>
           </Button>
           <Button
+            disabled={blocked}
             onClick={() => like(slug)}
             className={cn(
               "flex max-w-[22rem] items-center space-x-[.8rem] rounded-xl border border-[#6E67774D] bg-transparent px-[3.2rem] py-[1rem] text-muted md:w-fit md:py-[1.4rem]",
@@ -332,6 +337,24 @@ export default function TopSection() {
           </div>
         </DialogContent>
       </Dialog>
+      {
+        blocked && (
+          <div className="border border-[#FA5151] bg-[#FA515114] w-full h-[200px] rounded-xs !text-[#FC0808] flex flex-col items-start justify-center p-[2rem] gap-8">
+            <div>
+              <h3 className="text-mdx font-semibold">
+                This business is temporarly closed !!
+              </h3>
+              <p>
+                Due to inactive for 6 months we have closed this business, if you like to reopen it please contact with us.
+              </p>
+            </div>
+            <Link href={'/contact-us'} className="flex bg-[#FC0808] text-white h-16 items-center px-10 rounded-full gap-4">
+              <MessageCircleIcon />
+              Contact us
+            </Link>
+          </div>
+        )
+      }
     </>
   );
 }

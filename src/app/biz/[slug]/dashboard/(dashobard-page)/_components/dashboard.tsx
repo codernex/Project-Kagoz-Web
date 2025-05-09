@@ -1,7 +1,5 @@
 "use client"
-import { CustomButton } from "@/components/shared/custom-button";
-import { useAddBusinessModal } from "@/hooks/addBusinessModal";
-import { useGetBusinessByCurrentUserQuery, useGetBusinessBySlugQuery, useGetDailyPageViewsQuery, useGetReviewQuery, useGetTotalPageViewsQuery } from "@/redux/api";
+import { useGetBusinessBySlugQuery, useGetDailyPageViewsQuery, useGetReviewQuery } from "@/redux/api";
 import { ChartColumn, HeartIcon, LucideIcon, StarIcon } from "lucide-react";
 import millify from "millify";
 import { useParams } from "next/navigation";

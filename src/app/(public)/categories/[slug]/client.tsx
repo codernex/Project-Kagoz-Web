@@ -2,10 +2,8 @@
 import { BlogWidget } from "@/components/shared/blog-widget";
 import { Loader } from "@/components/shared/loader";
 import { Pagination } from "@/components/shared/pagination";
-import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
 import {
-  useGetBusinessByQueryQuery,
-  useLazyGetSocialMediaQuery,
+  useGetBusinessByQueryQuery
 } from "@/redux/api";
 import Dompurify from "dompurify";
 import { ChevronRight } from "lucide-react";
@@ -31,21 +29,18 @@ export default function CategoriesSearchPage({
   category: ICategory;
   searchLocation?: string;
 }) {
-  const [action, { data: socialData }] = useLazyGetSocialMediaQuery();
   const sectionRef = useRef<HTMLElement>(null);
   const [location, setLocation] = useState<{
     latitude: null | number;
     longitude: null | number;
   }>({ latitude: null, longitude: null });
 
-  useFetchOnVisible(sectionRef, action);
-
   /**
    * Filtering DOM Content
    */
   const sanitizedConent = useMemo(() => {
-    return Dompurify.sanitize(socialData?.content || "");
-  }, [socialData]);
+    return Dompurify.sanitize(category.details || "");
+  }, [category]);
 
   const searchParams = useSearchParams();
   /**
@@ -106,7 +101,7 @@ export default function CategoriesSearchPage({
             Top {data?.items.length}{" "}
             <span className="capitalize text-black">{`${slug.replace(`-in-${searchLocation}`, "").split("-").join(" ")}`}</span>{" "}
             {
-              searchLocation ?<><span>in</span> <span className="text-black capitalize">{searchLocation?.split('-').join(' ')}</span></> : null
+              searchLocation ? <><span>in</span> <span className="text-black capitalize">{searchLocation?.split('-').join(' ')}</span></> : null
             }
           </h1>
         </div>
@@ -136,7 +131,7 @@ export default function CategoriesSearchPage({
       <section className="container grid grid-cols-6 gap-x-[6rem] gap-y-[4rem] py-[6rem]">
         <div className="col-span-6 w-full space-y-[3rem] md:col-span-4">
           {data?.items.length ? (
-            data?.items?.map((b, index) => {
+            data?.items?.filter(b => b.name.length && b.slug.length)?.map((b, index) => {
               return (
                 <SearchItem
                   key={index}

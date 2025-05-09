@@ -1,15 +1,17 @@
 "use client"
 import GoogleMapComponent from "@/components/map";
+import { LockFunctionalities } from "@/components/shared/lock";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, isBlocked } from "@/lib/utils";
 import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { Clock } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
 export default function LocationAndHours() {
   const { slug } = useParams() as { slug: string }
   const { data } = useGetBusinessBySlugQuery(slug)
+  const blocked = isBlocked(data?.updatedAt)
 
   const openingHours = useMemo(() => {
     const object: Record<string, OpeningHour['timeRanges']> = {}
@@ -23,7 +25,7 @@ export default function LocationAndHours() {
   }
 
   return (
-    <>
+    <div className="relative">
       <div className="space-y-sm">
         <h2 className="text-mdx font-bold text-black">Location & Hours</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2xl gap-y-12">
@@ -81,7 +83,8 @@ export default function LocationAndHours() {
       </div>
 
       <hr className="border-[#EEEDED]" />
-    </>
+      <LockFunctionalities locked={blocked} />
+    </div>
 
   );
 };

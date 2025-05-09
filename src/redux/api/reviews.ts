@@ -4,9 +4,17 @@ import { baseApi } from "./base";
 const reviews = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getReview: builder.query<IReview[], string>({
-      query: (slug) => ({
-        url: `/reviews/${slug}`,
-      }),
+      query: (slug) => {
+        if (slug) {
+          return {
+            url: `/reviews/${slug}`,
+          };
+        } else {
+          return {
+            url: `/reviews/unknown`,
+          };
+        }
+      },
     }),
     createReview: builder.mutation<IReview, any>({
       query: ({ slug, data }) => ({
