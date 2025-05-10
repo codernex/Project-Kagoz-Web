@@ -26,13 +26,11 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "api.kagoz.com",
-        port: "9000",
         pathname: "/api/v1/uploads/**", // Add /** to allow dynamic paths
       },
       {
         protocol: "http",
         hostname: "api.kagoz.com",
-        port: "9000",
         pathname: "/api/v1/uploads/**", // Add /** to allow dynamic paths
       },
     ],
