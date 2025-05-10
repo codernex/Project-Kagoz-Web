@@ -61,7 +61,7 @@
         <xsl:for-each select="s:urlset/s:url">
           <div class="url">
             <a href="{s:loc}">
-              <xsl:value-of select="s:title"/>
+              <xsl:value-of select="s:loc"/>
             </a>
             <div class="meta">
               Last Updated: <xsl:value-of select="s:lastmod"/>

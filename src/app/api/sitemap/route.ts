@@ -66,7 +66,6 @@ function generateSitemap(
     <url>
       <loc>${baseUrl}${page.url}</loc>
       <lastmod>${page.lastModified}</lastmod>
-      <title>${page.title}</title>
     </url>
   `
   );

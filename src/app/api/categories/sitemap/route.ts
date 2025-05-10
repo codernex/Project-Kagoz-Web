@@ -19,7 +19,6 @@ function generateSitemap(categories: ICategory[], baseUrl: string): string {
     <url>
       <loc>${baseUrl}/categories/${category.slug}</loc>
       <lastmod>${category.updatedAt}</lastmod>
-      <title>${category.slug}</title>
     </url>
   `
   );

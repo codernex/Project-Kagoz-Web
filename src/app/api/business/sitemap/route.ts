@@ -41,7 +41,6 @@ function generateSitemapXml(
     <url>
       <loc>${baseUrl}/business/${b.slug}</loc>
       <lastmod>${b.updatedAt}</lastmod>
-      <title>${b.slug || "Unknown"}</title>
     </url>
   `
   );
