@@ -84,28 +84,29 @@ export default async function SingleBusiness({ params }: any) {
   const cookieStore = await cookies()
   let cookie = cookieStore.get('access_token')
   let data: IBusiness | null = null;
-  let isLoading: boolean = false;
+  let isLoading: boolean = true;
   let err;
 
-  isLoading = false
-  axiosInstance.get(`/business/${slug}`, {
-    withCredentials: true, headers: {
-      Authorization: `Bearer ${cookie?.value}`
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${slug}`, {
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${cookie?.value}`
     }
-  }).then(response => {
-    data = response.data.data
-  }).catch(err => {
-    err = err
-    data = null
-  }).finally(() => {
+  })
+
+  if (response.ok) {
+    const result = await response.json() as { data: IBusiness }
     isLoading = false
-  });
+    data = result.data
+  } else if (response.status !== 200) {
+    err = "Something went wrong"
+    isLoading = false
+  }
 
   if (isLoading) {
     return <Loader />
   }
-
-  if (err && !data) {
+  if (err || !data) {
     return <NotFound />
   }
   return (

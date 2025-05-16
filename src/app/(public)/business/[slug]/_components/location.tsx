@@ -20,7 +20,7 @@ export default function LocationAndHours() {
     })
     return object
   }, [data?.openingHours])
-  if (!openingHours || !data) {
+  if (!JSON.stringify(openingHours)?.length || !data?.openingHours?.length) {
     return null
   }
 

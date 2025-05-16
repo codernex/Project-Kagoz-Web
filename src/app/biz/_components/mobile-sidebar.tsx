@@ -9,7 +9,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useAddBusinessModal } from "@/hooks/addBusinessModal";
 import { useMemorizedPath } from "@/hooks/memorizeCurrentPath";
-import { appendApi, cn } from "@/lib/utils";
+import { appendApi, cn, trimToWordCount } from "@/lib/utils";
 import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business";
 import { motion } from "framer-motion";
 import {
@@ -26,6 +26,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDynamicNavLink } from "./dynamic-nav";
 import { userUserProfile } from "@/hooks/userProfileModal";
 import Image from "next/image";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 const MobileBusinessSidebar: React.FC = () => {
   /**
    * States
@@ -172,8 +173,25 @@ const MobileBusinessSidebar: React.FC = () => {
                           )
                         }
                       >
-                        {b?.name}
-                        <ChevronRightIcon />
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger className="flex justify-between w-full">
+                              <div className="relative">
+                                {trimToWordCount(b?.name, 2)}
+                                {
+                                  b.isApproved ? (
+                                    <div className="h-4 w-4 bg-green-500 rounded-full absolute top-0" />
+                                  ) :
+                                    <div className="h-4 w-4 bg-red-500 rounded-full absolute top-2 -right-6" />
+                                }
+                              </div>
+                              <ChevronRightIcon />
+                            </TooltipTrigger>
+                            <TooltipContent className={cn("border-[#e7e7e7] min-w-[200px] text-center rounded-[6px] text-white", b.isApproved ? "bg-green-500" : "bg-green-500")}>{
+                              b.isApproved ? "Business is live" : "Business is pending"
+                            }</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </Link>
                     );
                   })}

@@ -16,6 +16,7 @@ interface IBusiness {
   subcategories: ICategory[];
   facilities: IFacility[];
   photos: IPhoto[];
+  isApproved: boolean;
   faqs: {
     id: number;
     question: string;
