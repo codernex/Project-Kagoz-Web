@@ -180,7 +180,7 @@ const MobileBusinessSidebar: React.FC = () => {
                                 {trimToWordCount(b?.name, 2)}
                                 {
                                   b.isApproved ? (
-                                    <div className="h-4 w-4 bg-green-500 rounded-full absolute top-0" />
+                                    <div className="h-4 w-4 bg-green-500 rounded-full absolute top-2 -right-6" />
                                   ) :
                                     <div className="h-4 w-4 bg-red-500 rounded-full absolute top-2 -right-6" />
                                 }
