@@ -49,7 +49,7 @@ const staticPages = [
     title: "Categories Sitemap",
   },
   {
-    url: "/categories/sitemap.xml",
+    url: "/business/sitemap.xml",
     lastModified: new Date().toISOString(),
     title: "Business Sitemap",
   },
