@@ -10,7 +10,7 @@ export const AboutBusiness = () => {
   if (!data?.about && !data?.primaryCategory && !data?.subcategories.length) return null
   return (
     <div className="relative">
-      <div className="grid grid-cols-1 md:grid-cols-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
         {
           data?.about && (
             <div className="space-y-sm">
