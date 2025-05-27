@@ -46,7 +46,7 @@ const WhyChooseUs = () => {
             </div>
 
             <div className="space-y-[4rem]">
-              <div className="flex space-x-[2rem] items-center">
+              <div className="flex space-x-[2rem] items-start">
                 <div className="min-w-fit">
                   <svg
                     width="60"
@@ -98,7 +98,7 @@ const WhyChooseUs = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex space-x-[2rem] items-center">
+              <div className="flex space-x-[2rem] items-start">
                 <div className="min-w-fit">
                   <svg
                     width="60"
@@ -141,7 +141,7 @@ const WhyChooseUs = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex space-x-[2rem] items-center">
+              <div className="flex space-x-[2rem] items-start">
                 <div className="min-w-fit">
                   <svg
                     width="60"
@@ -198,7 +198,7 @@ const WhyChooseUs = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex space-x-[2rem] items-center">
+              <div className="flex space-x-[2rem] items-start">
                 <div className="min-w-fit">
                   <svg
                     width="60"

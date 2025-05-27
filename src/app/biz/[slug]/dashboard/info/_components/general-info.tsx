@@ -1,16 +1,16 @@
 "use client"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { CustomButton } from "@/components/shared/custom-button";
+import FileUploadDropdown from "@/components/shared/file-upload-dropdown";
+import { Flex } from "@/components/shared/flex";
 import { TextInput } from "@/components/shared/text-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Flex } from "@/components/shared/flex";
-import FileUploadDropdown from "@/components/shared/file-upload-dropdown";
-import { useEffect, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { CustomButton } from "@/components/shared/custom-button";
-import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api";
-import { useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api";
 import { InfoIcon } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type GeneralInfoInput = {
     name: string
@@ -76,7 +76,7 @@ export const GeneralInfo = () => {
                         <TextInput name="city" placeholder="Enter Your City" control={generalInfoForm.control} label="City" />
                     </Flex>
                     <Flex className="gap-x-[2rem]">
-                        <TextInput name="state" placeholder="Select your state" control={generalInfoForm.control} label="State" />
+                        <TextInput name="state" placeholder="Select your state" control={generalInfoForm.control} label="Division" />
                         <TextInput name="postalCode" placeholder="Enter Postal Code" control={generalInfoForm.control} label="Postal Code" />
                     </Flex>
                     <Flex className="gap-x-[2rem]">

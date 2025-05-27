@@ -15,7 +15,7 @@ export async function generateMetadata({ params, searchParams }: any): Promise<M
       title: location ? `Top 10 Best ${data.name} in ${location} - KAGOZ` : `Top 10 Best ${data.name} - KAGOZ`,
       description: data.about,
       alternates: {
-        canonical: `/categories/${slug?.replace(`-in-${location}`, "")}`,
+        canonical: `/categories/${slug}`,
       },
       openGraph: {
         type: "website",

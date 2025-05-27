@@ -10,6 +10,10 @@ export default function FeaturedBusiness() {
 
   useFetchOnVisible(ref, action)
 
+  if (!data?.length) {
+    return null
+  }
+
   return (
     <section ref={ref} className="container section_padding space-y-[6rem]">
       <div className="space-y-[2rem] max-w-7xl mx-auto">

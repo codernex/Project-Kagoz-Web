@@ -31,7 +31,6 @@ export default function LocationAndHours() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2xl gap-y-12">
           <div className="">
             {Object.entries(openingHours).map(([key, value], index) => {
-              console.log(value)
               return (
                 <div
                   key={index}
@@ -73,7 +72,7 @@ export default function LocationAndHours() {
               <GoogleMapComponent cid={data.cid} isLoading={false} lat={data.latitude ? Number(data.latitude) : 0} lng={data.longitude ? Number(data.longitude) : 0} />
             </div>
             <div className="flex justify-between items-center text-black">
-              <h2 className="text-md font-semibold">{data.streetAddress}</h2>
+              <h2 className="text-md font-semibold hidden md:block">{data.streetAddress}</h2>
               <Button onClick={() => {
                 window.open(`https://www.google.com/maps/dir/?cid=${data.cid}`, "_blank")
               }} className="h-[4.5rem] px-[3.4rem]">Get Direction</Button>

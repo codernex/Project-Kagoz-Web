@@ -23,6 +23,7 @@ import {
   useLikeBusinessMutation
 } from "@/redux/api";
 import { differenceInDays, differenceInYears, subYears } from "date-fns";
+import { FaEnvelope, FaPrint, FaWhatsapp } from 'react-icons/fa'
 import {
   Clock3,
   Globe,
@@ -31,7 +32,6 @@ import {
   PlayIcon,
   Share2Icon,
   Star,
-  TwitterIcon
 } from "lucide-react";
 import millify from "millify";
 import Image from "next/image";
@@ -295,12 +295,27 @@ export default function TopSection() {
             </button>
             <button
               onClick={() => {
-                const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(process.env.NEXT_PUBLIC_BASE_URL + `/business/${slug}`)}`;
-                window.open(url, "_blank", "width=600,height=400");
+                const shareUrl = process.env.NEXT_PUBLIC_BASE_URL + `/business/${slug}`;
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`;
+                window.open(whatsappUrl, "_blank", "width=600,height=400");
               }}
               className="flex h-[4.6rem] w-[4.6rem] items-center justify-center rounded-full bg-slate-100"
             >
-              <TwitterIcon className="fill-[#1DA1F2] stroke-[#1DA1F2]" />
+              <FaWhatsapp size={28} className="fill-green-600 stroke-green-500" />
+            </button>
+            <button
+              onClick={() => {
+                const subject = encodeURIComponent("Check out this business!"); // Customize your subject
+                const body = encodeURIComponent(
+                  `I thought you might be interested in this business: ${process.env.NEXT_PUBLIC_BASE_URL}/business/${slug}`
+                ); // Customize your email body
+                const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+                window.open(mailtoUrl, "_blank"); // Opens in a new window/tab, which is typical for mailto links
+              }}
+              className="flex h-[4.6rem] w-[4.6rem] items-center justify-center rounded-full bg-slate-100"
+            >
+              {/* You'll likely want an email icon here, e.g., from react-icons */}
+              <FaEnvelope size={28} />
             </button>
             <button
               onClick={() => {
@@ -333,6 +348,16 @@ export default function TopSection() {
                   </clipPath>
                 </defs>
               </svg>
+            </button>
+
+            <button
+              onClick={() => {
+                window.print();
+              }}
+              className="flex h-[4.6rem] w-[4.6rem] items-center justify-center rounded-full bg-slate-100"
+            >
+              {/* You'll likely want a print icon here, e.g., from react-icons */}
+              <FaPrint size={28}/>
             </button>
           </div>
         </DialogContent>

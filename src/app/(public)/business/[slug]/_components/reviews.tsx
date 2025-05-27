@@ -43,11 +43,22 @@ export default function Reviews() {
     };
   }, [ratingsNumber, data])
 
+  if (!averageRatings) {
+    return null
+  }
+
 
   return (
     <div className="space-y-sm">
       <h2 className="text-mdx font-bold text-black">Reviews</h2>
-      <div>
+      <div className="flex gap-4 items-center text-[2rem]">
+        <div className="flex items-center space-x-4">
+          <h2 className="font-bold">{averageRatings > 0 ? averageRatings.toFixed(1) : 0}</h2>
+          <div className="flex">{ratings}</div>
+        </div>
+        <h3 className="font-bold">{millify(data?.length || 0)} reviews</h3>
+      </div>
+      <div className="md:block hidden">
         <div className="grid grid-cols-1 md:grid-cols-3 text-black items-center">
           <div className="space-y-xs">
             <h3 className="text-[2.1rem] font-semibold">Total Reviews</h3>
