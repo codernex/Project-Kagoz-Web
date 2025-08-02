@@ -12,14 +12,15 @@ import MobileNav from "./mobile-nav";
 import NavSearch from "./nav-search";
 import { useDynamicNavLink } from "@/app/biz/_components/dynamic-nav";
 import Image from "next/image";
+import { toast } from "sonner";
 
 const Header = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
   const router = useRouter();
-  const { isAuth } = useAuth()
-  const { setOpen } = useAuthModal()
-  const { selectedSlug } = useDynamicNavLink()
+  const { isAuth } = useAuth();
+  const { setOpen } = useAuthModal();
+  const { selectedSlug } = useDynamicNavLink();
 
   // Memoize the scroll handler
   const handleScroll = useCallback(() => {
@@ -42,11 +43,13 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky top-0 w-full z-50 ${hasScrolled ? "bg-white drop-shadow" : "nav_gradient"} sticky:bg-transparent`}
+      className={`sticky top-0 w-full z-50 ${
+        hasScrolled ? "bg-white drop-shadow" : "nav_gradient"
+      } sticky:bg-transparent`}
     >
       <nav
         className={cn(
-          "container justify-between items-center py-8 bg-transparent hidden md:flex",
+          "container justify-between items-center py-8 bg-transparent hidden md:flex"
         )}
       >
         {/* Logo */}
@@ -65,7 +68,7 @@ const Header = () => {
         <div
           className={cn(
             "w-full md:max-w-2xl lg:max-w-3xl xl:max-w-5xl shadow-md rounded-xl px-4 py-3 bg-white",
-            scrollTop < 400 ? "hidden" : "lg:block",
+            scrollTop < 400 ? "hidden" : "lg:block"
           )}
         >
           <NavSearch />
@@ -76,8 +79,8 @@ const Header = () => {
             href={"#"}
             className="text-xs font-medium text-black lg:text-sm flex"
           >
-            <span>
-              Tutorial</span> <Lightbulb className="fill-yellow-300 text-yellow-300" />
+            <span>Tutorial</span>{" "}
+            <Lightbulb className="fill-yellow-300 text-yellow-300" />
           </Link>
           <Link
             href={"/blogs"}
@@ -87,17 +90,19 @@ const Header = () => {
           </Link>
           <CustomButton
             onClick={() => {
-              if (isAuth) {
-                router.push(`/biz/${selectedSlug}/dashboard`)
-              } else {
-                setOpen()
-              }
+              toast.error(
+                "Currently we are not allowing any businesses! Stay tuned"
+              );
+              // if (isAuth) {
+              //   router.push(`/biz/${selectedSlug}/dashboard`)
+              // } else {
+              //   setOpen()
+              // }
             }}
             className="md:min-h-[40px] lg:min-h-[51px] md:min-w-[140px] lg:min-w-[196px] rounded-xl space-x-1 lg:space-x-3 text-xs lg:text-sm text-white"
           >
             <Plus />
             <span>Add Business</span>
-
           </CustomButton>
         </div>
       </nav>

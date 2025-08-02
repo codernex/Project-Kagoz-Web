@@ -13,15 +13,15 @@ const nextConfig = {
         hostname: "img.youtube.com",
       },
       {
-        protocol: 'http',
+        protocol: "http",
         hostname: "88.222.241.93",
         port: "9000",
-        pathname: "/api/v1/uploads/**"
+        pathname: "/api/v1/uploads/**",
       },
       {
-        protocol: 'http',
+        protocol: "http",
         hostname: "88.222.241.93",
-        pathname: "/api/v1/uploads/**"
+        pathname: "/api/v1/uploads/**",
       },
       {
         protocol: "https",
@@ -39,16 +39,24 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/categories/sitemap.xml", // The URL you want
-        destination: "/api/categories/sitemap", // The actual route (mapped to your `route.ts`)
+        source: "/categories.xml", // The URL you want
+        destination: "/api/categories", // The actual route (mapped to your `route.ts`)
       },
       {
         source: "/sitemap.xml", // The URL you want
         destination: "/api/sitemap", // The actual route (mapped to your `route.ts`)
       },
       {
-        source: "/business/sitemap.xml", // The URL you want
-        destination: "/api/business/sitemap", // The actual route (mapped to your `route.ts`)
+        source: "/businesscategories.xml", // The URL you want
+        destination: "/api/business", // The actual route (mapped to your `route.ts`)
+      },
+      {
+        source: "/pages.xml",
+        destination: "/api/pages",
+      },
+      {
+        source: "/:category.xml", // e.g. /tires.xml
+        destination: "/api/:category",
       },
     ];
   },

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { axiosInstance } from "@/redux/api";
+import { locationData } from "@/components/location";
 
 // Helper function to fetch categories
 async function fetchCategories() {
@@ -14,17 +15,27 @@ async function fetchCategories() {
 
 // Generate XML sitemap
 function generateSitemap(categories: ICategory[], baseUrl: string): string {
-  const urls = categories.map(
-    (category) => `
+  const urls = categories.flatMap((category) => {
+    // const locationUrls = locationData.map((l) => {
+    //   return `
+    //   <url>
+    //     <loc>${baseUrl}/categories/${category.slug}-in-${l.toLowerCase()}</loc>
+    //     <lastmod>${category.updatedAt}</lastmod>
+    //   </url>
+    // `;
+    // });
+
+    const categoryUrl = `
     <url>
-      <loc>${baseUrl}/categories/${category.slug}</loc>
+      <loc>${baseUrl}/${category.slug}-business.xml</loc>
       <lastmod>${category.updatedAt}</lastmod>
     </url>
-  `
-  );
+  `;
 
-  const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>
-  <?xml-stylesheet type="text/xsl" href="${baseUrl}/categories.xsl"?>`;
+    return [categoryUrl];
+  });
+
+  const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>`;
 
   return (
     xmlHeader +

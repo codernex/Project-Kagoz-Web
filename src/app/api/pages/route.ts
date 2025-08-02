@@ -24,22 +24,25 @@ async function fetchBusiness() {
 
 // List of static pages
 const staticPages = [
+  { url: "/", lastModified: new Date().toISOString(), title: "Home" },
+  { url: "/about", lastModified: new Date().toISOString(), title: "About" },
+  { url: "/contact", lastModified: new Date().toISOString(), title: "Contact" },
+  { url: "/blogs", lastModified: new Date().toISOString(), title: "Blogs" },
   {
-    url: "/pages.xml",
+    url: "/privacy-policy",
     lastModified: new Date().toISOString(),
-    title: "Categories Sitemap",
+    title: "Privacy Policy",
   },
   {
-    url: "/categories.xml",
+    url: "/tos",
     lastModified: new Date().toISOString(),
-    title: "Categories Sitemap",
+    title: "Terms of service",
   },
   {
-    url: "/businesscategories.xml",
+    url: "/ads-policy",
     lastModified: new Date().toISOString(),
-    title: "Business Sitemap",
+    title: "Ads Policy",
   },
-  // Add any other static pages here
 ];
 
 // Generate XML sitemap with XSL reference
@@ -55,9 +58,6 @@ function generateSitemap(
     </url>
   `
   );
-  const extraPages = `
-  
-  `;
 
   const styleHeader = `<?xml version="1.0" encoding="UTF-8"?>
   `;
