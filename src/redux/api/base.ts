@@ -2,8 +2,11 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import axios, { AxiosResponse } from "axios";
 import { toast } from "sonner";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
+
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
@@ -53,7 +56,7 @@ const baseQuery =
   };
 
 export const baseApi = createApi({
-  baseQuery: baseQuery({ baseURL: process.env.NEXT_PUBLIC_API_URL }),
+  baseQuery: baseQuery({ baseURL: API_BASE_URL }),
   endpoints: () => ({}),
   refetchOnReconnect: true,
   tagTypes: [

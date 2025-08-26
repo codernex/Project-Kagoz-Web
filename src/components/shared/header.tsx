@@ -90,14 +90,14 @@ const Header = () => {
           </Link>
           <CustomButton
             onClick={() => {
-              toast.error(
-                "Currently we are not allowing any businesses! Stay tuned"
-              );
-              // if (isAuth) {
-              //   router.push(`/biz/${selectedSlug}/dashboard`)
-              // } else {
-              //   setOpen()
-              // }
+              // toast.error(
+              //   "Currently we are not allowing any businesses! Stay tuned"
+              // );
+              if (isAuth) {
+                router.push(`/biz/${selectedSlug}/dashboard`)
+              } else {
+                setOpen()
+              }
             }}
             className="md:min-h-[40px] lg:min-h-[51px] md:min-w-[140px] lg:min-w-[196px] rounded-xl space-x-1 lg:space-x-3 text-xs lg:text-sm text-white"
           >

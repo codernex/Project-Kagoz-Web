@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
+/* html {
   font-size: 62.5%;
   scroll-behavior: smooth;
-}
+} */
 body {
   font-size: 1.6rem;
 }
@@ -44,78 +44,10 @@ body {
   }
 }
 
-@layer components {
-  .section_title {
-    @apply text-center text-md font-bold lg:leading-xl text-black lg:text-lg;
-  }
-
-  p {
-    @apply max-sm:!text-sm
-  }
-
-  .section_padding {
-    @apply py-[4.8rem] md:py-[6.4rem] lg:py-[8.4rem] xl:py-[10rem] 2xl:py-[12rem];
-  }
-  .contact_box {
-    box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.08);
-  }
-
-  .editor {
-    @apply text-muted;
-    & h1 {
-      @apply !text-lg text-black;
-    }
-
-    & h2 {
-      @apply !text-[3.2rem] text-black;
-    }
-
-    & h3 {
-      @apply !text-[2.6rem] text-black;
-    }
-    & p {
-      @apply text-sm text-muted;
-    }
-
-    & ul {
-      @apply list-disc ml-3 pl-10;
-    }
-    & ol {
-      @apply list-decimal ml-3 pl-10;
-    }
-  }
-}
-
-.hero_gradient {
-  background: radial-gradient(
-    62.66% 147.73% at 50% 0%,
-    #9452e9 0%,
-    #6f00ff 100%
-  );
-}
-
-.nav_gradient {
-  background: linear-gradient(
-    180deg,
-    rgba(111, 0, 255, 0.08) 0%,
-    rgba(111, 0, 255, 0) 100%
-  );
-}
-
-.instagram {
-  background: linear-gradient(180deg, #7028ce 0%, #ed2a7c 50%, #f9cb35 100%);
-}
-
-.about-bg {
-  background-image: url("/images/about.png");
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-.about-bottom-bg {
-  background-image: url("/images/about-bottom.png");
-  background-position: center center;
-  background-repeat: no-repeat;
-}
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+.inter-font {
+  font-family: 'Inter';
+} */
 .heading {
   @apply lg:text-[40px] sm:text-3xl text-2xl font-bold lg:leading-[46px] sm:leading-9 leading-7 text-center text-[#111827] tracking-[0%] ;
 }

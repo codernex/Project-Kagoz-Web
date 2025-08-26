@@ -72,7 +72,7 @@ export function TextInput<
                                                 setShow(prev => !prev)
                                             }} className='absolute -translate-y-1/2 cursor-pointer right-3 top-1/2'>
                                                 {
-                                                    show ? <EyeClosed className='cursor-pointer text-muted' /> : <Eye className='cursor-pointer text-muted' />
+                                                    show ? <Eye className='cursor-pointer text-muted' /> :<EyeClosed className='cursor-pointer text-muted' />
                                                 }
                                             </div>
                                         ) : ''
