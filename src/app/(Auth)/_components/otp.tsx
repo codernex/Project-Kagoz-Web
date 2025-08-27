@@ -85,7 +85,7 @@ const OtpPage = ({ email }: { email: string }) => {
   }
 
     return (
-        <div className=" flex items-center justify-center inter-font my-[54px] ">
+        <div className=" flex items-center justify-center inter-font my-[139px] ">
             <div className="max-w-[942px] place-items-center grid md:grid-cols-2 gap-[56px] bg-white rounded-2xl ">
                 {/* Left side */}
               <LeftSideOtp />
@@ -101,9 +101,6 @@ const OtpPage = ({ email }: { email: string }) => {
        actionHref="/setup"
      />
    )}
-                    <Link href="/signin" className="common-text  !font-normal text-[#111827] flex items-center mb-[23px]">
-                        <ArrowLeft className="size-4 mr-1" /> Back to Sign In
-                    </Link>
 
                     <h2 className="auth-heading !font-semibold text-[#111827]  mb-2">Verify OTP</h2>
                     <p className="common-text !font-normal  text-[#2D3643] mb-8">

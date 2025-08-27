@@ -2,16 +2,57 @@
 import React, { useState } from 'react'
 import { Lock, ArrowLeft } from "lucide-react";
 import Link from 'next/link';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import SuccessModal from '@/app/(Auth)/_components/successDialog';
+import { axiosInstance } from '@/redux/api'
+import { toast } from 'sonner'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { TextInput } from '@/components/shared/text-input'
+import { useForm, FormProvider } from 'react-hook-form'
 
 const ResetPassword = () => {
     const [showSuccess, setShowSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const email = searchParams.get('email');
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setShowSuccess(true);
+    const methods = useForm({
+        defaultValues: {
+            password: '',
+            confirmPassword: ''
+        }
+    });
+
+    const onSubmit = async (data: any) => {
+        if (data.password !== data.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
+        if (data.password.length < 8) {
+            toast.error("Password must be at least 8 characters long");
+            return;
+        }
+
+        if (!email) {
+            toast.error("Email is required");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await axiosInstance.post('/auth/reset-password', { 
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+                email: email
+            });
+            setShowSuccess(true);
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || "Failed to reset password");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -44,34 +85,42 @@ const ResetPassword = () => {
             </div>
 
             {/* Options */}
-            <form className="space-y-4 flex flex-col items-start !w-full justify-start" onSubmit={handleSubmit}>
-                <div className="flex flex-col items-start justify-start !w-full">
-                    <p className="common-text !text-start text-[#111827]">New Password</p>
-                    <Input
-                        type="password"
-                        className='w-full sm:w-[368px] '
-                        placeholder="Enter your password"
-                        icon={Lock}
-                    />
-                </div>
+            <FormProvider {...methods}>
+                <form className="space-y-4 flex flex-col items-start !w-full justify-start" onSubmit={methods.handleSubmit(onSubmit)}>
+                    <div className="flex flex-col items-start justify-start !w-full">
+                        <TextInput
+                            name="password"
+                            placeholderIcon={Lock}
+                            type="password"
+                            label="New Password"
+                            placeholder="Enter your password"
+                            required
+                            control={methods.control}
+                        />
+                    </div>
 
-                {/* Confirm Password */}
-                <div className="">
-                    <p className="common-text !text-start text-[#111827]">Confirm Password</p>
-                    <Input
-                        width="100%"
-                        className='w-full sm:w-[368px] '
-                        type="password"
-                        placeholder="Re-enter your password"
-                        icon={Lock}
-                    />
-                </div>
-                <Button type="submit" 
-                    variant="submit" 
-                    className="w-full cursor-pointer">
-                    Reset Password
-                </Button>
-            </form>
+                    {/* Confirm Password */}
+                    <div className="w-full">
+                        <TextInput
+                            name="confirmPassword"
+                            placeholderIcon={Lock}
+                            type="password"
+                            label="Confirm Password"
+                            placeholder="Re-enter your password"
+                            required
+                            control={methods.control}
+                        />
+                    </div>
+                    <Button 
+                        type="submit" 
+                        variant="submit" 
+                        className="w-full cursor-pointer"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Resetting..." : "Reset Password"}
+                    </Button>
+                </form>
+            </FormProvider>
 
             {/* Back Link */}
             <Link href="/signin" className="flex items-center justify-center gap-2 mt-8 common-text text-[#111827]">

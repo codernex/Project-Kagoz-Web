@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 import React from 'react';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, LockKeyhole } from 'lucide-react';
 import Link from 'next/link';
 import { TextInput } from '@/components/shared/text-input';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -22,21 +22,18 @@ const LoginForm = () => {
   const onSubmit = async (data: any) => {
     try {
       await login(data.email, data.password);
-      // The login function in AuthContext handles the redirect logic
-      // If user needs OTP, it will open the OTP modal
-      // If user is verified, it will redirect to dashboard
     } catch (error) {
-      // Error handling is already done in the AuthContext
       console.log('Login error handled by context');
     }
   };
 
   return (
     <FormProvider {...methods}>
-      <form className="space-y-5 w-full" onSubmit={methods.handleSubmit(onSubmit)}>
+      <form className="space-y-5 w-full font-inter" onSubmit={methods.handleSubmit(onSubmit)}>
         {/* Email */}
         <TextInput
           name="email"
+          placeholderIcon={Mail}
           type="email"
           label="Email Address"
           placeholder="Enter your email"
@@ -46,6 +43,7 @@ const LoginForm = () => {
 
         {/* Password */}
         <TextInput
+        placeholderIcon={LockKeyhole}
           name="password"
           type="password"
           label="Password"
@@ -57,7 +55,7 @@ const LoginForm = () => {
         {/* Checkbox */}
         <div className="flex justify-between">
           <div className="flex items-center space-x-2">
-            <Checkbox id="terms" />
+            <Checkbox variant="remember" />
             <label
               htmlFor="terms"
               className="text-sm text-[#353535] leading-5 font-normal inter-font"
@@ -86,7 +84,7 @@ const LoginForm = () => {
             height={20}
             src="https://www.svgrepo.com/show/355037/google.svg"
             alt="Google"
-            className="size-4"
+            className="w-[16px] h-[16px]"
           />
           Continue with Google
         </Button>

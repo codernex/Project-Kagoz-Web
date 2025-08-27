@@ -3,9 +3,20 @@ import React, { useState } from 'react'
 import { Lock, Mail, Phone, Check, ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 import { useReset } from './methodContext';
+import { toast } from 'sonner';
+
 const ResetMethodSelector = () => {
     // const [method, setMethod] = useState<"email" | "phone">("email");
     const { method, setMethod } = useReset();
+
+    const handleMethodSelect = (selectedMethod: "email" | "phone") => {
+        if (selectedMethod === "phone") {
+            toast.error("This module is under development");
+            return;
+        }
+        setMethod(selectedMethod);
+    };
+
   return (
      <div className="max-w-[452px] inter-font mx-auto bg-white reset-method-selector-shadow rounded-3xl py-4 sm:py-8 px-5 sm:px-[42px] text-center ">
       {/* Icon */}
@@ -26,7 +37,7 @@ const ResetMethodSelector = () => {
         {/* Email Option */}
         <Link
         href={'/forgot-method/forgot-password'}
-          onClick={() => setMethod("email")}
+          onClick={() => handleMethodSelect("email")}
           className={`w-full flex items-center justify-between sm:px-5 px-3 sm:py-[18px] py-2.5 rounded-xl border transition ${
             method === "email"
               ? "bg-purple-50 border-[#6F00FF]"
@@ -54,10 +65,9 @@ const ResetMethodSelector = () => {
         </Link>
 
         {/* Phone Option */}
-        <Link
-        href={'/forgot-method/forgot-password'}
-          onClick={() => setMethod("phone")}
-          className={`w-full flex items-center justify-between sm:px-5 px-3 sm:py-[18px] py-2.5 rounded-xl border transition ${
+        <div
+          onClick={() => handleMethodSelect("phone")}
+          className={`w-full flex items-center justify-between sm:px-5 px-3 sm:py-[18px] py-2.5 rounded-xl border transition cursor-pointer ${
             method === "phone"
               ? "bg-purple-50 border-[#6F00FF]"
               : "bg-white border-gray-200 hover:border-gray-300"
@@ -81,7 +91,7 @@ const ResetMethodSelector = () => {
                 <Check className="text-white sm:size-4 size-2" />
             </div>
           )}
-        </Link>
+        </div>
       </div>
 
       {/* Back Link */}

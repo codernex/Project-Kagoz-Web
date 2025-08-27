@@ -50,7 +50,7 @@ const SignupForm = () => {
 
   return (
     <FormProvider {...methods}>
-      <form className="space-y-5 w-full" onSubmit={methods.handleSubmit(onSubmit)}>
+      <form className="space-y-5 w-full font-inter" onSubmit={methods.handleSubmit(onSubmit)}>
         {/* Name */}
         <TextInput
           name="name"
@@ -102,10 +102,10 @@ const SignupForm = () => {
 
         {/* Checkbox */}
         <div className="flex items-center  space-x-2">
-          <Checkbox id="terms" />
+          <Checkbox variant='remember' id="terms" />
           <label
             htmlFor="terms"
-            className="text-sm text-[#353535] leading-5 font-normal inter-font"
+            className="text-[14px] !text-[#353535] leading-5 font-normal "
           >
             I agree to the Terms of Service and Privacy Policy
           </label>
@@ -116,9 +116,9 @@ const SignupForm = () => {
           Sign Up
         </Button>
         <div className="flex items-center">
-          <div className="h-[1px] bg-[#E4E4E4] w-full"></div>
+          <div className="h-px bg-[#E4E4E4] w-full"></div>
           <p className="text-center text-gray-500 whitespace-pre mx-1.5">Or sign up with</p>
-          <div className="h-[1px] bg-[#E4E4E4] w-full"></div>
+          <div className="h-px bg-[#E4E4E4] w-full"></div>
         </div>
         <Button
           variant="outline"
@@ -129,12 +129,12 @@ const SignupForm = () => {
             height={20}
             src="https://www.svgrepo.com/show/355037/google.svg"
             alt="Google"
-            className="size-4"
+            className="w-[16px] h-[16px]"
           />
           Continue with Google
         </Button>
 
-        <p className="text-center common-text text-[#2D3643] inter-font">
+        <p className="text-center common-text text-[#2D3643] ">
           Already have an account?{" "}
           <Link href="/signin" className="text-[#6F00FF] font-semibold">
             Sign in

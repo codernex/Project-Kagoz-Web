@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,7 +36,7 @@ body {
     --black: #181023;
   }
 }
-
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap'); */
 @layer base {
   * {
     @apply border-border;
@@ -126,10 +128,10 @@ body {
   @apply text-sm text-[#6F6D71] font-normal leading-5 tracking-[0%] text-center;
 }
 .bottom-text {
-  @apply text-base text-[#6F6D71] font-normal leading-[22px] tracking-[0%] ;
+  @apply text-[16px] text-[#6F6D71] font-normal leading-[22px] tracking-[0%] ;
 }
 .common-text {
-  @apply text-base leading-[22px] font-medium !tracking-[0%];
+  @apply text-[16px] leading-[22px] font-medium !tracking-[0%];
 }
 /* All shadows */
 .authform-shadow {
@@ -139,7 +141,7 @@ body {
   box-shadow: 0px 4px 50px 0px #00000014;
 }
 .auth-heading{
-  @apply text-2xl font-bold  tracking-[0%] leading-[30px] ;
+  @apply font-inter text-[24px] font-bold  tracking-[0%] leading-[30px] ;
 }
 .reset-method-selector-shadow {
   box-shadow: 0px 4px 50px 0px #0000000D;

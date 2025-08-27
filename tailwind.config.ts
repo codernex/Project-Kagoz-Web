@@ -17,6 +17,7 @@ const config = {
       },
     },
     fontFamily: {
+      inter: ["Inter"],
       geistVf: ["GeistVF", "sans-serif"],
       geistVfMono: ["GeistMonoVF", "monospace"],
     },

@@ -113,16 +113,18 @@ function InputOTPSlot({
       data-slot="input-otp-slot"
       data-active={isActive}
       className={cn(
-        "relative flex h-12 w-12 items-center justify-center text-lg font-medium",
-        "border rounded-md bg-white",
-        isActive ? "border-black" : "border-gray-300",
+        "relative flex items-center justify-center",
+        "w-[48px] h-[48px]", // 48px
+        "border border-[#EDEDED] bg-white",
+        "rounded-[8px]",
+        "text-[2rem] font-medium text-[#111827]",
+        isActive ? "border-black" : "border-[#EDEDED]",
         "transition-all duration-200",
         className
       )}
       {...props}
     >
       {char}
-      {/* caret removed on purpose */}
     </div>
   )
 }

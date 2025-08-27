@@ -13,7 +13,6 @@ import { useEffect, useState } from 'react';
 import { Eye, EyeClosed } from 'lucide-react';
 
 export type FieldValues = Record<string, any>;
-// Define TextInputProps interface
 
 export function TextInput<
     TFieldValues extends FieldValues = FieldValues,
@@ -24,31 +23,31 @@ export function TextInput<
     control,
     variant = 'primary',
     type,
+    placeholderIcon: PlaceholderIcon,
     ...props
 }: InputProps & {
     name?: TName;
     control?: Control<TFieldValues>;
     label?: string;
     variant?: 'primary' | 'secondary';
+    placeholderIcon?: React.ElementType;
 }) {
-    const [show, setShow] = useState(false)
-    const [inputType, setInputType] = useState(type)
+    const [show, setShow] = useState(false);
+    const [inputType, setInputType] = useState(type);
 
     useEffect(() => {
-
         if (type === 'password') {
-            if (show) {
-                setInputType('text')
-            } else {
-                setInputType('password')
-            }
+            setInputType(show ? 'text' : 'password');
+        } else {
+            setInputType(type);
         }
-    }, [show, type])
+    }, [show, type]);
+
     return (
         <FormField
             render={({ field }) => {
                 return (
-                    <FormItem className={'w-full'}>
+                    <FormItem className="w-full">
                         <div
                             className={cn(
                                 variant === 'secondary' ? 'flex items-center' : '',
@@ -56,35 +55,52 @@ export function TextInput<
                             )}
                         >
                             {label ? (
-                                <FormLabel className={'w-full max-w-fit mb-3 inline-block text-black font-normal text-[1.5rem]'}>
-                                    {props.required?`${label} *`:label}
+                                <FormLabel className="w-full max-w-fit mb-3 inline-block text-black font-semibold text-[1.5rem]">
+                                    {label}
+                                    {props.required && <span className="text-red-500"> *</span>}
                                 </FormLabel>
-                            ) : (
-                                ''
-                            )}
-                            <FormControl className={'w-full'}>
-                                <div className='relative'>
-                                    <Input className={cn('placeholder:text-sm text-black placeholder:text-muteds', props.className)} key={inputType} type={inputType} {...field} {...props} />
+                            ) : null}
 
-                                    {
-                                        type === 'password' ? (
-                                            <div onClick={() => {
-                                                setShow(prev => !prev)
-                                            }} className='absolute -translate-y-1/2 cursor-pointer right-3 top-1/2'>
-                                                {
-                                                    show ? <Eye className='cursor-pointer text-muted' /> :<EyeClosed className='cursor-pointer text-muted' />
-                                                }
-                                            </div>
-                                        ) : ''
-                                    }
+                            <FormControl className="w-full">
+                                <div className="relative flex items-center">
+                                   
+                                    {PlaceholderIcon && (
+                                        <PlaceholderIcon 
+                                        style={{ width: '1.8rem', height: '1.8rem' }}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 ml-2 mt-[2px] !text-[#949494] text-muted" />
+                                    )}
+                                    <Input
+                                        className={cn(
+                                            'placeholder:text-sm text-black  placeholder:text-muteds',
+                                            props.className,
+                                            PlaceholderIcon ? 'pl-14' : '' // add left padding if icon exists
+                                        )}
+                                        key={inputType}
+                                        type={inputType}
+                                        {...field}
+                                        {...props}
+                                    />
+
+                                    {type === 'password' && (
+                                        <div
+                                            onClick={() => setShow((prev) => !prev)}
+                                            className="absolute -translate-y-1/2 cursor-pointer right-3 top-1/2"
+                                        >
+                                            {show ? (
+                                                <Eye className="cursor-pointer text-muted" />
+                                            ) : (
+                                                <EyeClosed className="cursor-pointer text-muted" />
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </FormControl>
                         </div>
-                        <FormMessage className='text-red-500' />
+                        <FormMessage className="text-red-500" />
                     </FormItem>
                 );
             }}
-            name={name ?? '' as any}
+            name={(name ?? '') as any}
             control={control}
         />
     );

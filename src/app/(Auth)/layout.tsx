@@ -5,8 +5,8 @@ import "@/styles/globals.css";
 // import "./style.css";
 import { ResetProvider } from "./_components/methodContext";
 export const metadata: Metadata = {
-  title: "Interview Task",
-  description: "A Next.js application for an interview task",
+  title: "KAGOZ",
+  description: "A Next.js application for KAGOZ",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // <html lang="en">
       <body
         suppressHydrationWarning={true}
         className={`antialiased inter-font`}
@@ -25,6 +25,6 @@ export default function RootLayout({
         {children}
        </ResetProvider>
       </body>
-    </html>
+    // </html>
   );
 }
