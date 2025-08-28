@@ -56,7 +56,7 @@ const ResetPassword = () => {
     };
 
     return (
-        <div className="max-w-[452px] my-[103px] inter-font mx-auto bg-white reset-method-selector-shadow rounded-3xl py-4 sm:py-8 px-5 sm:px-[42px] text-center ">
+        <div className="max-w-[452px] my-[103px]  inter-font mx-auto bg-white reset-method-selector-shadow rounded-3xl py-4 sm:py-8 px-5 sm:px-[42px]  ">
             {/* Success Modal */}
             {showSuccess && (
                 <SuccessModal
@@ -76,8 +76,8 @@ const ResetPassword = () => {
 
             {/* Title */}
             <div>
-                <h2 className="auth-heading text-[#111827] mt-2 ">Reset Your Password</h2>
-                <p className="common-text text-[#2D3643] !font-normal  mt-3 mb-4 sm:mb-8">
+                <h2 className="auth-heading text-[#111827] text-center mt-2 ">Reset Your Password</h2>
+                <p className="common-text text-[#2D3643] text-center !font-normal  mt-3 mb-4 sm:mb-8">
                     Add least 8 characters with uppercase,
                     lowercase
                     and special character.
@@ -124,7 +124,7 @@ const ResetPassword = () => {
 
             {/* Back Link */}
             <Link href="/signin" className="flex items-center justify-center gap-2 mt-8 common-text text-[#111827]">
-                <ArrowLeft className="size-4" />
+                <ArrowLeft className="w-[16px] h-[16px]" />
                 Back to Sign in
             </Link>
         </div>

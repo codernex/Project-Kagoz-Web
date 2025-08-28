@@ -24,7 +24,7 @@ const LeftSideOtp = () => {
                             </div>
                             <h2 className="auth-heading  mt-2 mb-3 text-[#111827]">Verify OTP</h2>
                             <p className="common-text !text-[14px] !font-normal !text-[#2D3643] mb-8">
-                                We've sent a 6-digit verification code to your email address. Please enter it to continue.
+                                We&apos;ve sent a 6-digit verification code to your email address. Please enter it to continue.
                             </p>
                             <ul className="text-left space-y-4 text-gray-700">
                                 <li className="flex items-center text-[14px] ">

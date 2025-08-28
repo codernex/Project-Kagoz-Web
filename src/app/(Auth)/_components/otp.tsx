@@ -22,6 +22,7 @@ const OtpPage = ({ email }: { email: string }) => {
     const [submitting, setSubmitting] = useState(false)
     const [timer, setTimer] = useState(120)
     const [canResend, setCanResend] = useState(false)
+    const [resending, setResending] = useState(false)
 
     // Check if this is a login flow by checking the current URL
     const isLoginFlow = typeof window !== 'undefined' && window.location.pathname.includes('/signin/')
@@ -64,7 +65,7 @@ const OtpPage = ({ email }: { email: string }) => {
 
   // countdown timer
   React.useEffect(() => {
-    let intervalId: any
+    let intervalId: NodeJS.Timeout
     if (timer > 0) {
       intervalId = setInterval(() => setTimer(prev => prev - 1), 1000)
     } else {
@@ -74,14 +75,33 @@ const OtpPage = ({ email }: { email: string }) => {
   }, [timer])
 
   const handleResend = async () => {
-    if (!canResend || !email) return
+    if (!canResend || !email || resending) return
+    
     try {
+      setResending(true)
       await axiosInstance.post(resendEndpoint, { email, type })
+      toast.success('OTP resent successfully!')
       setTimer(120)
       setCanResend(false)
-    } catch (_) {
-      toast.error('Something went wrong, Please try again later')
+    } catch (error: any) {
+      const message = error?.response?.data?.message;
+      if (Array.isArray(message)) {
+        toast.error(message.join(', '));
+      } else if (typeof message === 'string') {
+        toast.error(message);
+      } else {
+        toast.error('Failed to resend OTP. Please try again later.');
+      }
+    } finally {
+      setResending(false)
     }
+  }
+
+  // Format timer display
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
     return (
@@ -140,15 +160,24 @@ const OtpPage = ({ email }: { email: string }) => {
             <p className="text-center !font-normal common-text text-[#2D3643] inter-font">
               Resend code in 
               <span className="text-[#6F00FF] ml-0.5 font-semibold">
-                {canResend ? '0s' : `${timer}s`}
+                {canResend ? '0s' : formatTime(timer)}
               </span>
             </p>
 
-            <button type="button" onClick={handleResend} disabled={!canResend} className="block mx-auto text-center !font-normal common-text text-[#2D3643] inter-font">
+            <button 
+              type="button" 
+              onClick={handleResend} 
+              disabled={!canResend || resending} 
+              className={`block mx-auto text-center !font-normal common-text text-[#2D3643] inter-font ${
+                !canResend || resending ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'
+              }`}
+            >
               <span>
-                Didn't receive any code? 
-                <span className="text-[#6F00FF] font-semibold ml-1">
-                  Resend code
+                Didn&apos;t receive any code? 
+                <span className={`text-[#6F00FF] font-semibold ml-1 ${
+                  canResend && !resending ? 'cursor-pointer' : 'cursor-not-allowed'
+                }`}>
+                  {resending ? 'Resending...' : 'Resend code'}
                 </span>
               </span>
             </button>

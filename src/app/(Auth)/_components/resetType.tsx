@@ -85,10 +85,10 @@ const ResetTypeForm = () => {
             </Button>
            
 
-            <p className="text-center common-text text-[#2D3643] inter-font">
+            <p className="text-center common-text !font-normal text-[#2D3643] inter-font">
               Already have an account?{" "}
-              <Link href="/signup" className="text-[#6F00FF] font-semibold">
-                Sign up
+              <Link href="/signin" className="text-[#6F00FF] font-semibold">
+                Sign in
               </Link>
             </p>
           </form>

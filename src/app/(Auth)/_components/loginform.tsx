@@ -90,7 +90,7 @@ const LoginForm = () => {
         </Button>
 
         <p className="text-center common-text text-[#2D3643] inter-font">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/signup" className="text-[#6F00FF] font-semibold">
             Sign up
           </Link>

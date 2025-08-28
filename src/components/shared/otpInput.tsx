@@ -114,7 +114,7 @@ function InputOTPSlot({
       data-active={isActive}
       className={cn(
         "relative flex items-center justify-center",
-        "w-[48px] h-[48px]", // 48px
+        "w-[38px] h-[38px] sm:w-[48px] sm:h-[48px]", // 48px
         "border border-[#EDEDED] bg-white",
         "rounded-[8px]",
         "text-[2rem] font-medium text-[#111827]",

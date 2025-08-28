@@ -31,7 +31,6 @@ const SuccessModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-      showCloseButton={false}
         className="rounded-2xl text-center px-8 py-[75px] inter-font"
         style={{ width: "406px", height: "340px" }} // fixed width & height
       >

@@ -17,19 +17,21 @@ const Page = () => {
     const email = decodeURIComponent(params.slug as string);
     const [otp, setOtp] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-    const [countdown, setCountdown] = useState(60)
+    const [timer, setTimer] = useState(120) // 2 minutes like auth.tsx
     const [canResend, setCanResend] = useState(false)
+    const [resending, setResending] = useState(false)
     const isComplete = otp.length === 6
 
+    // countdown timer - similar to auth.tsx pattern
     useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (countdown > 0) {
-            timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+        let intervalId: NodeJS.Timeout
+        if (timer > 0) {
+            intervalId = setInterval(() => setTimer(prev => prev - 1), 1000)
         } else {
-            setCanResend(true);
+            setCanResend(true)
         }
-        return () => clearTimeout(timer);
-    }, [countdown]);
+        return () => clearInterval(intervalId)
+    }, [timer])
 
     const handleVerifyOTP = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,28 +45,50 @@ const Page = () => {
             });
             toast.success("OTP verified successfully");
             router.push(`/forgot-method/forgot-password/reset-password?email=${encodeURIComponent(email)}`);
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || "Invalid OTP");
+        } catch (error: any) {
+            const message = error?.response?.data?.message;
+            if (Array.isArray(message)) {
+                toast.error(message.join(', '));
+            } else if (typeof message === 'string') {
+                toast.error(message);
+            } else {
+                toast.error('Invalid OTP');
+            }
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleResendOTP = async () => {
-        if (!canResend) return;
-
-        setIsLoading(true);
+        if (!canResend || !email || resending) return;
+        
         try {
+            setResending(true);
+            // Use the same endpoint as auth.tsx for forgot password
             await axiosInstance.post('/auth/forget-password', { email });
-            toast.success("OTP resent successfully");
-            setCountdown(60);
+            toast.success('OTP resent successfully!');
+            setTimer(120); // Reset to 2 minutes
             setCanResend(false);
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || "Failed to resend OTP");
+        } catch (error: any) {
+            const message = error?.response?.data?.message;
+            if (Array.isArray(message)) {
+                toast.error(message.join(', '));
+            } else if (typeof message === 'string') {
+                toast.error(message);
+            } else {
+                toast.error('Failed to resend OTP. Please try again later.');
+            }
         } finally {
-            setIsLoading(false);
+            setResending(false);
         }
     };
+
+    // Format timer display - same as auth.tsx
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
 
     return (
         <div className=" flex items-center justify-center inter-font my-[54px] ">
@@ -112,21 +136,29 @@ const Page = () => {
             </Button>
 
             <p className="text-center !font-normal common-text text-[#2D3643] inter-font">
-              {!canResend ? (
-                <>Resend code in <span className="text-[#6F00FF] ml-0.5 font-semibold">{countdown}s</span></>
-              ) : (
-                <span 
-                  className="text-[#6F00FF] font-semibold cursor-pointer"
-                  onClick={handleResendOTP}
-                >
-                  Resend code
-                </span>
-              )}
+              Resend code in 
+              <span className="text-[#6F00FF] ml-0.5 font-semibold">
+                {canResend ? '0s' : formatTime(timer)}
+              </span>
             </p>
 
-            <p className="text-center !font-normal common-text text-[#2D3643] inter-font">
-              Didn't receive any code? <span className="text-[#6F00FF] font-semibold cursor-pointer" onClick={handleResendOTP}>Resend code</span>
-            </p>
+            <button 
+              type="button" 
+              onClick={handleResendOTP} 
+              disabled={!canResend || resending} 
+              className={`block mx-auto text-center !font-normal common-text text-[#2D3643] inter-font ${
+                !canResend || resending ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'
+              }`}
+            >
+              <span>
+                Didn&apos;t receive any code? 
+                <span className={`text-[#6F00FF] font-semibold ml-1 ${
+                  canResend && !resending ? 'cursor-pointer' : 'cursor-not-allowed'
+                }`}>
+                  {resending ? 'Resending...' : 'Resend code'}
+                </span>
+              </span>
+            </button>
           </form>
                 </div>
             </div>

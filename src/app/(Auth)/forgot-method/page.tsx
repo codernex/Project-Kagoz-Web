@@ -1,4 +1,3 @@
-import { ResetProvider } from '../_components/methodContext';
 import ResetMethodSelector from '../_components/resetMethod';
 const Page = () => {
     

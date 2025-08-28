@@ -55,7 +55,7 @@ export function TextInput<
                             )}
                         >
                             {label ? (
-                                <FormLabel className="w-full max-w-fit mb-3 inline-block text-black font-semibold text-[1.5rem]">
+                                <FormLabel className="w-full  max-w-fit mb-3 inline-block text-black font-semibold text-[1.5rem]">
                                     {label}
                                     {props.required && <span className="text-red-500"> *</span>}
                                 </FormLabel>
