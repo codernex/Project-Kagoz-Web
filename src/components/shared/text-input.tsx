@@ -55,7 +55,7 @@ export function TextInput<
                             )}
                         >
                             {label ? (
-                                <FormLabel className="w-full  max-w-fit mb-3 inline-block text-black font-semibold text-[1.5rem]">
+                                <FormLabel className="w-full  max-w-fit mb-3 inline-block text-black font-semibold text-[14px] sm:text-[16px]">
                                     {label}
                                     {props.required && <span className="text-red-500"> *</span>}
                                 </FormLabel>
@@ -71,9 +71,9 @@ export function TextInput<
                                     )}
                                     <Input
                                         className={cn(
-                                            'placeholder:text-sm text-black  placeholder:text-muteds',
+                                            'sm:placeholder:text-[16px] placeholder:text-[14px] placeholder: text-black  placeholder:text-muteds',
                                             props.className,
-                                            PlaceholderIcon ? 'pl-14' : '' // add left padding if icon exists
+                                            PlaceholderIcon ? 'pl-14' : '' 
                                         )}
                                         key={inputType}
                                         type={inputType}

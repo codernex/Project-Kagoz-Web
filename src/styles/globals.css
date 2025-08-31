@@ -62,7 +62,33 @@ body {
     box-shadow: 0px 4px 40px 0px rgba(0, 0, 0, 0.08);
   }
 
-  .editor {
+  .content-editor {
+    @apply text-muted;
+    & h1 {
+      @apply !text-lg text-black;
+    }
+
+    & h2 {
+      @apply !text-[3.2rem] text-black;
+    }
+
+    & h3 {
+      @apply !text-[2.6rem] text-black;
+    }
+    & p {
+      @apply text-sm text-muted;
+    }
+
+    & ul {
+      @apply list-disc ml-3 pl-10;
+    }
+    & ol {
+      @apply list-decimal ml-3 pl-10;
+    }
+  }
+
+  /* TipTap Editor Styles - Scoped to prevent conflicts */
+  .tiptap-editor {
     @apply text-muted;
     & h1 {
       @apply !text-lg text-black;
@@ -141,13 +167,13 @@ body {
   box-shadow: 0px 4px 50px 0px #00000014;
 }
 .auth-heading{
-  @apply font-inter text-[24px] font-bold  tracking-[0%] leading-[30px] ;
+  @apply font-inter lg:text-[24px] text-[19px]  font-bold  tracking-[0%] leading-[30px] ;
 }
 .reset-method-selector-shadow {
   box-shadow: 0px 4px 50px 0px #0000000D;
 }
 .learge-headeing{
-  @apply text-[32px] leading-[38px] tracking-[0%] font-semibold text-[#111827];
+  @apply md:text-[32px] text-[26px] md:leading-[38px] leading-8 tracking-[0%] font-medium sm:font-semibold text-[#111827];
 }
 
 /* Hide scrollbar for webkit browsers */
