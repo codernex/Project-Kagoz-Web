@@ -8,8 +8,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { Check, CheckCircle2 } from "lucide-react"
-import Link from "next/link"
+import { Check } from "lucide-react"
+import { useRouter } from "next/navigation"
+
 
 interface SuccessModalProps {
   open: boolean
@@ -28,6 +29,33 @@ const SuccessModal = ({
   actionLabel = "",
   actionHref = "",
 }: SuccessModalProps) => {
+  const router = useRouter();
+  const isNavigating = React.useRef(false);
+
+  // Cleanup effect when component unmounts
+  React.useEffect(() => {
+    return () => {
+      // Cleanup function for component unmount
+    };
+  }, []);
+
+  const handleActionClick = () => {
+    if (isNavigating.current) return; // Prevent multiple clicks
+    
+    isNavigating.current = true;
+    
+    // Close the modal first
+    onOpenChange(false);
+    
+    // Use a longer timeout to ensure all DOM cleanup is complete
+    setTimeout(() => {
+      // Force a small delay to ensure React has finished cleanup
+      requestAnimationFrame(() => {
+        router.push(actionHref);
+      });
+    }, 300);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -47,12 +75,12 @@ const SuccessModal = ({
         </DialogHeader>
 
         <div className="mt-6">
-          <Link
-            href={actionHref}
-            className="text-[#6F00FF] hover:text-purple-700 font-medium inline-flex items-center gap-1"
+          <button
+            onClick={handleActionClick}
+            className="text-[#6F00FF] hover:text-purple-700 font-medium inline-flex items-center gap-1 cursor-pointer"
           >
             {actionLabel} →
-          </Link>
+          </button>
         </div>
       </DialogContent>
     </Dialog>

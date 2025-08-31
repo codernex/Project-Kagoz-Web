@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Building2, Camera, Clock, Star } from "lucide-react"
 import { JSX } from "react"
-import FileUploader from "@/components/setup-busines/file-upload"
+import FileUploader from "@/components/bizness/file-upload"
 // import FileUploader from "@/components/ui/file-upload"
 // import BusinessStartDate from "@/components/ui/date-selector"
 

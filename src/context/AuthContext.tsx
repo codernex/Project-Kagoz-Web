@@ -65,7 +65,8 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                 setIsAuth(true)
                 setUser(decodedUser); // Set the user
                 setOpen()
-                router.push(`/biz/null/dashboard`)
+                // router.push(`/biz/null/dashboard`)
+                router.push(`/business-dashboard`)
             }
 
         } catch (error: any) {
@@ -84,8 +85,14 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
         try {
             const response = await axiosInstance.post('/auth/register', d);
             const { email } = response.data.data
-            setOpen()
-            setOtpOpen({ open: true, email, endpoint: '/auth/verify' })
+            
+            // Comment out the current OTP modal logic
+            // setOpen()
+            // setOtpOpen({ open: true, email, endpoint: '/auth/verify' })
+            
+            // Add the previous router push logic
+            router.push(`/signup/${encodeURIComponent(email)}`);
+            
         } catch (error: any) {
             const message = error.response.data.message;
             if (message instanceof Array) {

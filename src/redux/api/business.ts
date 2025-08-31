@@ -71,6 +71,21 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Business"],
     }),
+    addBanner: builder.mutation<IBusiness, { slug: string; data: FormData }>({
+      query: ({ slug, data }) => ({
+        url: `/business/${slug}/banner`,
+        data,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Banner image added succesfully");
+      },
+      invalidatesTags: ["Business"],
+    }),
 
     getPhotos: builder.query<IPhoto[], string>({
       query: (slug) => {

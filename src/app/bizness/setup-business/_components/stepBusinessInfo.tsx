@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Building2, Tag } from "lucide-react"
 import { JSX, useState, useMemo } from "react"
 import { TextInput } from "@/components/shared/text-input"
-import { Textarea } from "@/components/setup-busines/textarea"
+import { Textarea } from "@/components/bizness/textarea"
 import { TiptapEditor } from "@/components/ui/texteditor"
-import { DateSelector } from "@/components/setup-busines/select-date"
+import { DateSelector } from "@/components/bizness/select-date"
 
 interface StepProps {
   businessData: BusinessData
@@ -64,7 +64,7 @@ export function StepBusinessInfo({ businessData, updateBusinessData, renderBusin
         <div>
           <div className="">
             <div className="flex items-center space-x-2 mb-4">
-              <Building2 className="size-6 text-[#6F00FF]" />
+              <Building2 className="w-6 h-6 text-[#6F00FF]" />
               <h2 className="auth-heading !font-medium text-[#111827]">Business Information</h2>
             </div>
             <p className="text-[#2D3643] mb-6">Tell us about your business</p>

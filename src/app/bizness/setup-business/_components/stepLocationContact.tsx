@@ -21,8 +21,8 @@ export function StepLocationContact({
   return (
     <div>
       <div className="flex items-center space-x-2 mb-6">
-        <MapPin className="w-5 h-5 text-[#6F00FF]" />
-        <h2 className="text-lg font-semibold">Location & Contact</h2>
+        <MapPin className="w-6 h-6 text-[#6F00FF]" />
+        <h2 className="auth-heading !font-medium text-[#111827]">Location & Contact</h2>
       </div>
       <p className="text-gray-600 mb-6">Where is your business located?</p>
 

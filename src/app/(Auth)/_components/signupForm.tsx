@@ -7,11 +7,12 @@ import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
 import { TextInput } from '@/components/shared/text-input';
 import { toast } from 'sonner';
-import { axiosInstance } from '@/redux/api';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const SignupForm = () => {
   const router = useRouter();
+  const { signUp } = useAuth();
   const methods = useForm({
     defaultValues: {
       name: '',
@@ -34,17 +35,21 @@ const SignupForm = () => {
         phone: data.phone,
         password: data.password,
       };
-      await axiosInstance.post('/auth/register', payload);
-      router.push(`/signup/${encodeURIComponent(data.email)}`);
+      
+      // Call the AuthContext signUp method
+      await signUp(payload);
+      
+      // Add some logging logic here
+      console.log('Signup successful for:', data.email);
+      console.log('User data:', payload);
+      console.log('Redirecting to OTP verification...');
+      
+      // The AuthContext will handle the OTP modal and navigation
+      // No need to manually push to router as the context handles it
+      
     } catch (error: any) {
-      const message = error?.response?.data?.message;
-      if (Array.isArray(message)) {
-        toast.error(message.join(', '));
-      } else if (typeof message === 'string') {
-        toast.error(message);
-      } else {
-        toast.error('Failed to sign up');
-      }
+      // Error handling is already done in the AuthContext
+      console.error('Signup error:', error);
     }
   };
 

@@ -118,7 +118,7 @@ const OtpPage = ({ email }: { email: string }) => {
        title="Success"
        description="Your account has been successfully verified and created."
        actionLabel="Continue to business setup"
-       actionHref="/setup"
+       actionHref="/signin"
      />
    )}
 
