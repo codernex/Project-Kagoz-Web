@@ -40,16 +40,15 @@ const route = useRouter();
   loading={false}
   onReload={() => console.log("reload")}
   action={
-    <Button
-    variant={'submit'}
-      className=""
+    <button
+       className="bg-[#6F00FF] text-white px-[20px] py-[10px] rounded-[8px] font-medium text-sm flex items-center gap-2  transition"
       onClick={() => {
-        route.push("/business-dashboard/add-business");
+        route.push("/business-dashboard/setup-business");
         console.log("Add new");
       }}
     >
       + Add Business
-    </Button>
+    </button>
   }
   onEdit={(row) => route.push(`/business-dashboard/edit-business/${row.id}`)}
   onDelete={(row) => console.log("delete", row)}

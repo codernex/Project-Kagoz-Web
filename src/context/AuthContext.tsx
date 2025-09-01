@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                 })
                 setIsAuth(true)
                 setUser(decodedUser); // Set the user
-                setOpen()
+                // setOpen()
                 // router.push(`/biz/null/dashboard`)
                 router.push(`/business-dashboard`)
             }

@@ -44,7 +44,7 @@ export default function Table({
             Easily manage and explore the businesses listed here
           </p>
         </div>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow text-sm font-medium transition">+ Add Business</button>
+        <div>{action}</div>
       </div>
 
       {/* Table */}
@@ -91,15 +91,15 @@ export default function Table({
                         className="border border-[#6F00FF] text-[#6F00FF] bg-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2 hover:bg-purple-50 transition"
                         onClick={() => onEdit && onEdit(row)}
                       >
-                        <PenLine className="w-4 h-4" /> Edit
+                        <PenLine className="w-[16px] h-[16px]" /> Edit
                       </button>
                       {row.status === "Pending" ? (
-                        <button className="bg-[#6F00FF] text-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2 hover:bg-purple-700 transition">
-                          <SquareArrowOutUpRight className="w-4 h-4" /> Preview
+                        <button className="bg-[#6F00FF] text-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2  transition">
+                          <SquareArrowOutUpRight className="w-[16px] h-[16px]" /> Preview
                         </button>
                       ) : (
-                        <button className="bg-[#6F00FF] text-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2 hover:bg-purple-700 transition">
-                          <SquareArrowOutUpRight className="w-4 h-4" /> Live Preview
+                        <button className="bg-[#6F00FF] text-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2  transition">
+                          <SquareArrowOutUpRight className="w-[16px] h-[16px]" /> Live Preview
                         </button>
                       )}
                     </div>
