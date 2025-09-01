@@ -9,7 +9,6 @@ import { useFormContext, Controller } from "react-hook-form";
 interface StepProps {
   businessData: BusinessData;
   updateBusinessData: (field: string, value: any) => void;
-  renderBusinessPreview: () => React.ReactNode;
 }
 
 export function StepLocationContact({

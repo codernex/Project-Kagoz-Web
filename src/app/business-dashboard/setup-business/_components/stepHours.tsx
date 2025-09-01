@@ -1,6 +1,7 @@
 "use client"
 
 import type { BusinessData } from "./businessSetup"
+import { BusinessPreview } from "./BusinessPreview"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -33,10 +34,9 @@ interface DayHours {
 interface StepProps {
   businessData: BusinessData
   updateBusinessData: (field: string, value: any) => void
-  renderBusinessPreview: () => JSX.Element
 }
 
-export function StepHours({ businessData, updateBusinessData, renderBusinessPreview }: StepProps) {
+export function StepHours({ businessData, updateBusinessData }: StepProps) {
   const [businessHours, setBusinessHours] = useState<{ [key: string]: DayHours }>(() => {
     // If businessData.businessHours exists, hydrate from it
     if (businessData.businessHours && typeof businessData.businessHours === 'object') {
@@ -273,7 +273,7 @@ export function StepHours({ businessData, updateBusinessData, renderBusinessPrev
 
         {/* Optional Toggles Section */}
         <div className="mb-8">
-          <h3 className="text-[16px] text-[#111827] font-medium mb-4">Optional Toggles</h3>
+          <h3 className="text-[14px] text-[#111827] font-medium mb-4">Optional Toggles</h3>
           
           <div className="space-y-4">
             <div className="flex items-center ">
@@ -281,7 +281,7 @@ export function StepHours({ businessData, updateBusinessData, renderBusinessPrev
                 checked={businessData.is24x7}
                 onCheckedChange={handle24x7Toggle}
               />
-              <Label className="text-[14px] text-[#353535] font-normal">24/7 Open</Label>
+              <Label className="ml-[12px] text-[14px] text-[#353535] font-normal">24/7 Open</Label>
             </div>
             
             <div className="flex items-center ">
@@ -289,56 +289,53 @@ export function StepHours({ businessData, updateBusinessData, renderBusinessPrev
                 checked={businessData.closedOnHolidays}
                 onCheckedChange={handleHolidaysToggle}
               />
-              <Label className="text-[14px] text-[#353535] font-normal">Closed on Public Holidays</Label>
+              <Label className="ml-[12px] text-[14px] text-[#353535] font-normal">Closed on Public Holidays</Label>
             </div>
-            
-            <Button
-              variant="outline"
-              onClick={copyMonFriHours}
-              className="flex items-center space-x-2"
-            >
-              <Copy className="w-4 h-4" />
+
+            <div className="bg-[#F3F4F6] p-[8px] text-[#2D3643] text-[14px] rounded-[8px] gap-3 flex items-center w-fit">
+              <Copy className="w-[16px] h-[16px]" />
               <span>Copy Mon-Fri hours to all weekdays</span>
-            </Button>
+            </div>
           </div>
         </div>
 
             {/* Only show slots if closedOnHolidays is ON and is24x7 is OFF */}
             {!businessData.is24x7 && businessData.closedOnHolidays && hasSelectedDays && (
               <div>
-                <h3 className="text-lg font-semibold mb-4">Opening Hours</h3>
+                <h3 className="text-[16px] text-[#111827] font-medium mb-4">Opening Hours</h3>
                 <div className="space-y-4">
                   {DAYS.filter(day => businessHours[day]?.isOpen).map((day) => (
-                    <div key={day} className="border border-gray-200 rounded-lg p-4">
+                    <div key={day} className="border border-gray-200 rounded-[8px] p-[16px]">
                       <h3 className="font-medium text-gray-900 mb-3">{DAY_NAMES[day as keyof typeof DAY_NAMES]}</h3>
                       {businessHours[day]?.timeSlots?.map((slot, index) => (
-                        <div key={slot.id} className="flex items-center gap-3 mb-3">
+                        <div key={slot.id} className="flex items-center space-y-3 gap-[12px] text-[#353535] mb-3">
+                          <span className="text-gray-500">Time Slot {index + 1}:</span>
                           <Select
                             value={slot.startTime}
                             onValueChange={(value) => updateTimeSlot(day, slot.id, 'startTime', value)}
                           >
-                            <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-md">
+                            <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-[8px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               {timeOptions.map((time) => (
-                                <SelectItem key={time} value={time}>
+                                <SelectItem key={time} value={time} className="text-[#353535]">
                                   {time}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-500">to</span>
+                          <span className="text-gray-500">→</span>
                           <Select
                             value={slot.endTime}
                             onValueChange={(value) => updateTimeSlot(day, slot.id, 'endTime', value)}
                           >
-                            <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-md">
+                            <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-[8px]">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               {timeOptions.map((time) => (
-                                <SelectItem key={time} value={time}>
+                                <SelectItem key={time} value={time} className="text-[#353535]">
                                   {time}
                                 </SelectItem>
                               ))}
@@ -351,19 +348,18 @@ export function StepHours({ businessData, updateBusinessData, renderBusinessPrev
                               onClick={() => removeTimeSlot(day, slot.id)}
                               className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                             >
-                              <X className="w-4 h-4" />
+                              <X className="w-[16px] h-[16px]" />
                             </Button>
                           )}
                         </div>
                       ))}
-                      <Button
-                        variant="link"
-                        size="sm"
+                      <button
+                        
                         onClick={() => addTimeSlot(day)}
-                        className="text-[#6F00FF] hover:text-purple-700 text-sm font-medium p-0 h-auto"
+                        className="text-[#6F00FF] flex justify-start items-start pt-[6px] !text-start text-[14px] font-medium h-auto"
                       >
                         + Add Another Time Slot
-                      </Button>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -378,11 +374,12 @@ export function StepHours({ businessData, updateBusinessData, renderBusinessPrev
             <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
             <h3 className="font-semibold">Hours Preview</h3>
           </div>
-          {renderBusinessPreview()}
+          <BusinessPreview businessData={businessData} stepIndex={2} />
         </div>
       </div>
     </div>
   )
 }
+export default StepHours;
 
 

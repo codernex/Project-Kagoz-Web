@@ -2,22 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  Clock,
-  MapPin,
-  Phone,
-  Globe,
-  Facebook,
-  Check,
-  Calendar,
-  Building2,
-  Star,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  Leaf,
-} from "lucide-react"
+import { Check, ChevronLeft } from "lucide-react"
 import { StepBusinessInfo } from "./stepBusinessInfo"
 import { StepHours } from "./stepHours"
 import { StepMediaBranding } from "./stepMediaBranding"
@@ -211,147 +196,6 @@ const renderProgressBar = () => (
   </div>
 )
 
-  const renderBusinessPreview = () => (
-    <div className="w-full border border-[#E4E4E4] rounded-2xl">
-      <div className="p-4">
-          <div className="flex items-center space-x-3 mb-4 bg-gradient-to-r border border-[#CCFBF1] rounded-[12px] px-4 py-[20px] from-[#F0FDFA] to-[#FAF5FF]">
-            <div className="size-16 basis-16 shrink-0 bg-[#6F00FF] rounded-lg flex items-center justify-center">
-              <Building2 className="size-8 text-white" />
-            </div>
-                         <div className="flex-1 min-w-0">
-               <h3 className="font-semibold text-sm truncate">{businessData.name || "Business Name"}</h3>
-               <p className="text-xs text-gray-600 break-words">{businessData.tagline || "Business tagline"}</p>
-             </div>
-          </div>
-
-        <div className="space-y-6 text-xs">
-                     <div className="flex items-start space-x-2">
-             <Building2 className="w-3 h-3 text-gray-400 mt-0.5" />
-             <div>
-               <p className="font-medium">About</p>
-               <p className="text-gray-600 line-clamp-3">{businessData.about || "Business description will appear here"}</p>
-             </div>
-           </div>
-
-                     <div className="flex items-center space-x-2">
-             <Calendar className="w-3 h-3 text-gray-400" />
-             <div>
-               <p className="font-medium">Starting Date</p>
-               <p className="text-gray-600">
-                 {businessData.startingDate.year && businessData.startingDate.month && businessData.startingDate.day 
-                   ? `${businessData.startingDate.year}-${businessData.startingDate.month}-${businessData.startingDate.day}`
-                   : "Not specified"}
-               </p>
-             </div>
-           </div>
-
-           <div className="flex items-center space-x-2">
-             <Star className="w-3 h-3 text-gray-400" />
-             <div>
-               <p className="font-medium">Category</p>
-               <p className="text-gray-600">{businessData.category || "Not specified"}</p>
-             </div>
-           </div>
-
-          {currentStep >= 1 && (
-            <>
-                             <div className="flex items-start space-x-2">
-                 <MapPin className="w-3 h-3 text-gray-400 mt-0.5" />
-                 <div>
-                   <p className="font-medium">Address</p>
-                   <p className="text-gray-600">
-                     {(() => {
-                       const parts = [businessData.streetAddress, businessData.houseInfo, businessData.localArea, businessData.city, businessData.postalCode, businessData.country].filter(Boolean)
-                       return parts.length > 0 ? parts.join(", ") : "Address not provided"
-                     })()}
-                   </p>
-                 </div>
-               </div>
-
-               <div className="flex items-center space-x-2">
-                 <Phone className="w-3 h-3 text-gray-400" />
-                 <div>
-                   <p className="font-medium">Phone</p>
-                   <p className="text-gray-600">{businessData.mobile || "Not provided"}</p>
-                 </div>
-               </div>
-
-               <div className="flex items-center space-x-2">
-                 <Globe className="w-3 h-3 text-gray-400" />
-                 <div>
-                   <p className="font-medium">Website</p>
-                   <p className="text-blue-600">{businessData.website || "Not provided"}</p>
-                 </div>
-               </div>
-
-               <div className="flex items-center space-x-2">
-                 <Facebook className="w-3 h-3 text-gray-400" />
-                 <div>
-                   <p className="font-medium">Facebook</p>
-                   <p className="text-blue-600">{businessData.facebook || "Not provided"}</p>
-                 </div>
-               </div>
-            </>
-          )}
-
-          {currentStep >= 2 && (
-            <div className="flex items-start space-x-2">
-              <Clock className="w-3 h-3 text-gray-400 mt-0.5" />
-              <div>
-                <p className="font-medium">Business Hours</p>
-                {businessData.is24x7 ? (
-                  <div className="space-y-2">
-                    <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
-                      Open 24 hours a day, 7 days a week
-                    </Badge>
-                    {businessData.closedOnHolidays && (
-                      <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 flex items-center gap-1">
-                        <Leaf className="w-3 h-3" />
-                        Closed on public holidays
-                      </Badge>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    {(() => {
-                      const hasOpenDays = Object.values(businessData.businessHours).some(hours => hours.isOpen)
-                      if (!hasOpenDays) {
-                        return <p className="text-xs text-gray-500">Business hours will appear here</p>
-                      }
-                      return (
-                        <>
-                          {Object.entries(businessData.businessHours).map(([day, hours]) => (
-                            <div key={day} className="flex justify-between text-xs">
-                              <span className="font-medium">{day}</span>
-                              <span className={hours.isOpen ? "text-gray-600" : "text-red-600"}>
-                                {hours.isOpen ? hours.openTime : "Closed"}
-                              </span>
-                            </div>
-                          ))}
-                          {businessData.closedOnHolidays && (
-                            <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 mt-2 flex items-center gap-1">
-                              <Leaf className="w-3 h-3" />
-                              Closed on public holidays
-                            </Badge>
-                          )}
-                        </>
-                      )
-                    })()}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-4 py-3 px-5 rounded-[8px] bg-[#F9FAFB] border-l-[4px] border-[#6F00FF]  text-xs text-[#717684]">
-          This preview shows how your business {currentStep < 1 ? "information will appear" : currentStep < 2 ? "location and contact information will appear" : currentStep < 3 ? "hours will appear" : "information will appear"} to
-          customers. Make sure all {currentStep < 1 ? "details" : currentStep < 2 ? "details" : currentStep < 3 ? "times" : "details"} are accurate.
-        </div>
-      </div>
-    </div>
-  )
-
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -359,7 +203,6 @@ const renderProgressBar = () => (
           <StepBusinessInfo
             businessData={businessData}
             updateBusinessData={updateBusinessData}
-            renderBusinessPreview={renderBusinessPreview}
           />
         )
       case 1:
@@ -367,7 +210,6 @@ const renderProgressBar = () => (
           <StepLocationContact
             businessData={businessData}
             updateBusinessData={updateBusinessData}
-            renderBusinessPreview={renderBusinessPreview}
           />
         )
       case 2:
@@ -375,7 +217,6 @@ const renderProgressBar = () => (
           <StepHours
             businessData={businessData}
             updateBusinessData={updateBusinessData}
-            renderBusinessPreview={renderBusinessPreview}
           />
         )
       case 3:
@@ -383,7 +224,6 @@ const renderProgressBar = () => (
           <StepMediaBranding
             businessData={businessData}
             updateBusinessData={updateBusinessData}
-            renderBusinessPreview={renderBusinessPreview}
           />
         )
       case 4:

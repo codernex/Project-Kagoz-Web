@@ -1,14 +1,15 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import BusinessForm from "@/components/business/BusinessForm"
+import BusinessForm from "../../add-business/_components/BusinessForm"
+// import BusinessForm from "@/components/business/BusinessForm"
 
 export default function EditBusiness() {
   const params = useParams()
   const businessId = params.id as string
 
   return (
-    <BusinessForm 
+    <BusinessForm
       businessId={businessId}
       mode="edit"
       onSuccess={(businessId) => {

@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Camera } from "lucide-react"
-import FileUploader from "@/components/ui/file-upload"
+import FileUploader from "@/components/bizness/file-upload"
+// import FileUploader from "@/components/ui/file-upload"
 
 interface UploadedFile {
   id: string

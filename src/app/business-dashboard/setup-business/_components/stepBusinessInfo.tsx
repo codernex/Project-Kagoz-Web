@@ -1,6 +1,7 @@
 "use client"
 
 import type { BusinessData } from "./businessSetup"
+import { BusinessPreview } from "./BusinessPreview"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -16,10 +17,9 @@ import { DateSelector } from "@/components/bizness/select-date"
 interface StepProps {
   businessData: BusinessData
   updateBusinessData: (field: string, value: any) => void
-  renderBusinessPreview: () => JSX.Element
 }
 
-export function StepBusinessInfo({ businessData, updateBusinessData, renderBusinessPreview }: StepProps) {
+export function StepBusinessInfo({ businessData, updateBusinessData }: StepProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const { control } = useFormContext()
 
@@ -165,7 +165,7 @@ export function StepBusinessInfo({ businessData, updateBusinessData, renderBusin
             <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
             <h3 className="font-semibold">Business Preview</h3>
           </div>
-          {renderBusinessPreview()}
+          <BusinessPreview businessData={businessData} stepIndex={0} />
         </div>
       </div>
     </div>

@@ -172,7 +172,7 @@ export default function FileUploader({
           // Upload area
           <div
             className={cn(
-              "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors",
+              "border-2 border-dashed rounded-[8px] p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors",
               isDragOver 
                 ? "border-purple-400 bg-purple-50" 
                 : "border-gray-300 hover:border-purple-400 hover:bg-gray-50"
@@ -200,22 +200,22 @@ export default function FileUploader({
           </div>
         ) : (
           // File preview (single file)
-          <div className="border border-gray-200 rounded-lg p-4 bg-white">
+          <div className="border border-gray-200 rounded-[8px] p-4 bg-white">
             <div className="flex items-center gap-3">
               <img
-                src={files[0].preview}
-                alt={files[0].name}
+                src={files[0]?.preview}
+                alt={files[0]?.name}
                 className="w-12 h-12 object-cover rounded"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {files[0].name}
+                  {files[0]?.name}
                 </p>
-                <p className="text-xs text-gray-500">{files[0].size}</p>
+                <p className="text-xs text-gray-500">{files[0]?.size}</p>
               </div>
               <button
                 type="button"
-                onClick={() => removeFile(files[0].id)}
+                onClick={() => files[0]?.id && removeFile(files[0].id)}
                 className="p-1 text-red-500 hover:text-red-700 transition-colors"
               >
                 <X className="h-4 w-4" />
@@ -243,7 +243,7 @@ export default function FileUploader({
       {files.length === 0 && (
         <div
           className={cn(
-            "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors",
+            "border-2 border-dashed rounded-[8px] p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors",
             isDragOver 
               ? "border-purple-400 bg-purple-50" 
               : "border-gray-300 hover:border-purple-400 hover:bg-gray-50"
@@ -269,7 +269,7 @@ export default function FileUploader({
               <img
                 src={file.preview}
                 alt={file.name}
-                className="w-20 h-20 object-cover rounded-lg"
+                className="w-20 h-20 object-cover rounded-[8px]"
               />
               <button
                 type="button"
@@ -284,7 +284,7 @@ export default function FileUploader({
           {/* Plus Icon - inline with thumbnails for adding more images */}
           {files.length < max && (
             <div
-              className="flex-shrink-0 w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-gray-50 transition-colors"
+              className="flex-shrink-0 w-20 h-20 border-2 border-dashed border-gray-300 rounded-[8px] flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-gray-50 transition-colors"
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}

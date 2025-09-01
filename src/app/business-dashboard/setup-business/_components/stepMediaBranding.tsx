@@ -30,7 +30,6 @@ interface MediaBrandingData {
 interface StepProps {
   businessData: BusinessData
   updateBusinessData: (field: string, value: any) => void
-  renderBusinessPreview: () => JSX.Element
 }
 
 export function StepMediaBranding({ businessData, updateBusinessData }: StepProps) {
@@ -130,10 +129,10 @@ export function StepMediaBranding({ businessData, updateBusinessData }: StepProp
       <div className="lg:col-span-2">
         <div>
           <div className="flex items-center space-x-2 mb-6">
-            <Camera className="w-5 h-5 text-[#6F00FF]" />
-            <h2 className="text-lg font-semibold">Media & Business Branding</h2>
+            <Camera className="w-[16px] h-[16px] text-[#6F00FF]" />
+            <h2 className="auth-heading !font-medium text-[#111827]">Media & Business Branding</h2>
           </div>
-          <p className="text-gray-600 mb-6">Add Visuals to Represent Your Business</p>
+          <p className="text-[#2D3643] mb-6">Add Visuals to Represent Your Business</p>
 
           <div className="space-y-8">
             {/* Business Logo */}
