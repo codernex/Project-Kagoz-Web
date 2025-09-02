@@ -38,21 +38,20 @@ export default function PageUpgrade() {
           {/* Left Section - Content */}
           <div className="space-y-8">
             {/* Header */}
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold text-gray-900">
-                Page Upgrades
-              </h1>
-              <p className="text-lg text-gray-600">
-                Upgrade and enhance existing pages anytime
-              </p>
-            </div>
+            
+             <div>
+          <h2 className="text-[32px] font-semibold text-[#111827]">Page Upgrades</h2>
+          <p className="text-[#6F6D71] text-sm">
+            Upgrade and enhance existing pages anytime
+          </p>
+        </div>
 
             {/* Main Benefit */}
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-[24px] font-semibold text-[#111827]">
                 Businesses see an average of 50 more page visits 14 days after setting it up
               </h2>
-              <p className="text-gray-600">
+              <p className="text-[#6F6D71]">
                 A set of features that boosts the appeal of your page and your business.
               </p>
             </div>
@@ -74,7 +73,7 @@ export default function PageUpgrade() {
             </div>
 
             {/* Pricing Box */}
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="bg-purple-50 border border-purple-200 rounded-[8px] p-4">
               <div className="flex items-start gap-2">
                 <Diamond className="w-4 h-4 text-[#6F00FF] mt-0.5 flex-shrink-0" />
                 <p className="text-purple-900 text-sm">
@@ -115,7 +114,7 @@ export default function PageUpgrade() {
           <div className="flex flex-col items-center space-y-6">
             {/* Toggle Switch */}
             <div className="flex items-center gap-3 md:gap-4">
-              <span className={`text-sm font-medium ${!isUpgraded ? 'text-gray-900' : 'text-gray-500'}`}>
+              <span className={`text-sm font-medium ${!isUpgraded ? 'text-gray-900' : 'text-[#6F6D71]'}`}>
                 Before upgrade
               </span>
               <Switch

@@ -39,8 +39,8 @@ export default function Table({
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-[32px] font-semibold text-gray-800">Business Lists</h2>
-          <p className="text-gray-500 text-sm">
+          <h2 className="text-[32px] font-semibold text-[#111827]">Business Lists</h2>
+          <p className="text-[#6F6D71] text-sm">
             Easily manage and explore the businesses listed here
           </p>
         </div>

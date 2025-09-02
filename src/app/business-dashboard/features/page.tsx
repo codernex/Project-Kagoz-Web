@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Star, Play, Youtube, User, Building } from 'lucide-react'
+import { Star, Play, Youtube, User, Building, CirclePlay } from 'lucide-react'
 import FileUploader from '@/components/bizness/file-upload'
 import { TextInput } from '@/components/shared/text-input'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -109,25 +109,25 @@ export default function SpecialFeaturesPage() {
 
   return (
     <FormProvider {...methods}>
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 sm:p-8 p-0">
         <div className=" space-y-6">
         {/* Special Features Header */}
-        <div className="  p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Special Features</h1>
-          <p className="text-gray-600">Enjoy the extra features that bring better experience</p>
+        <div className="pl-2">
+          <h1 className="sm:text-[32px] text-[26px] font-semibold text-[#111827] mb-2">Special Features</h1>
+          <p className="text-[#6F6D71]">Enjoy the extra features that bring better experience</p>
         </div>
 
         {/* Add Promo Video Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-[8px] shadow-sm p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Add Promo Video</h3>
-              <p className="text-sm text-gray-600">Embed a YouTube video to promote your business</p>
+              <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Add Promo Video</h3>
+              <p className="text-[14px] text-[#6F6D71]">Embed a YouTube video to promote your business</p>
             </div>
-            <Button className="bg-[#6F00FF] hover:bg-purple-700 text-white flex items-center gap-2">
-              <Play className="h-4 w-4" />
+            <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+              <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
-            </Button>
+            </button>
           </div>
           
           <div className="relative">
@@ -143,16 +143,16 @@ export default function SpecialFeaturesPage() {
         </div>
 
         {/* Add Customer Brand Logo Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-start justify-between mb-4">
+        <div className="bg-white rounded-[8px] shadow-sm p-6">
+          <div className="flex items-start justify-between gap-2 mb-4">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Add Customer Brand Logo</h3>
-              <p className="text-sm text-gray-600">Upload and showcase customer brand logos to highlight trusted collaborations</p>
+              <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Add Customer Brand Logo</h3>
+              <p className="text-[14px] text-[#6F6D71]">Upload and showcase customer brand logos to highlight trusted collaborations</p>
             </div>
-            <Button className="bg-[#6F00FF] hover:bg-purple-700 text-white flex items-center gap-2">
-              <Play className="h-4 w-4" />
+           <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+              <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
-            </Button>
+            </button>
           </div>
           
           <FileUploader
@@ -166,22 +166,22 @@ export default function SpecialFeaturesPage() {
         </div>
 
         {/* Customer Video Feedback Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-[8px] shadow-sm p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Customer Video Feedback</h3>
-              <p className="text-sm text-gray-600">Upload video testimonials from satisfied customers to build trust and engagement</p>
+              <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Customer Video Feedback</h3>
+              <p className="text-[14px] text-[#6F6D71]">Upload video testimonials from satisfied customers to build trust and engagement</p>
             </div>
-            <Button className="bg-[#6F00FF] hover:bg-purple-700 text-white flex items-center gap-2">
-              <Play className="h-4 w-4" />
+           <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+              <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
-            </Button>
+            </button>
           </div>
           
           <div className="space-y-4">
             {/* Customer Name */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
                 Customer Name
               </Label>
               <div className="">
@@ -198,7 +198,7 @@ export default function SpecialFeaturesPage() {
 
             {/* Customer Image/Logo */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
                 Customer Image/Logo
               </Label>
               <FileUploader
@@ -243,7 +243,7 @@ export default function SpecialFeaturesPage() {
 
             {/* Rating */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
                 Rating
               </Label>
               <div className="flex gap-1">
@@ -269,16 +269,16 @@ export default function SpecialFeaturesPage() {
         </div>
 
         {/* Featured Offers Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-[8px] shadow-sm p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Featured Offers</h3>
-              <p className="text-sm text-gray-600">Display special offers that add value for your customers</p>
+              <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Featured Offers</h3>
+              <p className="text-[14px] text-[#6F6D71]">Display special offers that add value for your customers</p>
             </div>
-            <Button className="bg-[#6F00FF] hover:bg-purple-700 text-white flex items-center gap-2">
-              <Play className="h-4 w-4" />
+            <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+              <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
-            </Button>
+            </button>
           </div>
           
           <FileUploader
