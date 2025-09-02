@@ -24,10 +24,9 @@ interface MediaBrandingStepProps {
   data: MediaBrandingData
   onUpdate: (data: MediaBrandingData) => void
   onBack: () => void
-  onSubmit: () => void
 }
 
-export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: MediaBrandingStepProps) {
+export default function MediaBrandingStep({ data, onUpdate, onBack }: MediaBrandingStepProps) {
   const [formData, setFormData] = useState<MediaBrandingData>(data)
   const [errors, setErrors] = useState<{ logo?: string }>({})
 
@@ -72,7 +71,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
 
   const handleSubmit = () => {
     if (validateForm()) {
-      onSubmit()
+      // Submit handled within this component or parent routing after save if needed
     }
   }
 
@@ -126,7 +125,12 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
 
      
        <div className="flex gap-10 justify-center mx-auto">
-        
+        <button
+          onClick={onBack}
+          className="!px-20 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg"
+        >
+          Save & Back to Businesses
+        </button>
         <button
           onClick={handleSubmit}
           className="!px-20 !py-3 bg-[#6F00FF] cursor-pointer lg:whitespace-pre whitespace-normal text-white rounded-lg"

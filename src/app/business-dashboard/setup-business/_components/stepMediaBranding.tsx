@@ -30,9 +30,12 @@ interface MediaBrandingData {
 interface StepProps {
   businessData: BusinessData
   updateBusinessData: (field: string, value: any) => void
+  onPrev: () => void
+  onNext: () => void
+  isNextDisabled?: boolean
 }
 
-export function StepMediaBranding({ businessData, updateBusinessData }: StepProps) {
+export function StepMediaBranding({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
   const [formData, setFormData] = useState<MediaBrandingData>({
     logo: null,
     banner: null,
@@ -175,20 +178,7 @@ export function StepMediaBranding({ businessData, updateBusinessData }: StepProp
               <Label className="text-sm font-medium">Verified License</Label>
               <p className="text-xs text-gray-500 mb-3">Upload your business license</p>
               
-              {/* Issue Date Section */}
-              {/* <div className="mb-4">
-                <BusinessStartDate
-                  id="issueDate"
-                  label="Issue Date"
-                  required
-                  value={
-                    typeof businessData.issueDate === "string"
-                      ? { year: "", month: "", day: "" }
-                      : businessData.issueDate
-                  }
-                  onChange={e => updateBusinessData("issueDate", e)}
-                />
-              </div> */}
+          
 
               {/* Document Upload */}
               <div className="mb-3">
@@ -252,7 +242,23 @@ export function StepMediaBranding({ businessData, updateBusinessData }: StepProp
           </div>
 
           {/* Navigation Buttons */}
-        
+          <div className="flex gap-4 my-8 w-1/2">
+            <button
+              onClick={onPrev}
+              className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
+            >
+              <span>Previous</span>
+            </button>
+            <button
+              onClick={onNext}
+              disabled={!!isNextDisabled}
+              className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
+                isNextDisabled ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#6F00FF] hover:bg-purple-700 text-white"
+              }`}
+            >
+              <span>Next</span>
+            </button>
+          </div>
         </div>
       </div>
 

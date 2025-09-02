@@ -4,19 +4,24 @@ import type { BusinessData } from "./businessSetup";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Home, Phone, Globe, Facebook, Building2 } from "lucide-react";
 import { TextInput } from "@/components/shared/text-input";
-import { useFormContext, Controller } from "react-hook-form";
+// removed useFormContext
 
 interface StepProps {
   businessData: BusinessData;
   updateBusinessData: (field: string, value: any) => void;
+  onPrev: () => void;
+  onNext: () => void;
+  isNextDisabled?: boolean;
 }
 
 export function StepLocationContact({
   businessData,
   updateBusinessData,
+  onPrev,
+  onNext,
+  isNextDisabled
 }: StepProps) {
 
-  const { control } = useFormContext();
   return (
     <div>
       <div className="flex items-center space-x-2 mb-6">
@@ -33,7 +38,6 @@ export function StepLocationContact({
               name="streetAddress"
               placeholderIcon={Home}
               label="Street Address"
-              control={control}
               value={businessData.streetAddress}
               onChange={(e) =>
                 updateBusinessData("streetAddress", e.target.value)
@@ -46,7 +50,6 @@ export function StepLocationContact({
               name="houseInfo"
               label="House / Road Info"
               required
-              control={control}
               value={businessData.houseInfo}
               onChange={(e) => updateBusinessData("houseInfo", e.target.value)}
               width="100%"
@@ -56,7 +59,6 @@ export function StepLocationContact({
               name="localArea"
               label="Local Area"
               required
-              control={control}
               value={businessData.localArea}
               onChange={(e) => updateBusinessData("localArea", e.target.value)}
               width="100%"
@@ -65,7 +67,6 @@ export function StepLocationContact({
             <TextInput
               name="city"
               label="City"
-              control={control}
               value={businessData.city}
               onChange={(e) => updateBusinessData("city", e.target.value)}
               width="100%"
@@ -74,7 +75,6 @@ export function StepLocationContact({
             <TextInput
               name="postalCode"
               label="Postal Code"
-              control={control}
               required
               value={businessData.postalCode}
               onChange={(e) => updateBusinessData("postalCode", e.target.value)}
@@ -85,7 +85,6 @@ export function StepLocationContact({
               name="country"
               label="Country"
               required
-              control={control}
               value={businessData.country}
               onChange={(e) => updateBusinessData("country", e.target.value)}
               width="100%"
@@ -97,7 +96,6 @@ export function StepLocationContact({
             required
             label="Phone Number"
             placeholderIcon={Phone}
-            control={control}
             value={businessData.mobile}
             onChange={(e) => updateBusinessData("mobile", e.target.value)}
             width="100%"
@@ -107,7 +105,6 @@ export function StepLocationContact({
             name="website"
             placeholderIcon={Globe}
             label="Website URL (Optional)"
-            control={control}
             value={businessData.website}
             onChange={(e) => updateBusinessData("website", e.target.value)}
             width="100%"
@@ -117,7 +114,6 @@ export function StepLocationContact({
             name="facebook"
             label="Facebook Page (Optional)"
             placeholderIcon={Facebook}
-            control={control}
             value={businessData.facebook}
             onChange={(e) => updateBusinessData("facebook", e.target.value)}
             width="100%"
@@ -202,6 +198,23 @@ export function StepLocationContact({
             </Card>
           </div>
         </div>
+      </div>
+      <div className="flex gap-4 my-8 w-1/2">
+        <button
+          onClick={onPrev}
+          className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
+        >
+          <span>Previous</span>
+        </button>
+        <button
+          onClick={onNext}
+          disabled={!!isNextDisabled}
+          className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
+            isNextDisabled ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#6F00FF] hover:bg-purple-700 text-white"
+          }`}
+        >
+          <span>Next</span>
+        </button>
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import { StepLocationContact } from "./stepLocationContact"
 import { CompletionAndPublish } from "./completionAndPublish"
 import { FullPagePreview } from "./fullPagePreview"
 import { SuccessDialog } from "./successDialog"
-import { useForm, FormProvider } from "react-hook-form"
+// removed react-hook-form provider; each step handles its own submission
 
 interface UploadedFile {
   id: string
@@ -72,7 +72,7 @@ export function BusinessSetupWizard() {
   const [currentStep, setCurrentStep] = useState(0)
   const [showFullPreview, setShowFullPreview] = useState(false)
   const [isPublished, setIsPublished] = useState(false)
-  
+
   const defaultValues: BusinessData = {
     name: "",
     tagline: "",
@@ -105,16 +105,13 @@ export function BusinessSetupWizard() {
     closedOnHolidays: false,
   }
 
-  const methods = useForm<BusinessData>({
-    defaultValues,
-    mode: "onChange"
-  })
-
-  const { watch, setValue, getValues } = methods
-  const businessData = watch()
+  const [businessData, setBusinessData] = useState<BusinessData>(defaultValues)
 
   const updateBusinessData = (field: string, value: any) => {
-    setValue(field as keyof BusinessData, value, { shouldValidate: true })
+    setBusinessData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
   }
 
   const nextStep = async () => {
@@ -203,6 +200,9 @@ const renderProgressBar = () => (
           <StepBusinessInfo
             businessData={businessData}
             updateBusinessData={updateBusinessData}
+            onPrev={prevStep}
+            onNext={nextStep}
+            isNextDisabled={!isCurrentStepValid()}
           />
         )
       case 1:
@@ -210,6 +210,9 @@ const renderProgressBar = () => (
           <StepLocationContact
             businessData={businessData}
             updateBusinessData={updateBusinessData}
+            onPrev={prevStep}
+            onNext={nextStep}
+            isNextDisabled={!isCurrentStepValid()}
           />
         )
       case 2:
@@ -217,6 +220,9 @@ const renderProgressBar = () => (
           <StepHours
             businessData={businessData}
             updateBusinessData={updateBusinessData}
+            onPrev={prevStep}
+            onNext={nextStep}
+            isNextDisabled={!isCurrentStepValid()}
           />
         )
       case 3:
@@ -224,6 +230,9 @@ const renderProgressBar = () => (
           <StepMediaBranding
             businessData={businessData}
             updateBusinessData={updateBusinessData}
+            onPrev={prevStep}
+            onNext={nextStep}
+            isNextDisabled={!isCurrentStepValid()}
           />
         )
       case 4:
@@ -258,7 +267,7 @@ const renderProgressBar = () => (
 
   const submitBusiness = async () => {
     try {
-      const formData = getValues()
+      const formData = businessData
       console.log("Submitting business data:", formData)
       // const response = await fetch("/api/business/setup", {
       //   method: "POST",
@@ -274,40 +283,10 @@ const renderProgressBar = () => (
   }
 
   return (
-    <FormProvider {...methods}>
-      <div className="min-h-screen bg-white">
-        {currentStep < STEPS.length - 1 && renderProgressBar()}
+    <div className="min-h-screen bg-white">
+      {currentStep < STEPS.length - 1 && renderProgressBar()}
 
-        <div className="max-w-[1184px] mx-auto mt-8">
-          {renderStep()}
-
-          {currentStep < STEPS.length - 1 && currentStep !== 4 && (
-            <div className="flex gap-4 my-8 w-1/2">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 0}
-                className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </Button>
-
-              <Button 
-                onClick={nextStep} 
-                disabled={!isCurrentStepValid()}
-                className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
-                  isCurrentStepValid() 
-                    ? "bg-[#6F00FF] hover:bg-purple-700 text-white" 
-                    : "bg-gray-400 cursor-not-allowed text-white"
-                }`}
-              >
-                <span>Next</span>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    </FormProvider>
+      <div className="max-w-[1184px] mx-auto mt-8">{renderStep()}</div>
+    </div>
   )
 }

@@ -1,8 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import BusinessForm from "../../add-business/_components/BusinessForm"
-// import BusinessForm from "@/components/business/BusinessForm"
+import BusinessForm from "./_components/BusinessForm"
 
 export default function EditBusiness() {
   const params = useParams()
@@ -14,8 +13,6 @@ export default function EditBusiness() {
       mode="edit"
       onSuccess={(businessId) => {
         console.log('Business updated successfully:', businessId)
-        // You can add additional success handling here
-        // For example, show a success toast or redirect
       }}
       onCancel={() => {
         // Handle cancel action

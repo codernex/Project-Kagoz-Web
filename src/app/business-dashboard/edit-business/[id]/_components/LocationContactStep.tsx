@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MapPin, Building, Phone, Globe, Facebook } from "lucide-react"
+import { TextInput } from "@/components/shared/text-input"
+import { useRegisterBusinessMutation } from "@/redux/api"
+import { toast } from "sonner"
 
 interface LocationContactData {
   streetAddress: string
@@ -23,11 +26,16 @@ interface LocationContactStepProps {
   onUpdate: (data: LocationContactData) => void
   onNext: () => void
   onBack: () => void
+  onSaveAndBack: () => void
 }
 
-export default function LocationContactStep({ data, onUpdate, onNext, onBack }: LocationContactStepProps) {
+export default function LocationContactStep({ data, onUpdate, onNext, onBack, onSaveAndBack }: LocationContactStepProps) {
   const [formData, setFormData] = useState<LocationContactData>(data)
   const [errors, setErrors] = useState<Partial<LocationContactData>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Redux API hook
+  const [registerBusiness] = useRegisterBusinessMutation()
 
   const handleInputChange = (field: keyof LocationContactData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -65,9 +73,49 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
     return Object.keys(newErrors).length === 0
   }
 
-  const handleNext = () => {
-    if (validateForm()) {
+  const handleSaveAndBack = async () => {
+    if (!validateForm()) return
+
+    setIsSubmitting(true)
+    try {
+      const formDataToSubmit = new FormData()
+      
+      // Add location contact fields
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSubmit.append(key, value)
+      })
+
+      await registerBusiness(formDataToSubmit)
+      toast.success("Location and contact information saved successfully!")
+      onSaveAndBack()
+    } catch (error) {
+      console.error('Error saving location contact:', error)
+      toast.error("Failed to save location and contact information. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleNext = async () => {
+    if (!validateForm()) return
+
+    setIsSubmitting(true)
+    try {
+      const formDataToSubmit = new FormData()
+      
+      // Add location contact fields
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSubmit.append(key, value)
+      })
+
+      await registerBusiness(formDataToSubmit)
+      toast.success("Location and contact information saved successfully!")
       onNext()
+    } catch (error) {
+      console.error('Error saving location contact:', error)
+      toast.error("Failed to save location and contact information. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -82,7 +130,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
       <p className="text-[#2D3643] Subheading !text-start mb-6">Where is your business located?</p>
 
     <div className="grid grid-cols-2 gap-5">
-    <Input 
+    <TextInput
     label="streetAddress"
     placeholderIcon={Building}
     required
@@ -92,7 +140,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
               onChange={(e) => handleInputChange('streetAddress', e.target.value)}
               className={` ${errors.streetAddress ? 'border-red-500' : ''}`}
             />
-            <Input 
+            <TextInput 
             label="House / Road Info"
             required
             width="100%"
@@ -101,7 +149,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
             onChange={(e) => handleInputChange('houseRoad', e.target.value)}
             className={` ${errors.houseRoad ? 'border-red-500' : ''}`}
           />
-          <Input 
+          <TextInput 
           required
           label="localArea"
           width="100%"
@@ -110,7 +158,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
             onChange={(e) => handleInputChange('localArea', e.target.value)}
             className={` ${errors.localArea ? 'border-red-500' : ''}`}
           />
-           <Input 
+           <TextInput 
            label="city"
            required
            width="100%"
@@ -119,7 +167,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
             onChange={(e) => handleInputChange('city', e.target.value)}
             className={` ${errors.city ? 'border-red-500' : ''}`}
           />
-           <Input 
+           <TextInput 
            label="postal Code"
            required
            width="100%"
@@ -128,7 +176,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
             onChange={(e) => handleInputChange('postalCode', e.target.value)}
             className={`mt-1 ${errors.postalCode ? 'border-red-500' : ''}`}
           />
-            <Input 
+            <TextInput 
             label="country"
             id="country" 
             readOnly
@@ -143,7 +191,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
        
 
       
-          <Input
+          <TextInput
             placeholder="phone"
             required
             width="100%"
@@ -159,7 +207,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
     
         
             <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input 
+            <TextInput 
             label="Website URL (Optional)"
             placeholderIcon={Globe}
             width="100%"
@@ -170,11 +218,12 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
               className=""
             />
           
+
     
 
        
           
-            <Input 
+            <TextInput 
             width="100%"
             placeholderIcon={Facebook}
             label="Facebook Page (Optional)"
@@ -184,22 +233,23 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack }: 
               onChange={(e) => handleInputChange('facebook', e.target.value)}
               className=""
             />
-         
+          
       </div>
 
       <div className="flex gap-10 w-1/2 mx-auto">
         <button
-         
-          onClick={handleNext}
-          className="!px-20 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg"
+          disabled={isSubmitting}
+          onClick={handleSaveAndBack}
+          className="!px-20 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save & Back to Businesses
+          {isSubmitting ? "Saving..." : "Save & Back to Businesses"}
         </button>
         <button
+          disabled={isSubmitting}
           onClick={handleNext}
-          className="!px-20 !py-3 cursor-pointer bg-[#6F00FF] lg:whitespace-pre whitespace-normal text-white rounded-lg"
+          className="!px-20 !py-3 cursor-pointer bg-[#6F00FF] lg:whitespace-pre whitespace-normal text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save & Continue
+          {isSubmitting ? "Saving..." : "Save & Continue"}
         </button>
       </div>
     </div>

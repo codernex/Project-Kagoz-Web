@@ -6,14 +6,23 @@ import Link from "@tiptap/extension-link"
 import { Bold, ClipboardMinus, Italic, LinkIcon, List } from "lucide-react"
 import Image from "next/image"
 import { useState, useCallback } from "react"
+import { Control, FieldPath } from "react-hook-form"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
-export function TiptapEditor({
+function EditorCore({
   label = "About",
   required = false,
   id = "about",
   placeholder = "Detailed description of your business, services, and what makes you unique...",
   value = "",
   onChange = (html: string) => {},
+}: {
+  label?: string
+  required?: boolean
+  id?: string
+  placeholder?: string
+  value?: string
+  onChange?: (html: string) => void
 }) {
   const [characterCount, setCharacterCount] = useState(0)
   const maxLength = 5000
@@ -28,7 +37,7 @@ export function TiptapEditor({
         },
       }),
     ],
-  content: value,
+    content: value,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const text = editor.getText()
@@ -64,12 +73,10 @@ export function TiptapEditor({
 
   return (
     <div className="space-y-2">
-      {/* Label */}
       <label htmlFor={id} className="block text-[14px] sm:text-[16px] font-medium text-[#111827]">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
 
-      {/* Editor box */}
       <div className="border border-[#E4E4E4] rounded-[8px] relative">
         <EditorContent
           editor={editor}
@@ -77,7 +84,6 @@ export function TiptapEditor({
           id={id}
           placeholder={placeholder}
         />
-        {/* Placeholder icon overlay */}
         {editor && editor.isEmpty && (
           <div className="absolute left-3 top-3 flex items-center pointer-events-none text-gray-400">
             {/* <Image src={placeholderIcon || "/icons/clipboard.png"} alt="placeholder icon" width={18} height={18} className="mr-2" /> */}
@@ -86,7 +92,6 @@ export function TiptapEditor({
           </div>
         )}
 
-        {/* Toolbar + character counter */}
         <div className="flex items-center justify-between border-t border-[#E4E4E4] px-2 py-2">
           <div className="flex sm:gap-6 gap-2">
             <button
@@ -123,7 +128,7 @@ export function TiptapEditor({
                 editor.isActive("bulletList") ? "!text-[#686868]" : ""
               }`}
             >
-              <List className="h-[16px] font-bold w-[16px] text-[#686868]" />
+              <List className="h-[16px] font-bold w/[16px] text-[#686868]" />
             </button>
           </div>
 
@@ -133,5 +138,62 @@ export function TiptapEditor({
         </div>
       </div>
     </div>
+  )
+}
+
+export function TiptapEditor({
+  label = "About",
+  required = false,
+  id = "about",
+  placeholder = "Detailed description of your business, services, and what makes you unique...",
+  value = "",
+  onChange = (html: string) => {},
+  name,
+  control,
+}: {
+  label?: string
+  required?: boolean
+  id?: string
+  placeholder?: string
+  value?: string
+  onChange?: (html: string) => void
+  name?: FieldPath<any>
+  control?: Control<any>
+}) {
+  if (control && name) {
+    return (
+      <FormField
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormControl>
+              <div>
+                <EditorCore
+                  label={label}
+                  required={required}
+                  id={id}
+                  placeholder={placeholder}
+                  value={typeof field.value === 'string' ? field.value : ''}
+                  onChange={(html) => field.onChange(html)}
+                />
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    )
+  }
+
+  return (
+    <EditorCore
+      label={label}
+      required={required}
+      id={id}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+    />
   )
 }

@@ -10,15 +10,18 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import { Control, FieldPath } from "react-hook-form"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
 interface DateSelectorProps {
   label?: string
   name: string
   required?: boolean
   onChange?: (date: { year: string; month: string; day: string }) => void
+  control?: Control<any>
 }
 
-export function DateSelector({ label, name, required, onChange }: DateSelectorProps) {
+export function DateSelector({ label, name, required, onChange, control }: DateSelectorProps) {
   const [year, setYear] = React.useState("")
   const [month, setMonth] = React.useState("")
   const [day, setDay] = React.useState("")
@@ -36,7 +39,7 @@ export function DateSelector({ label, name, required, onChange }: DateSelectorPr
     }
   }, [year, month, day, onChange])
 
-  return (
+  const Core = (
     <div className="space-y-2">
       {label && (
         <Label className="text-[#23272E] font-medium text-[16px]">
@@ -96,4 +99,45 @@ export function DateSelector({ label, name, required, onChange }: DateSelectorPr
       />
     </div>
   )
+
+  if (control) {
+    return (
+      <FormField
+        control={control}
+        name={name as FieldPath<any>}
+        render={({ field }) => {
+          // hydrate from existing field value
+          React.useEffect(() => {
+            const v: any = field.value
+            if (v && typeof v === 'object') {
+              if (v.year) setYear(v.year)
+              if (v.month) setMonth(v.month)
+              if (v.day) setDay(v.day)
+            }
+          }, [])
+          // push updates to RHF when local state changes
+          React.useEffect(() => {
+            if (year && month && day) {
+              field.onChange({ year, month, day })
+            }
+          }, [year, month, day])
+          return (
+            <FormItem>
+              {/* {label && (
+                <FormLabel className="text-[#23272E] font-medium text-[16px]">
+                  {label} {required && <span className="text-red-500">*</span>}
+                </FormLabel>
+              )} */}
+              <FormControl>
+                <div>{Core}</div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )
+        }}
+      />
+    )
+  }
+
+  return Core
 }

@@ -370,7 +370,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
   }
 
   return (
-    <main className="min-h-screen pl-[18px]">
+    <main className="min-h-screen mt-4">
       <div className="w-full mx-auto">
         {/* Page header */}
         <div className="bg-white py-8 pl-9 pr-6">
@@ -381,7 +381,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
           </div>
 
           {/* Tab Navigation */}
-          <div className="bg-[#F4F4F5] rounded-lg shadow-sm border">
+          <div className="bg-[#F4F4F5] rounded-[8px] shadow-sm border">
             <div className="flex flex-wrap p-1">
               {tabs.map((tab, index) => (
                 <button
@@ -390,7 +390,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
                     currentTab === index
                       ? "bg-[#6F00FF] text-white rounded-[8px]"
                       : "text-[#717684] hover:text-gray-900 bg-[#F4F4F5]"
-                  } ${index === 0 ? "rounded-l-lg" : ""} ${index === tabs.length - 1 ? "rounded-r-lg" : ""}`}
+                  } ${index === 0 ? "rounded-[8px]" : ""} ${index === tabs.length - 1 ? "rounded-r-lg" : ""}`}
                   onClick={() => setCurrentTab(index)}
                 >
                   {tab}

@@ -33,7 +33,7 @@ export default function PageUpgrade() {
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Left Section - Content */}
           <div className="space-y-8">

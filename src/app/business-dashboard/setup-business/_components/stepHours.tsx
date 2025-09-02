@@ -34,9 +34,12 @@ interface DayHours {
 interface StepProps {
   businessData: BusinessData
   updateBusinessData: (field: string, value: any) => void
+  onPrev: () => void
+  onNext: () => void
+  isNextDisabled?: boolean
 }
 
-export function StepHours({ businessData, updateBusinessData }: StepProps) {
+export function StepHours({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
   const [businessHours, setBusinessHours] = useState<{ [key: string]: DayHours }>(() => {
     // If businessData.businessHours exists, hydrate from it
     if (businessData.businessHours && typeof businessData.businessHours === 'object') {
@@ -376,6 +379,23 @@ export function StepHours({ businessData, updateBusinessData }: StepProps) {
           </div>
           <BusinessPreview businessData={businessData} stepIndex={2} />
         </div>
+      </div>
+      <div className="flex gap-4 my-8 w-1/2">
+        <button
+          onClick={onPrev}
+          className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
+        >
+          <span>Previous</span>
+        </button>
+        <button
+          onClick={onNext}
+          disabled={!!isNextDisabled}
+          className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
+            isNextDisabled ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#6F00FF] hover:bg-purple-700 text-white"
+          }`}
+        >
+          <span>Next</span>
+        </button>
       </div>
     </div>
   )
