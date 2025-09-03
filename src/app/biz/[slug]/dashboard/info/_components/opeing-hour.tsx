@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { useGetBusinessBySlugQuery, useSetOpeningHoursMutation } from "@/redux/api";
 import { MinusCircle, PlusCircleIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 interface TimeRange {
@@ -36,7 +36,7 @@ const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 export const OpeningHour = () => {
 
     const { slug } = useParams() as { slug: string }
-    const { data } = useGetBusinessBySlugQuery(slug)
+    const { data } = useGetBusinessBySlugQuery(slug, { skip: !slug })
 
     const defaultValues = useMemo(() => {
         return {
@@ -85,8 +85,12 @@ export const OpeningHour = () => {
     }, [data])
     const form = useForm<OpeningHourFormValues>({
         defaultValues: defaultValues,
-        values: defaultValues,
     });
+
+    useEffect(() => {
+        form.reset(defaultValues)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data])
 
     const [update] = useSetOpeningHoursMutation()
 

@@ -10,15 +10,22 @@ import { TextInput } from "@/components/shared/text-input"
 import { Textarea } from "@/components/bizness/textarea"
 import { TiptapEditor } from "@/components/ui/texteditor"
 import { DateSelector } from "@/components/bizness/select-date"
+import { useUpdateBusinessMutation } from "@/redux/api/business"
+import { useParams } from "next/navigation"
 
 
 interface BusinessInfoStepProps {
   form: any // react-hook-form instance
   onNext: () => void
+  data: any // existing business data
+  onUpdate?: (data: any) => void
 }
 
-export default function BusinessInfoStep({ form, onNext }: BusinessInfoStepProps) {
+export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: BusinessInfoStepProps) {
   const [searchQuery, setSearchQuery] = useState("")
+  const [updateBusiness] = useUpdateBusinessMutation()
+  const params = useParams() as { slug?: string }
+  const slug = (params?.slug as string) || ""
 
   const categories = [
     { value: "pharmacy", label: "Pharmacy" },
@@ -53,9 +60,35 @@ export default function BusinessInfoStep({ form, onNext }: BusinessInfoStepProps
     c.label.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleNext = (data: any) => {
-    console.log("Form Submitted:", data)
-    onNext()
+  const handleNext = async (values: any) => {
+    if (onUpdate) {
+      onUpdate({
+        businessName: values?.name ?? "",
+        tagline: values?.tagline ?? "",
+        about: values?.about ?? "",
+        startYear: "",
+        startMonth: "",
+        startDay: "",
+        category: values?.category ?? "",
+      })
+    }
+
+    const formData = new FormData()
+    ;[
+      ["name", values?.name ?? ""],
+      ["tagline", values?.tagline ?? ""],
+      ["about", values?.about ?? ""],
+      ["startingDate", values?.startingDate ?? ""],
+      ["category", values?.category ?? ""],
+    ].forEach(([k, v]) => formData.append(k as string, v as string))
+
+    try {
+      await updateBusiness({ slug, data: formData }).unwrap()
+      onNext()
+    } catch (e) {
+      // Swallow error to preserve UI; consider showing toast if available
+      console.error("Failed to save business info", e)
+    }
   }
 
   return (

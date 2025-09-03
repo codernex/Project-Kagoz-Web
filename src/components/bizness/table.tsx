@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { PenLine, SquareArrowOutUpRight } from "lucide-react";
+import { Pagination } from "@/components/shared/pagination";
 
 const statusColors: Record<"Pending" | "Active", string> = {
   Pending: "bg-yellow-100 text-yellow-700",
@@ -23,6 +24,10 @@ type TableProps = {
   onReload?: () => void;
   indexed?: boolean;
   pagination?: boolean;
+  // pagination controls (when pagination is true)
+  totalPages?: number;
+  page?: number;
+  setPage?: (page: number) => void;
 };
 
 export default function Table({
@@ -33,6 +38,9 @@ export default function Table({
   onEdit,
   indexed,
   pagination,
+  totalPages = 1,
+  page = 1,
+  setPage,
 }: TableProps) {
   return (
     <div className="w-full">
@@ -69,7 +77,7 @@ export default function Table({
               </tr>
             ) : (
               data?.map((row, rowIndex) => (
-                <tr key={row.id || rowIndex} className="border-b border-[#0000001A] last:border-b-0 ">
+                <tr key={row.id || rowIndex} className="border-b border-[#0000001A]  ">
                   {/* Index */}
                   {indexed && (
                     <td className="px-6 py-4 text-sm text-gray-500">{rowIndex + 1}</td>
@@ -112,19 +120,10 @@ export default function Table({
       </div>
 
       {/* Pagination */}
-      {pagination && (
-        <div className="flex justify-center items-center mt-8 gap-2">
-          <button className="w-8 h-8 flex items-center justify-center rounded text-purple-600 hover:bg-purple-100 transition">{'<'}</button>
-          {[1, 2, 3, 4, 5].map((page) => (
-            <button
-              key={page}
-              className={`w-8 h-8 flex items-center justify-center rounded font-semibold text-sm transition ${page === 1 ? 'bg-purple-600 text-white' : 'bg-white text-purple-600 hover:bg-purple-100'}`}
-            >
-              {page}
-            </button>
-          ))}
-          <button className="w-8 h-8 flex items-center justify-center rounded text-purple-600 hover:bg-purple-100 transition">{'>'}</button>
-        </div>
+      {pagination && setPage && (
+       <div className="flex justify-center items-center absolute bottom-0 left-0 right-0">
+         <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+         </div>
       )}
     </div>
   );

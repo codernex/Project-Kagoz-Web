@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Camera } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
+import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation } from "@/redux/api/business"
+import { useParams } from "next/navigation"
 // import FileUploader from "@/components/ui/file-upload"
 
 interface UploadedFile {
@@ -24,11 +26,17 @@ interface MediaBrandingStepProps {
   data: MediaBrandingData
   onUpdate: (data: MediaBrandingData) => void
   onBack: () => void
+  onSubmit?: () => void
 }
 
-export default function MediaBrandingStep({ data, onUpdate, onBack }: MediaBrandingStepProps) {
+export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: MediaBrandingStepProps) {
   const [formData, setFormData] = useState<MediaBrandingData>(data)
   const [errors, setErrors] = useState<{ logo?: string }>({})
+  const [updateBusiness] = useUpdateBusinessMutation()
+  const [addBanner] = useAddBannerMutation()
+  const [uploadPhoto] = useUploadPhotoMutation()
+  const params = useParams() as { slug?: string }
+  const slug = (params?.slug as string) || ""
 
   const handleLogoChange = (files: UploadedFile[]) => {
     const newData = { ...formData, logo: files[0] || null }
@@ -69,9 +77,31 @@ export default function MediaBrandingStep({ data, onUpdate, onBack }: MediaBrand
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // Submit handled within this component or parent routing after save if needed
+  const handleSubmit = async () => {
+    if (!validateForm()) return
+    try {
+      if (formData.logo?.file) {
+        const fd = new FormData()
+        fd.append('logo', formData.logo.file)
+        await updateBusiness({ slug, data: fd }).unwrap()
+      }
+      if (formData.banner?.file) {
+        const fd = new FormData()
+        fd.append('banner', formData.banner.file)
+        await addBanner({ slug, data: fd }).unwrap()
+      }
+      if (formData.gallery && formData.gallery.length) {
+        for (const g of formData.gallery) {
+          if (g.file) {
+            const fd = new FormData()
+            fd.append('image', g.file)
+            await uploadPhoto({ slug, data: fd }).unwrap()
+          }
+        }
+      }
+      onSubmit?.()
+    } catch (e) {
+      console.error('Failed to upload media', e)
     }
   }
 

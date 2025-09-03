@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Calendar, Copy, X, Clock, ArrowRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { useSetOpeningHoursMutation } from "@/redux/api/business"
+import { useParams } from "next/navigation"
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 const dayAbbr = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -57,6 +59,9 @@ interface BusinessHoursStepProps {
 export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: BusinessHoursStepProps) {
   const [formData, setFormData] = useState<BusinessHoursData>(data)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
+  const [setOpeningHours] = useSetOpeningHoursMutation()
+  const params = useParams() as { slug?: string }
+  const slug = (params?.slug as string) || ""
 
   // Initialize business hours if not already set
   useEffect(() => {
@@ -232,15 +237,33 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
     onUpdate(newData)
   }
 
-  const handleNext = () => {
-    if (validateForm()) {
+  const handleNext = async () => {
+    if (!validateForm()) return
+    try {
+      const payload = {
+        businessHours: formData.businessHours,
+        is24Hours: formData.is24Hours,
+        closedOnHolidays: formData.closedOnHolidays,
+      }
+      await setOpeningHours({ slug, ...payload }).unwrap()
       onNext()
+    } catch (e) {
+      console.error("Failed to save opening hours", e)
     }
   }
 
-  const handleSaveAndBack = () => {
-    if (validateForm()) {
+  const handleSaveAndBack = async () => {
+    if (!validateForm()) return
+    try {
+      const payload = {
+        businessHours: formData.businessHours,
+        is24Hours: formData.is24Hours,
+        closedOnHolidays: formData.closedOnHolidays,
+      }
+      await setOpeningHours({ slug, ...payload }).unwrap()
       onBack()
+    } catch (e) {
+      console.error("Failed to save opening hours", e)
     }
   }
 

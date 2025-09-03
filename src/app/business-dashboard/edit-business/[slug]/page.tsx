@@ -5,7 +5,7 @@ import BusinessForm from "./_components/BusinessForm"
 
 export default function EditBusiness() {
   const params = useParams()
-  const businessId = params.id as string
+  const businessId = params.slug as string
 
   return (
     <BusinessForm

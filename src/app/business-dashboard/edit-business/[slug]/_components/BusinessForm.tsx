@@ -6,6 +6,8 @@ import BusinessInfoStep from "./BusinessInfoStep"
 import LocationContactStep from "./LocationContactStep"
 import BusinessHoursStep from "./BusinessHoursStep"
 import MediaBrandingStep from "./MediaBrandingStep"
+import { useForm } from "react-hook-form"
+import { useGetBusinessBySlugQuery, useGetBusinessByCurrentUserQuery, useUpdateBusinessMutation } from "@/redux/api/business"
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -80,6 +82,24 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
   const [currentTab, setCurrentTab] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(mode === 'edit')
+  const rhfForm = useForm({
+    defaultValues: {
+      name: "",
+      tagline: "",
+      about: "",
+      startingDate: "",
+      category: "",
+      streetAddress: "",
+      houseRoad: "",
+      localArea: "",
+      city: "",
+      postalCode: "",
+      country: "",
+      mobile: "",
+      website: "",
+      facebook: "",
+    },
+  })
   const [formData, setFormData] = useState<FormData>({
     businessInfo: {
       businessName: "",
@@ -130,95 +150,73 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
   ]
 
   // Fetch business data if editing
+  const isLikelyObjectId = typeof businessId === 'string' && /^[a-f\d]{24}$/i.test(businessId)
+  const slugQuery = useGetBusinessBySlugQuery(
+    businessId || "",
+    { skip: mode !== 'edit' || !businessId || isLikelyObjectId }
+  ) as any
+
+  const userBizQuery = useGetBusinessByCurrentUserQuery(
+    { page: 1, limit: 100, all: true },
+    { skip: mode !== 'edit' || !businessId || !isLikelyObjectId }
+  ) as any
+
+  const fetchedBusiness = (slugQuery?.data as any) ||
+    ((userBizQuery?.data?.business as any[])?.find((b: any) => b?._id === businessId || b?.id === businessId || b?.slug === businessId) as any) ||
+    null
+  const isFetching = (slugQuery?.isFetching as boolean) || (userBizQuery?.isFetching as boolean) || false
+
   useEffect(() => {
-    if (mode === 'edit' && businessId) {
-      fetchBusinessData()
-    }
-  }, [businessId, mode])
+    const loading = mode === 'edit' && !!businessId && isFetching
+    setIsLoading(loading)
+  }, [isFetching, businessId, mode])
 
-  const fetchBusinessData = async () => {
-    try {
-      setIsLoading(true)
-      
-      // Fetch business data from API
-      // const response = await fetch(`/api/businesses/${businessId}`)
-      
-      // if (!response.ok) {
-      //   throw new Error('Failed to fetch business data')
-      // }
-
-      // const businessData = await response.json()
-      
-      // Transform API data to form data format
-      // const transformedData: FormData = {
-      //   businessInfo: {
-      //     businessName: businessData.businessName || "",
-      //     tagline: businessData.tagline || "",
-      //     about: businessData.about || "",
-      //     startYear: businessData.startYear || "",
-      //     startMonth: businessData.startMonth || "",
-      //     startDay: businessData.startDay || "",
-      //     category: businessData.category || ""
-      //   },
-      //   locationContact: {
-      //     streetAddress: businessData.streetAddress || "",
-      //     houseRoad: businessData.houseRoad || "",
-      //     localArea: businessData.localArea || "",
-      //     city: businessData.city || "",
-      //     postalCode: businessData.postalCode || "",
-      //     country: businessData.country || "",
-      //     mobile: businessData.mobile || "",
-      //     website: businessData.website || "",
-      //     facebook: businessData.facebook || ""
-      //   },
-      //   businessHours: {
-      //     is24Hours: businessData.is24Hours || false,
-      //     closedOnHolidays: businessData.closedOnHolidays || true,
-      //     businessHours: businessData.businessHours || days.reduce(
-      //       (acc: any, day: string) => {
-      //         acc[day] = {
-      //           isOpen: day !== "Friday",
-      //           slots: [{ start: "9:00 AM", end: "6:00 PM" }],
-      //         }
-      //         return acc
-      //       },
-      //       {} as Record<string, DaySchedule>,
-      //     ),
-      //   },
-      //   mediaBranding: {
-      //     logo: businessData.logo ? {
-      //       id: 'logo',
-      //       file: new File([], 'logo.png'),
-      //       preview: businessData.logo,
-      //       name: 'logo.png',
-      //       size: '0 KB'
-      //     } : null,
-      //     banner: businessData.banner ? {
-      //       id: 'banner',
-      //       file: new File([], 'banner.png'),
-      //       preview: businessData.banner,
-      //       name: 'banner.png',
-      //       size: '0 KB'
-      //     } : null,
-      //     gallery: businessData.gallery ? businessData.gallery.map((url: string, index: number) => ({
-      //       id: `gallery-${index}`,
-      //       file: new File([], `gallery-${index}.png`),
-      //       preview: url,
-      //       name: `gallery-${index}.png`,
-      //       size: '0 KB'
-      //     })) : []
-      //   }
-      // }
-      
-      // setFormData(transformedData)
-      
-    } catch (error) {
-      console.error('Error fetching business data:', error)
-      alert('Failed to load business data. Please try again.')
-    } finally {
-      setIsLoading(false)
+  useEffect(() => {
+    if (fetchedBusiness) {
+      const b: any = fetchedBusiness as any
+      const transformed: FormData = {
+        businessInfo: {
+          businessName: b?.name || "",
+          tagline: b?.tagline || "",
+          about: b?.about || "",
+          startYear: "",
+          startMonth: "",
+          startDay: "",
+          category: b?.category || "",
+        },
+        locationContact: {
+          streetAddress: b?.address?.streetAddress || b?.streetAddress || "",
+          houseRoad: b?.address?.houseRoad || b?.houseRoad || "",
+          localArea: b?.address?.localArea || b?.localArea || "",
+          city: b?.address?.city || b?.city || "",
+          postalCode: b?.address?.postalCode || b?.postalCode || "",
+          country: b?.address?.country || b?.country || "",
+          mobile: b?.contact?.mobile || b?.mobile || "",
+          website: b?.contact?.website || b?.website || "",
+          facebook: b?.contact?.facebook || b?.facebook || "",
+        },
+        businessHours: formData.businessHours,
+        mediaBranding: formData.mediaBranding,
+      }
+      setFormData(transformed)
+      rhfForm.reset({
+        name: transformed.businessInfo.businessName,
+        tagline: transformed.businessInfo.tagline,
+        about: transformed.businessInfo.about,
+        startingDate: `${transformed.businessInfo.startYear}-${transformed.businessInfo.startMonth}-${transformed.businessInfo.startDay}`.replace(/--/g, ""),
+        category: transformed.businessInfo.category,
+        streetAddress: transformed.locationContact.streetAddress,
+        houseRoad: transformed.locationContact.houseRoad,
+        localArea: transformed.locationContact.localArea,
+        city: transformed.locationContact.city,
+        postalCode: transformed.locationContact.postalCode,
+        country: transformed.locationContact.country,
+        mobile: transformed.locationContact.mobile,
+        website: transformed.locationContact.website,
+        facebook: transformed.locationContact.facebook,
+      })
     }
-  }
+  }, [fetchedBusiness])
 
   const updateBusinessInfo = (data: BusinessInfoData) => {
     setFormData(prev => ({ ...prev, businessInfo: data }))
@@ -321,6 +319,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
       case 0:
         return (
           <BusinessInfoStep
+            form={rhfForm}
             data={formData.businessInfo}
             onUpdate={updateBusinessInfo}
             onNext={handleNext}
@@ -333,6 +332,8 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
             onUpdate={updateLocationContact}
             onNext={handleNext}
             onBack={handleBack}
+            onSaveAndBack={handleBack}
+            form={rhfForm}
           />
         )
       case 2:

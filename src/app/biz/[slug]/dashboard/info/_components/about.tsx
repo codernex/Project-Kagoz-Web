@@ -4,20 +4,23 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Textarea } from "@/components/ui/textarea"
 import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api"
 import { useParams } from "next/navigation"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 export const AboutBusiness = () => {
     const { slug } = useParams() as { slug: string }
     
-    const { data } = useGetBusinessBySlugQuery(slug)
+    const { data } = useGetBusinessBySlugQuery(slug, { skip: !slug })
     const form = useForm({
         defaultValues: {
             about: data?.about || ''
-        },
-        values: {
-            about: data?.about || ''
         }
     })
+
+    useEffect(() => {
+        form.reset({ about: data?.about || '' })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data])
 
     const [update] = useUpdateBusinessMutation()
 

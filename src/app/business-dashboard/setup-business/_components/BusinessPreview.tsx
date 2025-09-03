@@ -13,6 +13,8 @@ import {
   Clock,
   Leaf,
 } from "lucide-react"
+import { useGetCategoriesQuery } from "@/redux/api/category"
+import { useMemo } from "react"
 
 interface BusinessPreviewProps {
   businessData: BusinessData
@@ -20,12 +22,21 @@ interface BusinessPreviewProps {
 }
 
 export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProps) {
+  const { data: categories } = useGetCategoriesQuery()
+  const categoryLabel = useMemo(() => {
+    const raw = (businessData as any)?.category
+    if (!raw) return "Not specified"
+    const str = String(raw)
+    const match = (categories || []).find((c: any) => String(c?.id ?? c?._id ?? c?.slug) === str)
+      || (categories || []).find((c: any) => String(c?.slug ?? c?.name) === str)
+    return match?.name ?? match?.slug ?? str
+  }, [categories, (businessData as any)?.category])
   return (
     <div className="w-full border border-[#E4E4E4] rounded-2xl">
       <div className="p-4">
         <div className="flex items-center space-x-3 mb-4 bg-gradient-to-r border border-[#CCFBF1] rounded-[12px] px-4 py-[20px] from-[#F0FDFA] to-[#FAF5FF]">
-          <div className="size-16 basis-16 shrink-0 bg-[#6F00FF] rounded-lg flex items-center justify-center">
-            <Building2 className="size-8 text-white" />
+            <div className="h-[64px] w-[64px] basis-[64px] shrink-0 bg-[#6F00FF] rounded-[8px] flex items-center justify-center">
+              <Building2 className="h-[32px] w-[32px] text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm truncate">{businessData.name || "Business Name"}</h3>
@@ -35,7 +46,7 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
 
         <div className="space-y-6 text-xs">
           <div className="flex items-start space-x-2">
-            <Building2 className="w-3 h-3 text-gray-400 mt-0.5" />
+            <Building2 className="h-[12px] w-[12px] text-gray-400 mt-0.5" />
             <div>
               <p className="font-medium">About</p>
               <p className="text-gray-600 line-clamp-3">{businessData.about || "Business description will appear here"}</p>
@@ -43,7 +54,7 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
           </div>
 
           <div className="flex items-center space-x-2">
-            <Calendar className="w-3 h-3 text-gray-400" />
+            <Calendar className="h-[12px] w-[12px] text-gray-400" />
             <div>
               <p className="font-medium">Starting Date</p>
               <p className="text-gray-600">
@@ -55,17 +66,17 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
           </div>
 
           <div className="flex items-center space-x-2">
-            <Star className="w-3 h-3 text-gray-400" />
+            <Star className="h-[12px] w-[12px] text-gray-400" />
             <div>
               <p className="font-medium">Category</p>
-              <p className="text-gray-600">{businessData.category || "Not specified"}</p>
+              <p className="text-gray-600">{categoryLabel}</p>
             </div>
           </div>
 
           {stepIndex >= 1 && (
             <>
               <div className="flex items-start space-x-2">
-                <MapPin className="w-3 h-3 text-gray-400 mt-0.5" />
+                <MapPin className="h-[12px] w-[12px] text-gray-400 mt-0.5" />
                 <div>
                   <p className="font-medium">Address</p>
                   <p className="text-gray-600">
@@ -85,7 +96,7 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
               </div>
 
               <div className="flex items-center space-x-2">
-                <Phone className="w-3 h-3 text-gray-400" />
+                <Phone className="h-[12px] w-[12px] text-gray-400" />
                 <div>
                   <p className="font-medium">Phone</p>
                   <p className="text-gray-600">{businessData.mobile || "Not provided"}</p>
@@ -93,7 +104,7 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
               </div>
 
               <div className="flex items-center space-x-2">
-                <Globe className="w-3 h-3 text-gray-400" />
+                <Globe className="h-[12px] w-[12px] text-gray-400" />
                 <div>
                   <p className="font-medium">Website</p>
                   <p className="text-blue-600">{businessData.website || "Not provided"}</p>
@@ -101,7 +112,7 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
               </div>
 
               <div className="flex items-center space-x-2">
-                <Facebook className="w-3 h-3 text-gray-400" />
+                <Facebook className="h-[12px] w-[12px] text-gray-400" />
                 <div>
                   <p className="font-medium">Facebook</p>
                   <p className="text-blue-600">{businessData.facebook || "Not provided"}</p>
@@ -112,7 +123,7 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
 
           {stepIndex >= 2 && (
             <div className="flex items-start space-x-2">
-              <Clock className="w-3 h-3 text-gray-400 mt-0.5" />
+              <Clock className="h-[12px] w-[12px] text-gray-400 mt-0.5" />
               <div>
                 <p className="font-medium">Business Hours</p>
                 {businessData.is24x7 ? (
@@ -123,6 +134,8 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
                     {businessData.closedOnHolidays && (
                       <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 flex items-center gap-1">
                         <Leaf className="w-3 h-3" />
+                        <Leaf className="h-[12px] w-[12px]" />
+                            <Leaf className="h-[12px] w-[12px]" />
                         Closed on public holidays
                       </Badge>
                     )}

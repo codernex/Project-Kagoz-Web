@@ -12,6 +12,7 @@ import { TiptapEditor } from "@/components/ui/texteditor"
 import { DateSelector } from "@/components/bizness/select-date"
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useRegisterBusinessMutation, useGetBusinessBySlugQuery } from "@/redux/api"
+import { useGetCategoriesQuery } from "@/redux/api/category"
 import { useParams } from "next/navigation"
 import { useForm, SubmitHandler } from "react-hook-form"
 
@@ -63,51 +64,32 @@ export function StepBusinessInfo({ onPrev, onNext }: StepProps) {
           ? `${(d.startingDate as any).year}-${(d.startingDate as any).month}-${(d.startingDate as any).day}`
           : d.startingDate,
       }
-      await registerBusiness(payload).unwrap()
+      // await registerBusiness(payload).unwrap()
       onNext()
     } catch (err) {
       // errors handled by RTK
     }
   }
 
-  const categories = [
-    { value: "pharmacy", label: "Pharmacy" },
-    { value: "restaurant", label: "Restaurant" },
-    { value: "retail-store", label: "Retail Store" },
-    { value: "grocery-store", label: "Grocery Store" },
-    { value: "clothing-store", label: "Clothing Store" },
-    { value: "electronics-shop", label: "Electronics Shop" },
-    { value: "beauty-salon", label: "Beauty Salon" },
-    { value: "barbershop", label: "Barbershop" },
-    { value: "cafe", label: "Cafe" },
-    { value: "bakery", label: "Bakery" },
-    { value: "bookstore", label: "Bookstore" },
-    { value: "gym-fitness", label: "Gym/Fitness Center" },
-    { value: "medical-clinic", label: "Medical Clinic" },
-    { value: "dental-clinic", label: "Dental Clinic" },
-    { value: "law-firm", label: "Law Firm" },
-    { value: "accounting-firm", label: "Accounting Firm" },
-    { value: "real-estate", label: "Real Estate" },
-    { value: "travel-agency", label: "Travel Agency" },
-    { value: "photography-studio", label: "Photography Studio" },
-    { value: "auto-repair", label: "Auto Repair" },
-    { value: "pet-store", label: "Pet Store" },
-    { value: "jewelry-store", label: "Jewelry Store" },
-    { value: "hardware-store", label: "Hardware Store" },
-    { value: "flower-shop", label: "Flower Shop" },
-    { value: "laundry-service", label: "Laundry Service" },
-    { value: "other", label: "Other" }
-  ]
+  // fetch categories for select
+  const { data: categoriesData } = useGetCategoriesQuery()
+  const categories = useMemo(() => {
+    return (categoriesData || []).map((c: any) => ({
+      value: String(c.id ?? c._id ?? c.slug ?? c.value ?? ""),
+      label: String(c.name ?? c.title ?? c.label ?? c.slug ?? ""),
+    })).filter(c => c.value && c.label)
+  }, [categoriesData])
 
   const filteredCategories = useMemo(() => {
     return categories.filter((category) =>
       category.label.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  }, [searchQuery])
+  }, [searchQuery, categories])
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-10 xl:p-1 p-2">
+      <form 
+      onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-10 xl:p-1 p-2">
         {/* Left side form fields */}
         <div className="lg:col-span-2">
           <div className="flex items-center space-x-2 mb-4">

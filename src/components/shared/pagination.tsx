@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
 
@@ -9,9 +9,10 @@ type PaginateProps = {
   totalPages: number;
   page: number;
   setPage: (page: number) => void;
+  className?: string;
 };
 
-export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentPage, setPage }) => {
+export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentPage, setPage, className }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -26,7 +27,7 @@ export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentP
     })
   };
 
-  // Pagination logic to show 7-8 pages at a time with ellipses
+
   const pagination = [];
   if (totalPages <= 8) {
     pagination.push(...Array.from({ length: totalPages }, (_, i) => i + 1));
@@ -46,15 +47,18 @@ export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentP
   }
 
   return (
-    <div className="flex px-[2rem] justify-start md:justify-center max-w-7xl mx-auto py-[6rem] gap-x-[2rem] gap-y-[1rem] items-center flex-wrap">
-      <Button
+    <div className={cn(
+      "flex justify-start md:justify-center max-w-7xl mx-auto gap-x-[2rem] gap-y-[1rem] items-center flex-wrap px-[2rem] py-[6rem]",
+      className
+    )}>
+      <button
         onClick={() => updatePage(currentPage - 1)}
         disabled={currentPage === 1}
-        className="flex items-center justify-center py-4 disabled:bg-[#6F00FF1A] space-x-[1.2rem] max-w-[17rem]"
+        className="flex items-center justify-center py-4  space-x-[1.2rem] max-w-[17rem]"
       >
-        <ArrowLeft />
-        <span>Prev Page</span>
-      </Button>
+       <ChevronLeft />
+
+      </button>
 
       {pagination.map((pageNumber, index) => (
         typeof pageNumber === "number" ? (
@@ -62,7 +66,7 @@ export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentP
             key={index}
             onClick={() => updatePage(pageNumber)}
             className={cn(
-              "[&.active]:bg-primary bg-transparent !min-w-[3.8rem] !h-[3.8rem] rounded-full [&.active]:text-white text-muted font-medium",
+              "[&.active]:bg-primary bg-transparent !min-w-[3.8rem] !h-[3.8rem] rounded-[8px] [&.active]:text-white text-muted font-medium",
               currentPage === pageNumber ? "active" : ""
             )}
           >
@@ -73,14 +77,14 @@ export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentP
         )
       ))}
 
-      <Button
+      <button
         onClick={() => updatePage(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="flex items-center justify-center py-4 disabled:bg-[#6F00FF1A] space-x-[1.2rem] max-w-[17rem]"
+        className="flex items-center justify-center py-4  space-x-[1.2rem] max-w-[17rem]"
       >
-        <span>Next Page</span>
-        <ArrowRight />
-      </Button>
+
+        <ChevronRight />
+      </button>
     </div>
   );
 };

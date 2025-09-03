@@ -4,7 +4,11 @@ import type { BusinessData } from "./businessSetup";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Home, Phone, Globe, Facebook, Building2 } from "lucide-react";
 import { TextInput } from "@/components/shared/text-input";
-// removed useFormContext
+import { Form } from "@/components/ui/form";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api";
+import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 interface StepProps {
   businessData: BusinessData;
@@ -21,6 +25,68 @@ export function StepLocationContact({
   onNext,
   isNextDisabled
 }: StepProps) {
+  const { slug } = useParams() as { slug?: string }
+  const { data: existingBusiness } = useGetBusinessBySlugQuery(slug as string, { skip: !slug })
+  const [update] = useUpdateBusinessMutation()
+
+  type LocationContactInput = {
+    streetAddress: string
+    houseInfo: string
+    localArea: string
+    city: string
+    postalCode: string
+    country: string
+    mobile: string
+    website: string
+    facebook: string
+  }
+
+  // Readable defaults like general-info.tsx (prefer API data → parent → empty string)
+  const api = (existingBusiness as any) || {}
+  const defaultValues: LocationContactInput = {
+    city: api.city || businessData.city || "",
+    country: api.country || businessData.country || "",
+    facebook: api.facebook || businessData.facebook || "",
+    houseInfo: api.houseInfo || businessData.houseInfo || "",
+    localArea: api.localArea || businessData.localArea || "",
+    mobile: api.mobile || businessData.mobile || "",
+    postalCode: api.postalCode || businessData.postalCode || "",
+    streetAddress: api.streetAddress || businessData.streetAddress || "",
+    website: api.website || businessData.website || "",
+  }
+
+  const form = useForm<LocationContactInput>({
+    defaultValues,
+    values: defaultValues,
+    mode: "onChange",
+  })
+
+  // Keep parent preview and validation in sync as user types
+  useEffect(() => {
+    const sub = form.watch((values) => {
+      Object.entries(values as Record<string, string>).forEach(([k, v]) => {
+        updateBusinessData(k, v || "")
+      })
+    })
+    return () => sub.unsubscribe()
+  }, [form])
+
+  const onSubmit: SubmitHandler<LocationContactInput> = async (d) => {
+    // reflect back to parent state
+    Object.entries(d).forEach(([k, v]) => updateBusinessData(k, v))
+    if (!slug) {
+      onNext()
+      return
+    }
+    const formData = new FormData()
+    Object.entries(d).forEach(([key, value]) => formData.append(key, value as string))
+    try {
+      await update({ slug, data: formData }).unwrap()
+      onNext()
+    } catch (_e) {
+   
+    }
+  }
 
   return (
     <div>
@@ -30,92 +96,82 @@ export function StepLocationContact({
       </div>
       <p className="text-gray-600 mb-6">Where is your business located?</p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section: Location & Contact Form */}
         <div className="col-span-2 w-full space-y-3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <TextInput
               name="streetAddress"
+              control={form.control}
               placeholderIcon={Home}
               label="Street Address"
-              value={businessData.streetAddress}
-              onChange={(e) =>
-                updateBusinessData("streetAddress", e.target.value)
-              }
               width="100%"
               required
               placeholder="Enter street address"
             />
             <TextInput
               name="houseInfo"
+              control={form.control}
               label="House / Road Info"
               required
-              value={businessData.houseInfo}
-              onChange={(e) => updateBusinessData("houseInfo", e.target.value)}
               width="100%"
               placeholder="Enter house/road info"
             />
             <TextInput
               name="localArea"
+              control={form.control}
               label="Local Area"
               required
-              value={businessData.localArea}
-              onChange={(e) => updateBusinessData("localArea", e.target.value)}
               width="100%"
               placeholder="Enter local area"
             />
             <TextInput
               name="city"
+              control={form.control}
               label="City"
-              value={businessData.city}
-              onChange={(e) => updateBusinessData("city", e.target.value)}
               width="100%"
               placeholder="Enter city"
             />
             <TextInput
               name="postalCode"
+              control={form.control}
               label="Postal Code"
               required
-              value={businessData.postalCode}
-              onChange={(e) => updateBusinessData("postalCode", e.target.value)}
               width="100%"
               placeholder="Enter postal code"
             />
             <TextInput
               name="country"
+              control={form.control}
               label="Country"
               required
-              value={businessData.country}
-              onChange={(e) => updateBusinessData("country", e.target.value)}
               width="100%"
               placeholder="Enter country"
             />
           </div>
           <TextInput
             name="mobile"
+            control={form.control}
             required
             label="Phone Number"
             placeholderIcon={Phone}
-            value={businessData.mobile}
-            onChange={(e) => updateBusinessData("mobile", e.target.value)}
             width="100%"
             placeholder="Enter mobile number"
           />
           <TextInput
             name="website"
+            control={form.control}
             placeholderIcon={Globe}
             label="Website URL (Optional)"
-            value={businessData.website}
-            onChange={(e) => updateBusinessData("website", e.target.value)}
             width="100%"
             placeholder="Enter website URL"
           />
           <TextInput
             name="facebook"
+            control={form.control}
             label="Facebook Page (Optional)"
             placeholderIcon={Facebook}
-            value={businessData.facebook}
-            onChange={(e) => updateBusinessData("facebook", e.target.value)}
             width="100%"
             placeholder="Enter Facebook page URL"
           />
@@ -198,7 +254,8 @@ export function StepLocationContact({
             </Card>
           </div>
         </div>
-      </div>
+      </form>
+      </Form>
       <div className="flex gap-4 my-8 w-1/2">
         <button
           onClick={onPrev}
@@ -207,10 +264,13 @@ export function StepLocationContact({
           <span>Previous</span>
         </button>
         <button
-          onClick={onNext}
+          onClick={form.handleSubmit(onSubmit)}
           disabled={!!isNextDisabled}
-          className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
-            isNextDisabled ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#6F00FF] hover:bg-purple-700 text-white"
+          aria-disabled={!!isNextDisabled}
+          className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
+            isNextDisabled
+              ? "bg-[#CDD1D8] text-white cursor-not-allowed"
+              : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
           }`}
         >
           <span>Next</span>

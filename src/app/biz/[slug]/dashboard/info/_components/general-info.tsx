@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api";
 import { InfoIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 type GeneralInfoInput = {
@@ -29,7 +29,7 @@ export const GeneralInfo = () => {
     const { slug } = useParams() as { slug: string }
     const [update] = useUpdateBusinessMutation()
 
-    const { data } = useGetBusinessBySlugQuery(slug)
+    const { data } = useGetBusinessBySlugQuery(slug, { skip: !slug })
 
     const defaultValues: GeneralInfoInput = {
         city: data?.city || '',
@@ -46,8 +46,12 @@ export const GeneralInfo = () => {
 
     const generalInfoForm = useForm({
         defaultValues,
-        values: defaultValues
     })
+
+    useEffect(() => {
+        generalInfoForm.reset(defaultValues)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data])
     const { isDirty } = generalInfoForm.formState
 
     const onSubmit: SubmitHandler<GeneralInfoInput> = (d) => {
@@ -57,7 +61,7 @@ export const GeneralInfo = () => {
             formData.append(key, value)
         })
 
-        if (file) {
+        if (file.length) {
             formData.append('image', file[0] as any)
         }
         update({ slug, data: formData })

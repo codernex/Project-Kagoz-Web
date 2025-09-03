@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api"
 import { FacebookIcon, InstagramIcon, LinkedinIcon, LucideIcon, TwitterIcon, YoutubeIcon } from "lucide-react"
 import { useParams } from "next/navigation"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
 const socialMedia: {
@@ -22,7 +22,7 @@ const socialMedia: {
     ]
 export const SocialMediaLink = () => {
     const { slug } = useParams() as { slug: string }
-    const { data } = useGetBusinessBySlugQuery(slug)
+    const { data } = useGetBusinessBySlugQuery(slug, { skip: !slug })
     const [update] = useUpdateBusinessMutation()
 
     const defaultValues = useMemo(() => {
@@ -36,8 +36,12 @@ export const SocialMediaLink = () => {
     }, [data])
     const form = useForm({
         defaultValues,
-        values: defaultValues
     })
+
+    useEffect(() => {
+        form.reset(defaultValues)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data])
 
     const { isDirty } = form.formState
     return (

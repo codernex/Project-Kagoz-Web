@@ -284,6 +284,7 @@ export const {
   useGetBusinessBySlugQuery,
   useGetPhotosQuery,
   useUploadPhotoMutation,
+  useAddBannerMutation,
   useAddFeaturedClientMutation,
   useGetFeauturedClientsQuery,
   useUpdateBusinessMutation,
