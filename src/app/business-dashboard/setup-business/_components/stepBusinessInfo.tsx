@@ -199,10 +199,7 @@ export function StepBusinessInfo({ onPrev, onNext }: StepProps) {
         {/* Right side preview */}
         <div>
           <div className="sticky top-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
-              <h3 className="font-semibold">Business Preview</h3>
-            </div>
+          
             <BusinessPreview businessData={form.getValues() as any} stepIndex={0} />
           </div>
         </div>

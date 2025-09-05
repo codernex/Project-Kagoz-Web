@@ -7,7 +7,7 @@ import LocationContactStep from "./LocationContactStep"
 import BusinessHoursStep from "./BusinessHoursStep"
 import MediaBrandingStep from "./MediaBrandingStep"
 import { useForm } from "react-hook-form"
-import { useGetBusinessBySlugQuery, useGetBusinessByCurrentUserQuery, useUpdateBusinessMutation } from "@/redux/api/business"
+import { useGetBusinessBySlugQuery, useGetBusinessByCurrentUserQuery } from "@/redux/api/business"
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -73,11 +73,12 @@ interface FormData {
 interface BusinessFormProps {
   businessId?: string
   mode: 'add' | 'edit'
+  businessData?: any
   onSuccess?: (businessId: string) => void
   onCancel?: () => void
 }
 
-export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: BusinessFormProps) {
+export default function BusinessForm({ businessId, mode, businessData, onSuccess, onCancel }: BusinessFormProps) {
   const router = useRouter()
   const [currentTab, setCurrentTab] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -100,6 +101,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
       facebook: "",
     },
   })
+
   const [formData, setFormData] = useState<FormData>({
     businessInfo: {
       businessName: "",
@@ -149,22 +151,23 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
     "Media & Business Branding",
   ]
 
-  // Fetch business data if editing
+  // Use passed business data or fetch if not provided
   const isLikelyObjectId = typeof businessId === 'string' && /^[a-f\d]{24}$/i.test(businessId)
   const slugQuery = useGetBusinessBySlugQuery(
     businessId || "",
-    { skip: mode !== 'edit' || !businessId || isLikelyObjectId }
-  ) as any
+    { skip: mode !== 'edit' || !businessId || isLikelyObjectId || !!businessData }
+  )
 
   const userBizQuery = useGetBusinessByCurrentUserQuery(
     { page: 1, limit: 100, all: true },
-    { skip: mode !== 'edit' || !businessId || !isLikelyObjectId }
-  ) as any
+    { skip: mode !== 'edit' || !businessId || !isLikelyObjectId || !!businessData }
+  )
 
-  const fetchedBusiness = (slugQuery?.data as any) ||
-    ((userBizQuery?.data?.business as any[])?.find((b: any) => b?._id === businessId || b?.id === businessId || b?.slug === businessId) as any) ||
+  const fetchedBusiness = businessData || 
+    slugQuery?.data ||
+    (userBizQuery?.data?.business as any[])?.find((b: any) => b?._id === businessId || b?.id === businessId || b?.slug === businessId) ||
     null
-  const isFetching = (slugQuery?.isFetching as boolean) || (userBizQuery?.isFetching as boolean) || false
+  const isFetching = !businessData && (slugQuery?.isFetching || userBizQuery?.isFetching || false)
 
   useEffect(() => {
     const loading = mode === 'edit' && !!businessId && isFetching
@@ -173,7 +176,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
 
   useEffect(() => {
     if (fetchedBusiness) {
-      const b: any = fetchedBusiness as any
+      const b = fetchedBusiness as any
       const transformed: FormData = {
         businessInfo: {
           businessName: b?.name || "",
@@ -216,7 +219,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
         facebook: transformed.locationContact.facebook,
       })
     }
-  }, [fetchedBusiness])
+  }, [fetchedBusiness, rhfForm])
 
   const updateBusinessInfo = (data: BusinessInfoData) => {
     setFormData(prev => ({ ...prev, businessInfo: data }))
@@ -250,36 +253,27 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
     setIsSubmitting(true)
     
     try {
-      // Create FormData for file uploads
       const submitData = new FormData()
       
-      // Add business info
       submitData.append('businessInfo', JSON.stringify(formData.businessInfo))
-      
-      // Add location contact
       submitData.append('locationContact', JSON.stringify(formData.locationContact))
-      
-      // Add business hours
       submitData.append('businessHours', JSON.stringify(formData.businessHours))
       
-      // Add media files
-      if (formData.mediaBranding.logo && formData.mediaBranding.logo.file.size > 0) {
-        submitData.append('logo', formData.mediaBranding.logo.file)
-      }
-      if (formData.mediaBranding.banner && formData.mediaBranding.banner.file.size > 0) {
-        submitData.append('banner', formData.mediaBranding.banner.file)
-      }
-      formData.mediaBranding.gallery.forEach((file, index) => {
-        if (file.file.size > 0) {
-          submitData.append(`gallery_${index}`, file.file)
-        }
-      })
+      // if (formData.mediaBranding.logo?.file.size > 0) {
+      //   submitData.append('logo', formData.mediaBranding.logo.file)
+      // }
+      // if (formData.mediaBranding.banner?.file.size > 0) {
+      //   submitData.append('banner', formData.mediaBranding.banner.file)
+      // }
+      // formData.mediaBranding.gallery.forEach((file, index) => {
+      //   if (file.file.size > 0) {
+      //     submitData.append(`gallery_${index}`, file.file)
+      //   }
+      // })
 
-      // Determine API endpoint and method
       const url = mode === 'edit' ? `/api/businesses/${businessId}` : '/api/businesses'
       const method = mode === 'edit' ? 'PUT' : 'POST'
 
-      // Make API call
       const response = await fetch(url, {
         method,
         body: submitData,
@@ -291,7 +285,6 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
 
       const result = await response.json()
       
-      // Call success callback or redirect
       if (onSuccess) {
         onSuccess(result.id || businessId || '')
       } else {
@@ -303,14 +296,6 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
       alert(`Failed to ${mode} business. Please try again.`)
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel()
-    } else {
-      router.back()
     }
   }
 
@@ -375,7 +360,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
       <div className="w-full mx-auto">
         {/* Page header */}
         <div className="bg-white py-8 pl-9 pr-6">
-          <div className="">
+          <div>
             <h1 className="learge-headeing mb-[26px]">
               {mode === 'edit' ? 'Edit Business' : 'Add New Business'}
             </h1>
@@ -383,7 +368,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
 
           {/* Tab Navigation */}
           <div className="bg-[#F4F4F5] rounded-[8px] shadow-sm border">
-            <div className="flex flex-wrap p-1">
+            <div className="flex md:flex-row flex-col p-1">
               {tabs.map((tab, index) => (
                 <button
                   key={tab}
@@ -391,7 +376,7 @@ export default function BusinessForm({ businessId, mode, onSuccess, onCancel }: 
                     currentTab === index
                       ? "bg-[#6F00FF] text-white rounded-[8px]"
                       : "text-[#717684] hover:text-gray-900 bg-[#F4F4F5]"
-                  } ${index === 0 ? "rounded-[8px]" : ""} ${index === tabs.length - 1 ? "rounded-r-lg" : ""}`}
+                  } ${index === 0 ? "rounded-[8px]" : ""} ${index === tabs.length - 1 ? "rounded-[8px]" : ""}`}
                   onClick={() => setCurrentTab(index)}
                 >
                   {tab}

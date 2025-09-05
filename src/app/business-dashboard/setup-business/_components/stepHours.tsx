@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Clock, Copy, X, Calendar } from "lucide-react"
+import { Clock, Copy, X, Calendar, ChevronLeft } from "lucide-react"
 import { JSX, useState, useEffect } from "react"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -368,35 +368,36 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
                 </div>
               </div>
             )}
+               <div className="flex gap-4 py-[32px] w-full">
+              <button
+                onClick={onPrev}
+                className="flex items-center space-x-2 bg-white border justify-center border-gray-300  text-gray-700 hover:bg-gray-50 rounded-[8px] w-1/3 !px-10 y-2"
+              >
+                <ChevronLeft /><span>Previous</span>
+              </button>
+              <button
+                onClick={onNext}
+                disabled={!!isNextDisabled}
+                aria-disabled={!!isNextDisabled}
+                className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
+                  isNextDisabled
+                    ? "bg-[#CDD1D8] text-white cursor-not-allowed"
+                    : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
+                }`}
+              >
+                <span>Next</span>
+              </button>
+            </div>
       </div>
 
       {/* Right Panel - Preview */}
       <div>
         <div className="sticky top-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
-            <h3 className="font-semibold">Hours Preview</h3>
-          </div>
+          
           <BusinessPreview businessData={businessData} stepIndex={2} />
         </div>
       </div>
-      <div className="flex gap-4 my-8 w-1/2">
-        <button
-          onClick={onPrev}
-          className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
-        >
-          <span>Previous</span>
-        </button>
-        <button
-          onClick={onNext}
-          disabled={!!isNextDisabled}
-          className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
-            isNextDisabled ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#6F00FF] hover:bg-purple-700 text-white"
-          }`}
-        >
-          <span>Next</span>
-        </button>
-      </div>
+     
     </div>
   )
 }

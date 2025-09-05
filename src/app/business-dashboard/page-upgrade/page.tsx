@@ -3,33 +3,13 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Check, ArrowRight, Diamond, Pen, Globe, ArrowRightIcon, Video, Play, Timer, Star, Share2, Bookmark, Heart } from "lucide-react"
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+import { Check, ArrowRight, Diamond} from "lucide-react"
+
 import Phone from "../_components/page-upgrade/phone"
 export default function PageUpgrade() {
   const [isUpgraded, setIsUpgraded] = useState(false)
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [galleryIndex, setGalleryIndex] = useState(0)
 
-  const faqs = [
-    { q: "What is your return policy?", a: "We accept returns within 30 days of purchase with a receipt." },
-    { q: "Do you offer international shipping?", a: "Yes, we ship worldwide with additional shipping costs." },
-    { q: "Are your products authentic?", a: "All our items are 100% authentic and come with certificates." },
-  ]
 
-  const galleryImages = [
-    "/images/Illustration1.png",
-    "/images/signin.png",
-    "/images/signup1.png",
-    "/images/authbg.png",
-    "/images/herobg.png",
-    "/images/right.png",
-  ]
-
-  const goPrev = () => setGalleryIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)
-  const goNext = () => setGalleryIndex((prev) => (prev + 1) % galleryImages.length)
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
@@ -111,17 +91,18 @@ export default function PageUpgrade() {
           </div>
 
           {/* Right Section - Mobile Mockup */}
-          <div className="flex flex-col items-center space-y-6">
+          <div className="flex flex-col items-center mt-6 space-y-6">
             {/* Toggle Switch */}
             <div className="flex items-center gap-3 md:gap-4">
               <span className={`text-sm font-medium ${!isUpgraded ? 'text-gray-900' : 'text-[#6F6D71]'}`}>
                 Before upgrade
               </span>
+           
               <Switch
-                checked={isUpgraded}
+                          id="holidays"
+                          checked={isUpgraded}
                 onCheckedChange={setIsUpgraded}
-                className="w-9 h-6"
-              />
+                        />
               <span className={`text-sm font-medium ${isUpgraded ? 'text-gray-900' : 'text-gray-500'}`}>
                 After upgrade
               </span>

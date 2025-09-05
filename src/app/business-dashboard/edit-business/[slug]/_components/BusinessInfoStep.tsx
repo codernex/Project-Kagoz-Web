@@ -11,7 +11,7 @@ import { Textarea } from "@/components/bizness/textarea"
 import { TiptapEditor } from "@/components/ui/texteditor"
 import { DateSelector } from "@/components/bizness/select-date"
 import { useUpdateBusinessMutation } from "@/redux/api/business"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 
 interface BusinessInfoStepProps {
@@ -23,10 +23,11 @@ interface BusinessInfoStepProps {
 
 export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: BusinessInfoStepProps) {
   const [searchQuery, setSearchQuery] = useState("")
+   const [isSubmitting, setIsSubmitting] = useState(false)
   const [updateBusiness] = useUpdateBusinessMutation()
   const params = useParams() as { slug?: string }
   const slug = (params?.slug as string) || ""
-
+  const route = useRouter();
   const categories = [
     { value: "pharmacy", label: "Pharmacy" },
     { value: "restaurant", label: "Restaurant" },
@@ -86,7 +87,7 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
       await updateBusiness({ slug, data: formData }).unwrap()
       onNext()
     } catch (e) {
-      // Swallow error to preserve UI; consider showing toast if available
+      
       console.error("Failed to save business info", e)
     }
   }
@@ -194,20 +195,25 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
         />
 
         {/* Buttons */}
-        <div className="flex gap-10 w-1/2 mx-auto">
-          <Button
-            type="submit"
-            className="!px-20 !py-3 border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987] rounded-lg"
-          >
-            Save & Back to Businesses
-          </Button>
-          <Button
-            type="submit"
-            className="!px-20 !py-3 bg-[#6F00FF] lg:whitespace-pre whitespace-normal text-white rounded-lg"
-          >
-            Save & Continue
-          </Button>
-        </div>
+          <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
+        <button
+          disabled={isSubmitting}
+          onClick={() => {
+            setIsSubmitting(true);
+            route.push('/business-dashboard/businesses');
+          }}
+          className="lg:px-20 px-4 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Saving..." : "Save & Back to Businesses"}
+        </button>
+        <button
+          disabled={isSubmitting}
+          onClick={handleNext}
+          className="lg:px-20 px-4 !py-3 cursor-pointer bg-[#6F00FF] lg:whitespace-pre whitespace-normal text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Saving..." : "Save & Continue"}
+        </button>
+      </div>
       </form>
     </Form>
   )

@@ -205,7 +205,7 @@ export default function FileUploader({
               <img
                 src={files[0]?.preview}
                 alt={files[0]?.name}
-                className="w-12 h-12 object-cover rounded"
+                className="w-12 h-12 sm:h-[80px] sm:w-[80px] object-cover rounded"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
@@ -269,7 +269,7 @@ export default function FileUploader({
               <img
                 src={file.preview}
                 alt={file.name}
-                className="w-20 h-20 object-cover rounded-[8px]"
+                className="w-20 h-20 sm:h-[80px] sm:w-[150px] object-cover rounded-[8px]"
               />
               <button
                 type="button"
@@ -284,7 +284,7 @@ export default function FileUploader({
           {/* Plus Icon - inline with thumbnails for adding more images */}
           {files.length < max && (
             <div
-              className="flex-shrink-0 w-20 h-20 border-2 border-dashed border-gray-300 rounded-[8px] flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-gray-50 transition-colors"
+              className="flex-shrink-0 w-20 h-20 sm:h-[80px] sm:w-[150px] border-2 border-dashed border-gray-300 rounded-[8px] flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-gray-50 transition-colors"
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}

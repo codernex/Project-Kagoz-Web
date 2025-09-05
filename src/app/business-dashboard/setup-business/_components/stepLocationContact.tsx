@@ -2,7 +2,7 @@
 
 import type { BusinessData } from "./businessSetup";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Home, Phone, Globe, Facebook, Building2 } from "lucide-react";
+import { MapPin, Home, Phone, Globe, Facebook, Building2, ChevronLeft } from "lucide-react";
 import { TextInput } from "@/components/shared/text-input";
 import { Form } from "@/components/ui/form";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -175,18 +175,40 @@ export function StepLocationContact({
             width="100%"
             placeholder="Enter Facebook page URL"
           />
+            <div className="flex gap-4 py-[32px] w-full">
+        <button
+          onClick={onPrev}
+          className="flex items-center space-x-2 bg-white border justify-center border-gray-300  text-gray-700 hover:bg-gray-50 rounded-[8px] w-1/3 !px-10 y-2"
+        >
+          <ChevronLeft /><span>Previous</span>
+        </button>
+        <button
+          onClick={form.handleSubmit(onSubmit)}
+          disabled={!!isNextDisabled}
+          aria-disabled={!!isNextDisabled}
+          className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
+            isNextDisabled
+              ? "bg-[#CDD1D8] text-white cursor-not-allowed"
+              : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
+          }`}
+        >
+          <span>Next</span>
+        </button>
+      </div>
         </div>
+        
 
         {/* Right Section: Location Preview */}
         <div className="col-span-1">
           <div className="">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
-              <h3 className="font-semibold">Location Preview</h3>
-            </div>
+          
 
-            <Card className="border border-gray-200 rounded-2xl">
-              <CardContent className="p-4">
+            <div className="border border-gray-200 rounded-2xl">
+              <div className="p-4">
+                  <div className="flex items-center space-x-2 mb-4">
+              <div className="w-[8px] h-[8px] bg-[#6F00FF] rounded-full"></div>
+              <h3 className="font-semibold text-[#111827]">Location Preview</h3>
+            </div>
                 {/* Business Card */}
                 <div className="flex items-center space-x-3 mb-4 bg-gradient-to-r border border-[#CCFBF1] rounded-[12px] px-4 py-[20px] from-[#F0FDFA] to-[#FAF5FF]">
                   <div className="size-16 basis-16 shrink-0 bg-[#6F00FF] rounded-lg flex items-center justify-center">
@@ -250,32 +272,13 @@ export function StepLocationContact({
                   This preview shows how your location and contact information
                   will appear to customers. Make sure all details are accurate.
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </form>
       </Form>
-      <div className="flex gap-4 my-8 w-1/2">
-        <button
-          onClick={onPrev}
-          className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
-        >
-          <span>Previous</span>
-        </button>
-        <button
-          onClick={form.handleSubmit(onSubmit)}
-          disabled={!!isNextDisabled}
-          aria-disabled={!!isNextDisabled}
-          className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
-            isNextDisabled
-              ? "bg-[#CDD1D8] text-white cursor-not-allowed"
-              : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
-          }`}
-        >
-          <span>Next</span>
-        </button>
-      </div>
+    
     </div>
   );
 }

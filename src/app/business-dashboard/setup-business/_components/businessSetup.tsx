@@ -145,53 +145,50 @@ export function BusinessSetupWizard() {
   }
 
 
-const renderProgressBar = () => (
-  <div className="w-full bg-white border-b border-gray-200 py-[25px] ">
-    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between">
-        <h1 className="learge-headeing ">Business Setup</h1>
-        <div className="text-sm text-gray-500">
-          Step {currentStep + 1} of 5 - {Math.round(((currentStep + 1) / STEPS.length) * 100)}% Complete
+const renderProgressBar = (opts?: { published?: boolean }) => {
+  const published = opts?.published;
+  const totalSteps = STEPS.length - 1; // 4 for published (0-based)
+  const isPublished = published === true;
+  const stepNum = isPublished ? totalSteps + 1 : currentStep + 1;
+  const percent = isPublished ? 100 : Math.round(((currentStep + 1) / STEPS.length) * 100);
+  return (
+    <div className="w-full bg-white border-b border-gray-200 py-[25px] ">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <h1 className="learge-headeing ">Business Setup</h1>
+          <div className="text-sm text-gray-500">
+            Step {isPublished ? `${totalSteps + 1} of ${totalSteps + 1}` : `${currentStep + 1} of ${STEPS.length}`} - {percent}% Complete
+          </div>
         </div>
-      </div>
-      {/* Progress container */}
-      <div className="relative mt-10">
-        {/* Gray background line */}
-        <div className="absolute top-[20px] left-0 w-full h-[8px] bg-[#F2F2F2] rounded-full">
-          {/* Purple active line */}
-          <div
-            className="h-[8px] bg-[#6F00FF] rounded-full transition-all duration-300"
-            style={{
-              width: `${((currentStep + 0.5) / STEPS.length) * 100}%`,
-            }}
-          />
-        </div>
-        {/* Step circles */}
-        <div className="relative flex justify-between">
-          {Array.from({ length: STEPS.length }, (_, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div
-                className={`sm:w-[32px] sm:h-[32px] w-[24px] h-[24px] rounded-full mb-8 flex items-center justify-center text-sm font-medium z-10 ${
-                  index < currentStep
-                    ? "bg-[#6F00FF] text-white"
-                    : index === currentStep
-                    ? "bg-[#6F00FF] text-white"
-                    : "bg-white border-2 border-[#D1D1D1] text-gray-500"
-                }`}
-                style={{ marginTop: "-18px" }}
-              >
-                {index === STEPS.length - 1
-                  ? <Check className="w-4 h-4" />
-                  : index + 1}
+        {/* Progress container */}
+        <div className="relative mt-10">
+          {/* Gray background line */}
+          <div className="absolute top-[20px] left-0 w-full h-[8px] bg-[#F2F2F2] rounded-full">
+            {/* Purple active line */}
+            <div
+              className="h-[8px] bg-[#6F00FF] rounded-full transition-all duration-300"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          {/* Step circles */}
+          <div className="relative flex justify-between">
+            {Array.from({ length: totalSteps + 1 }, (_, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <div
+                  className={`sm:w-[32px] sm:h-[32px] w-[24px] h-[24px] rounded-full mb-8 flex items-center justify-center text-sm font-normal z-10 bg-[#6F00FF] text-white`}
+                  style={{ marginTop: "-18px" }}
+                >
+                  {/* <Check className="w-4 h-4" /> */}
+                  {index < stepNum - 1 ? <Check className="w-4 h-4" /> : index + 1}
+                </div>
               </div>
-            
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  );
+}
 
   const renderStep = () => {
     switch (currentStep) {
@@ -204,7 +201,7 @@ const renderProgressBar = () => (
             onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
-        )
+        );
       case 1:
         return (
           <StepLocationContact
@@ -214,7 +211,7 @@ const renderProgressBar = () => (
             onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
-        )
+        );
       case 2:
         return (
           <StepHours
@@ -224,7 +221,7 @@ const renderProgressBar = () => (
             onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
-        )
+        );
       case 3:
         return (
           <StepMediaBranding
@@ -234,35 +231,44 @@ const renderProgressBar = () => (
             onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
-        )
+        );
       case 4:
-        return isPublished ? (
-          <SuccessDialog
-            onContinue={() => {
-              setCurrentStep(0)
-              setShowFullPreview(false)
-              setIsPublished(false)
-            }}
-          />
-        ) : showFullPreview ? (
-          <FullPagePreview
-            businessData={businessData}
-            onBack={() => setShowFullPreview(false)}
-          />
-        ) : (
-          <CompletionAndPublish
-            businessData={businessData}
-            completionPercentage={Math.round(((currentStep + 1) / STEPS.length) * 100)}
-            onPreviewClick={() => setShowFullPreview(true)}
-            onPublish={async () => {
-              setIsPublished(true)
-            }}
-          />
-        )
+        if (isPublished) {
+          // Only show SuccessDialog, progress bar will be rendered at 100% outside
+          return (
+            <SuccessDialog
+              onContinue={() => {
+                setCurrentStep(0);
+                setShowFullPreview(false);
+                setIsPublished(false);
+              }}
+            />
+          );
+        } else if (showFullPreview) {
+          // Only show FullPagePreview, progress bar will be rendered at 90% outside
+          return (
+            <FullPagePreview
+              businessData={businessData}
+              onBack={() => setShowFullPreview(false)}
+            />
+          );
+        } else {
+          // Only show CompletionAndPublish, progress bar will be rendered at 90% outside
+          return (
+            <CompletionAndPublish
+              businessData={businessData}
+              completionPercentage={Math.round(((currentStep + 1) / STEPS.length) * 100)}
+              onPreviewClick={() => setShowFullPreview(true)}
+              onPublish={async () => {
+                setIsPublished(true);
+              }}
+            />
+          );
+        }
       default:
-         return null
+        return null;
     }
-  }
+  };
     
 
   const submitBusiness = async () => {
@@ -282,11 +288,55 @@ const renderProgressBar = () => (
     }
   }
 
+  // Render progress bar at 90% for step 4 (before publish), 100% after publish, else normal
+  let progressBar = null;
+  if (currentStep === 4 && isPublished) {
+    progressBar = renderProgressBar({ published: true }); // 100%
+  } else if (currentStep === 4) {
+    // 90% for preview and completion
+    progressBar = (
+      <div className="w-full bg-white border-b border-gray-200 py-[25px] ">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <h1 className="learge-headeing ">Business Setup</h1>
+            <div className="text-sm text-gray-500">
+              Step 4 of 5 - 90% Complete
+            </div>
+          </div>
+          {/* Progress container */}
+          <div className="relative mt-10">
+            {/* Gray background line */}
+            <div className="absolute top-[20px] left-0 w-full h-[8px] bg-[#F2F2F2] rounded-full">
+              {/* Purple active line */}
+              <div
+                className="h-[8px] bg-[#6F00FF] rounded-full transition-all duration-300"
+                style={{ width: `90%` }}
+              />
+            </div>
+            {/* Step circles */}
+            <div className="relative flex justify-between">
+              {Array.from({ length: 5 }, (_, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div
+                    className={`sm:w-[32px] sm:h-[32px] w-[24px] h-[24px] rounded-full mb-8 flex items-center justify-center text-sm font-normal z-10 bg-[#6F00FF] text-white`}
+                    style={{ marginTop: "-18px" }}
+                  >
+                    {index < 3 ? <Check className="w-4 h-4" /> : index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    progressBar = renderProgressBar();
+  }
   return (
     <div className="min-h-screen bg-white">
-      {currentStep < STEPS.length - 1 && renderProgressBar()}
-
+      {progressBar}
       <div className="max-w-[1184px] mx-auto mt-8">{renderStep()}</div>
     </div>
-  )
+  );
 }

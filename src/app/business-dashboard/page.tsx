@@ -51,8 +51,7 @@ console.log(businessData)
             + Add Business
           </button>
         }
-        onEdit={(row) => route.push(`/business-dashboard/edit-business/${row.name}`)}
-        onDelete={(row) => console.log("delete", row)}
+        onEdit={(row) => route.push(`/business-dashboard/edit-business/${row.name}-${row.id}`)}
         indexed
         pagination
         totalPages={businessData?.totalPages ?? 1}

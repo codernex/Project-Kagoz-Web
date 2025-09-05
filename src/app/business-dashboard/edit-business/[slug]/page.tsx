@@ -2,15 +2,19 @@
 
 import { useParams } from "next/navigation"
 import BusinessForm from "./_components/BusinessForm"
+import { useGetBusinessBySlugQuery } from "@/redux/api/business"
 
 export default function EditBusiness() {
   const params = useParams()
-  const businessId = params.slug as string
+  const slug = params.slug as string
+  
+  const { data } = useGetBusinessBySlugQuery(slug, { skip: !slug })
 
   return (
     <BusinessForm
-      businessId={businessId}
+      businessId={slug}
       mode="edit"
+      businessData={data}
       onSuccess={(businessId) => {
         console.log('Business updated successfully:', businessId)
       }}

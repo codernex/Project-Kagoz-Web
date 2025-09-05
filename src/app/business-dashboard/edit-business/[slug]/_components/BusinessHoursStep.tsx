@@ -122,119 +122,118 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
   }
 
   const handleToggleDay = (day: string) => {
-    const updatedHours = {
+    const currentDay = formData.businessHours[day];
+    if (!currentDay) return;
+    const updatedHours: Record<string, DaySchedule> = {
       ...formData.businessHours,
       [day]: {
-        ...formData.businessHours[day],
-        isOpen: !formData.businessHours[day].isOpen,
-        // Initialize with default slot if opening the day
-        slots: !formData.businessHours[day].isOpen ? [{ start: "9:00 AM", end: "6:00 PM" }] : formData.businessHours[day].slots
+        ...currentDay,
+        isOpen: !currentDay.isOpen,
+        slots: !currentDay.isOpen ? [{ start: "9:00 AM", end: "6:00 PM" }] : currentDay.slots
       },
-    }
-    
-    const newData = { ...formData, businessHours: updatedHours }
-    setFormData(newData)
-    onUpdate(newData)
-    
+    };
+    const newData: BusinessHoursData = { ...formData, businessHours: updatedHours };
+    setFormData(newData);
+    onUpdate(newData);
     // Clear errors for this day
     if (errors[day]) {
-      const newErrors = { ...errors }
-      delete newErrors[day]
-      setErrors(newErrors)
+      const newErrors = { ...errors };
+      delete newErrors[day];
+      setErrors(newErrors);
     }
   }
 
   const addTimeSlot = (day: string) => {
-    const updatedHours = {
+    const currentDay = formData.businessHours[day];
+    if (!currentDay) return;
+    const updatedHours: Record<string, DaySchedule> = {
       ...formData.businessHours,
       [day]: {
-        ...formData.businessHours[day],
-        slots: [...formData.businessHours[day].slots, { start: "9:00 AM", end: "6:00 PM" }],
+        ...currentDay,
+        slots: [...currentDay.slots, { start: "9:00 AM", end: "6:00 PM" }],
       },
-    }
-    
-    const newData = { ...formData, businessHours: updatedHours }
-    setFormData(newData)
-    onUpdate(newData)
+    };
+    const newData: BusinessHoursData = { ...formData, businessHours: updatedHours };
+    setFormData(newData);
+    onUpdate(newData);
   }
 
   const removeTimeSlot = (day: string, index: number) => {
-    if (formData.businessHours[day].slots.length <= 1) return // Don't remove the last slot
-    
-    const updatedHours = {
+    const currentDay = formData.businessHours[day];
+    if (!currentDay || currentDay.slots.length <= 1) return; // Don't remove the last slot
+    const updatedHours: Record<string, DaySchedule> = {
       ...formData.businessHours,
       [day]: {
-        ...formData.businessHours[day],
-        slots: formData.businessHours[day].slots.filter((_, i) => i !== index),
+        ...currentDay,
+        slots: currentDay.slots.filter((_, i) => i !== index),
       },
-    }
-    
-    const newData = { ...formData, businessHours: updatedHours }
-    setFormData(newData)
-    onUpdate(newData)
+    };
+    const newData: BusinessHoursData = { ...formData, businessHours: updatedHours };
+    setFormData(newData);
+    onUpdate(newData);
   }
 
   const updateTimeSlot = (day: string, index: number, field: 'start' | 'end', value: string) => {
-    const updatedSlots = [...formData.businessHours[day].slots]
-    updatedSlots[index] = { ...updatedSlots[index], [field]: value }
-    
-    const updatedHours = {
+    const currentDay = formData.businessHours[day];
+    if (!currentDay) return;
+    const updatedSlots = [...currentDay.slots];
+    const prevSlot = updatedSlots[index] || { start: '', end: '' };
+    updatedSlots[index] = {
+      start: field === 'start' ? value : prevSlot.start || '',
+      end: field === 'end' ? value : prevSlot.end || '',
+    };
+    const updatedHours: Record<string, DaySchedule> = {
       ...formData.businessHours,
       [day]: {
-        ...formData.businessHours[day],
+        ...currentDay,
         slots: updatedSlots,
       },
-    }
-    
-    const newData = { ...formData, businessHours: updatedHours }
-    setFormData(newData)
-    onUpdate(newData)
-    
+    };
+    const newData: BusinessHoursData = { ...formData, businessHours: updatedHours };
+    setFormData(newData);
+    onUpdate(newData);
     // Clear errors for this day when user makes changes
     if (errors[day]) {
-      const newErrors = { ...errors }
-      delete newErrors[day]
-      setErrors(newErrors)
+      const newErrors = { ...errors };
+      delete newErrors[day];
+      setErrors(newErrors);
     }
   }
 
   const copyMonFriHours = () => {
-    const mondayHours = formData.businessHours["Monday"]
-    if (!mondayHours?.isOpen) {
-      alert("Please set Monday hours first before copying")
-      return
+    const mondayHours = formData.businessHours["Monday"];
+    if (!mondayHours || !mondayHours.isOpen) {
+      alert("Please set Monday hours first before copying");
+      return;
     }
-    
-    const updatedHours = {
+    const updatedHours: Record<string, DaySchedule> = {
       ...formData.businessHours,
       "Tuesday": { ...mondayHours },
       "Wednesday": { ...mondayHours },
       "Thursday": { ...mondayHours },
       "Friday": { ...mondayHours },
-    }
-    
-    const newData = { ...formData, businessHours: updatedHours }
-    setFormData(newData)
-    onUpdate(newData)
+    };
+    const newData: BusinessHoursData = { ...formData, businessHours: updatedHours };
+    setFormData(newData);
+    onUpdate(newData);
   }
 
   const handleToggle24Hours = (checked: boolean) => {
-    const newData = { ...formData, is24Hours: checked }
-    setFormData(newData)
-    onUpdate(newData)
-    
+    const newData: BusinessHoursData = { ...formData, is24Hours: checked };
+    setFormData(newData);
+    onUpdate(newData);
     // Clear general errors when toggling 24/7
     if (errors.general) {
-      const newErrors = { ...errors }
-      delete newErrors.general
-      setErrors(newErrors)
+      const newErrors = { ...errors };
+      delete newErrors.general;
+      setErrors(newErrors);
     }
   }
 
   const handleToggleHolidays = (checked: boolean) => {
-    const newData = { ...formData, closedOnHolidays: checked }
-    setFormData(newData)
-    onUpdate(newData)
+  const newData: BusinessHoursData = { ...formData, closedOnHolidays: checked };
+  setFormData(newData);
+  onUpdate(newData);
   }
 
   const handleNext = async () => {
@@ -282,15 +281,15 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
         <div>
           <Label className="text-sm font-medium">Days Open </Label>
           <div className="flex flex-wrap gap-2 mt-2">
-            {dayAbbr.map((day, index) => (
+            {dayAbbr.map((day, idx) => (
               <button
                 key={day}
                 className={`px-[53px] py-[13px] rounded ${
-                  formData.businessHours[days[index]]?.isOpen
+                  days[idx] !== undefined && formData.businessHours[days[idx]]?.isOpen
                     ? "border-[#9333EA] border hover:bg-[#F1EBFF] bg-[#F1EBFF] text-[#9333EA]"
                     : "text-[#2D3643] bg-white border-[#E4E4E4] border hover:bg-[#F1EBFF]"
                 }`}
-                onClick={() => handleToggleDay(days[index])}
+                onClick={() => { if (days[idx] !== undefined) handleToggleDay(days[idx]) }}
               >
                 {day}
               </button>
@@ -355,7 +354,7 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
           <Label className="text-sm font-medium">Opening Hours</Label>
           <div className="space-y-4">
             {days.map((day) => (
-              formData.businessHours[day]?.isOpen && (
+              formData.businessHours[day] && formData.businessHours[day].isOpen && (
                 <div key={day} className="border-gray-200 border rounded-[8px]">
                   <div className="p-4">
                     <div className="space-y-3">
@@ -371,51 +370,50 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
                       )}
                       
                       <div className="space-y-3">
-                        {formData.businessHours[day].slots.map((slot, index) => (
-                          <div key={index} className="flex items-center gap-3 p-3  ">
-                            <span className="text-sm text-gray-600 w-20">Time Slot {index + 1}:</span>
-                            
+                        {formData.businessHours[day]!.slots.map((slot, idx) => (
+                          <div key={idx} className="flex items-center gap-[12px] text-[#353535] mb-3">
+                            <span className="text-gray-500">Time Slot {idx + 1}:</span>
                             {/* Start Time Selector */}
                             <Select
-                              label={undefined}
-                              required={true}
-                              placeholder="Start"
-                              value={slot.start}
-                              onValueChange={(v) => updateTimeSlot(day, index, 'start', v)}
-                              width="w-32"
+                              value={slot.start || ''}
+                              onValueChange={(v) => updateTimeSlot(day, idx, 'start', v)}
                             >
-                              <SelectContent className="max-h-64">
+                              <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-[8px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
                                 {timeOptions.map((t) => (
-                                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                                  <SelectItem key={t} value={t} className="text-[#353535]">
+                                    {t}
+                                  </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
-                            <ArrowRight className="size-4 text-[#2D3643]" />
-                            {/* <span className="text-sm text-gray-500">to</span> */}
-                            
+                            <span className="text-gray-500">→</span>
                             {/* End Time Selector */}
                             <Select
-                              label={undefined}
-                              required={true}
-                              placeholder="End"
-                              value={slot.end}
-                              onValueChange={(v) => updateTimeSlot(day, index, 'end', v)}
-                              width="w-32"
+                              value={slot.end || ''}
+                              onValueChange={(v) => updateTimeSlot(day, idx, 'end', v)}
                             >
-                              <SelectContent className="max-h-64">
+                              <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-[8px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
                                 {timeOptions.map((t) => (
-                                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                                  <SelectItem key={t} value={t} className="text-[#353535]">
+                                    {t}
+                                  </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
-                            {formData.businessHours[day].slots.length > 1 && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => removeTimeSlot(day, index)}
-                                className="p-1 h-auto text-red-500 hover:text-red-700"
+                            {formData.businessHours[day]!.slots.length > 1 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeTimeSlot(day, idx)}
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                               >
-                                <X className="h-4 w-4" />
+                                <X className="w-[16px] h-[16px]" />
                               </Button>
                             )}
                           </div>
@@ -438,7 +436,7 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-10 w-1/2 mx-auto">
+      <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
         <button
          
           onClick={handleNext}

@@ -2,15 +2,11 @@
 
 import { useState } from "react"
 import type { BusinessData } from "./businessSetup"
-import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Building2, Camera, Clock, Star } from "lucide-react"
-import { JSX } from "react"
+import { Building2, Camera, ChevronLeft, Clock, Star } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
-// import FileUploader from "@/components/ui/file-upload"
-// import BusinessStartDate from "@/components/ui/date-selector"
+import { DateSelector } from "@/components/bizness/select-date"
+
 
 interface UploadedFile {
   id: string
@@ -173,12 +169,18 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
               )}
             </div>
 
-            {/* Business License */}
-            <div>
-              <Label className="text-sm font-medium">Verified License</Label>
+            <div className="">
+                <Label className="text-sm font-medium text-[#111827]">Verified License</Label>
               <p className="text-xs text-gray-500 mb-3">Upload your business license</p>
               
-          
+            <DateSelector
+          name="licenseIssueDate"
+          required
+        />
+            </div>
+            {/* Business License */}
+            <div>
+            
 
               {/* Document Upload */}
               <div className="mb-3">
@@ -200,20 +202,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
               )}
             </div>
 
-            {/* Business Starting Date */}
-            {/* <div>
-              <BusinessStartDate
-                id="startingDate"
-                label="Business Starting Date"
-                required
-                value={
-                  typeof businessData.startingDate === "string"
-                    ? { year: "", month: "", day: "" }
-                    : businessData.startingDate
-                }
-                onChange={e => updateBusinessData("startingDate", e)}
-              />
-            </div> */}
+          
 
             {/* Business Gallery */}
             <div>
@@ -242,47 +231,57 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex gap-4 my-8 w-1/2">
-            <button
-              onClick={onPrev}
-              className="flex items-center space-x-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg !px-10 y-2"
-            >
-              <span>Previous</span>
-            </button>
-            <button
-              onClick={onNext}
-              disabled={!!isNextDisabled}
-              className={`flex items-center w-full space-x-2 rounded-lg px-6 py-2 ${
-                isNextDisabled ? "bg-gray-400 cursor-not-allowed text-white" : "bg-[#6F00FF] hover:bg-purple-700 text-white"
-              }`}
-            >
-              <span>Next</span>
-            </button>
-          </div>
+            <div className="flex gap-4 py-[32px] w-full">
+              <button
+                onClick={onPrev}
+                className="flex items-center space-x-2 bg-white border justify-center border-gray-300  text-gray-700 hover:bg-gray-50 rounded-[8px] w-1/3 !px-10 y-2"
+              >
+                <ChevronLeft /><span>Previous</span>
+              </button>
+              <button
+                onClick={onNext}
+                disabled={!!isNextDisabled}
+                aria-disabled={!!isNextDisabled}
+                className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
+                  isNextDisabled
+                    ? "bg-[#CDD1D8] text-white cursor-not-allowed"
+                    : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
+                }`}
+              >
+                <span>Next</span>
+              </button>
+            </div>
         </div>
+        
       </div>
 
       <div>
-        <div className=" border p-6 rounded-2xl">
+        <div className="bg-white border border-gray-200 p-6 rounded-2xl">
           <div className="flex items-center space-x-2 mb-4">
-            <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
-            <h3 className="font-semibold">Business Card Preview</h3>
+            <div className="w-[8px] h-[8px] bg-[#6F00FF] rounded-full"></div>
+            <h3 className="font-semibold text-gray-900">Business Card Preview</h3>
           </div>
-          <div className="w-full  border-0 ">
+          
+          {/* Business Card Preview */}
+          <div className="w-full border-0">
             <div className="p-0">
               {/* Banner Image */}
-              <div className="h-30 bg-gray-200 rounded-t-lg relative overflow-hidden">
-                {formData.banner && (
+              <div className="h-[128px] bg-gray-200 rounded-t-lg relative overflow-hidden">
+                {formData.banner ? (
                   <img 
                     src={formData.banner.preview} 
                     alt="Banner"
                     className="w-full h-full object-cover rounded-t-lg"
                   />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 rounded-t-lg flex items-center justify-center">
+                    <div className="text-gray-400 text-sm">Banner Image</div>
+                  </div>
                 )}
               </div>
               
               {/* Company Information Box */}
-              <div className="bg-gradient-to-r from-[#F0FDFA] to-[#FAF5FF] border p-2 border-[#CCFBF1] rounded-b-[12px]">
+              <div className="bg-gradient-to-t from-[#F0FDFA] to-[#FAF5FF] border border-gray-200 rounded-b-lg p-4 -mt-2 relative z-10">
                 <div className="flex items-start space-x-3">
                   {/* Logo */}
                   <div className="flex-shrink-0">
@@ -290,20 +289,20 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                       <img 
                         src={formData.logo.preview} 
                         alt="Logo"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-red-500"
+                        className="w-12 sm:w-[64px] h-12 sm:h-[64px] rounded-[8px] object-cover "
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-[#6F00FF] rounded-full flex items-center justify-center border-2 border-red-500">
-                        <Building2 className="w-6 h-6 text-white" />
+                      <div className="w-12 sm:w-[64px] h-12 sm:h-[64px] bg-[#6F00FF] rounded-[8px] flex items-center justify-center ">
+                        <Building2 className="w-[24px] h-[24px] text-white" />
                       </div>
                     )}
                   </div>
                   
                   {/* Company Details */}
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg text-gray-900">{businessData.name || "Kagoz.com"}</h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {businessData.tagline || "KAGOZ stands out by offering both free and premium listing options to cater to the diverse needs of businesses."}
+                    <h3 className="font-medium sm:text-[20px] text-[16px] text-gray-900">{businessData.name }</h3>
+                    <p className="text-[14px] text-gray-600 mt-1">
+                      {businessData.tagline }
                     </p>
                   </div>
                 </div>
@@ -312,42 +311,38 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
           </div>
 
           {/* Verified License Preview */}
-          <div className="mt-6">
-            <h4 className="font-semibold text-sm mb-3 text-gray-900">Verified License</h4>
-            <div className="grid grid-cols-2 gap-2">
-              {formData.license.length > 0 ? (
-                formData.license.slice(0, 2).map((file, index) => (
-                  <div key={file.id} className="aspect-video bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+          {formData.license.length > 0 && (
+            <div className="mt-6">
+              <h4 className="font-semibold text-sm mb-3 text-gray-900">Verified License</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {formData.license.slice(0, 2).map((file, index) => (
+                  <div key={file.id} className="aspect-video bg-gray-100 rounded-[8px] overflow-hidden border border-gray-200">
                     <img 
                       src={file.preview} 
                       alt={file.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                ))
-              ) : (
-                Array.from({ length: 2 }, (_, i) => (
-                  <div key={i} className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
-                    <Camera className="w-4 h-4 text-gray-400" />
-                  </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Business Gallery Preview */}
-          <div className="mt-6">
+          {
+            formData.gallery.length > 0 && (
+              <div className="mt-6">
             <h4 className="font-semibold text-sm mb-3 text-gray-900 flex items-center gap-2">
               <Camera className="w-4 h-4" />
               Business Gallery
             </h4>
             <div className="grid grid-cols-3 gap-2">
               {formData.gallery.length > 0 ? (
-                formData.gallery.map((file, index) => (
+                formData.gallery.slice(0, 4).map((file, index) => (
                   <div 
                     key={file.id} 
-                    className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 relative ${
-                      index >= 3 ? 'col-span-1' : ''
+                    className={`aspect-square bg-gray-100 rounded-[8px] overflow-hidden border border-gray-200 ${
+                      index === 3 ? 'col-span-1' : ''
                     }`}
                   >
                     <img 
@@ -358,11 +353,11 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                   </div>
                 ))
               ) : (
-                Array.from({ length: 5 }, (_, i) => (
+                Array.from({ length: 4 }, (_, i) => (
                   <div 
                     key={i} 
-                    className={`aspect-square bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 ${
-                      i >= 3 ? 'col-span-1' : ''
+                    className={`aspect-square bg-gray-100 rounded-[8px] flex items-center justify-center border border-gray-200 ${
+                      i === 3 ? 'col-span-1' : ''
                     }`}
                   >
                     <Camera className="w-4 h-4 text-gray-400" />
@@ -370,14 +365,11 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                 ))
               )}
             </div>
-            {formData.gallery.length > 0 && (
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                {formData.gallery.length}/5 uploaded
-              </p>
-            )}
           </div>
+            )
+          }
 
-          {/* Profile Completion Status */}
+          {/* Business Gallery Status */}
           <div className="mt-6">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -389,7 +381,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                     </svg>
                   </div>
                 ) : (
-                  <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                  <span className="text-sm text-red-500">Required</span>
                 )}
               </div>
               
@@ -402,26 +394,23 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                     </svg>
                   </div>
                 ) : (
-                  <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
+                  <span className="text-sm text-gray-500">Optional</span>
                 )}
               </div>
               
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Gallery Images</span>
-                {formData.gallery.length > 0 ? (
-                  <span className="text-sm text-gray-700">{formData.gallery.length}/5 uploaded</span>
-                ) : (
-                  <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-                )}
+                <span className="text-sm text-gray-700">{formData.gallery.length}/5 uploaded</span>
               </div>
             </div>
           </div>
 
           {/* Call to Action Box */}
-          <div className="mt-6 p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <p className="text-xs text-purple-700">
+          <div className="mt-6 p-3 bg-gray-50 rounded-[8px] border-l-4 border-[#6F00FF]">
+            <p className="text-[14px] text-gray-700 mb-1">
               Update your business card with logos, banners, and images instantly, giving you a sense of progress and ownership.
             </p>
+           
           </div>
         </div>
       </div>

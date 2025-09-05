@@ -154,7 +154,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
       </div>
 
      
-       <div className="flex gap-10 justify-center mx-auto">
+       <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
         <button
           onClick={onBack}
           className="!px-20 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg"

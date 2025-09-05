@@ -34,6 +34,10 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
   return (
     <div className="w-full border border-[#E4E4E4] rounded-2xl">
       <div className="p-4">
+        <div className="flex items-center space-x-2 mb-4">
+              <div className="w-[8px] h-[8px] bg-[#6F00FF] rounded-full"></div>
+              <h3 className="font-semibold text-[#111827]">Business Preview</h3>
+            </div>
         <div className="flex items-center space-x-3 mb-4 bg-gradient-to-r border border-[#CCFBF1] rounded-[12px] px-4 py-[20px] from-[#F0FDFA] to-[#FAF5FF]">
             <div className="h-[64px] w-[64px] basis-[64px] shrink-0 bg-[#6F00FF] rounded-[8px] flex items-center justify-center">
               <Building2 className="h-[32px] w-[32px] text-white" />
