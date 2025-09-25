@@ -12,7 +12,17 @@ export const successMessage = (message: string) => {
 };
 
 export function appendApi(file: string) {
-  return process.env.NEXT_PUBLIC_API_URL + "/uploads/" + file;
+  // If already an absolute URL (e.g., Google avatar), return as-is
+  if (!file) return "";
+  if (/^https?:\/\//i.test(file)) {
+    return file;
+  }
+
+  // Derive base by stripping trailing /api/v1 from API url if present
+  const api = process.env.NEXT_PUBLIC_API_URL || "";
+  const base = api.replace(/\/api\/v1\/?$/, "");
+
+  return `${base}/uploads/${file}`;
 }
 
 export function extractYouTubeVideoId(url: string): string {

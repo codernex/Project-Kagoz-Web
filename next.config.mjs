@@ -9,8 +9,18 @@ const nextConfig = {
         pathname: "/api/v1/uploads/**", // Add /** to allow dynamic paths
       },
       {
+        protocol: "http",
+        hostname: "localhost",
+        port: "9000",
+        pathname: "/uploads/**",
+      },
+      {
         protocol: "https",
         hostname: "img.youtube.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
       },
       {
         protocol: "http",
@@ -24,6 +34,11 @@ const nextConfig = {
         pathname: "/api/v1/uploads/**",
       },
       {
+        protocol: "http",
+        hostname: "88.222.241.93",
+        pathname: "/uploads/**",
+      },
+      {
         protocol: "https",
         hostname: "api.kagoz.com",
         pathname: "/api/v1/uploads/**", // Add /** to allow dynamic paths
@@ -32,6 +47,16 @@ const nextConfig = {
         protocol: "http",
         hostname: "api.kagoz.com",
         pathname: "/api/v1/uploads/**", // Add /** to allow dynamic paths
+      },
+      {
+        protocol: "https",
+        hostname: "api.kagoz.com",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "http",
+        hostname: "api.kagoz.com",
+        pathname: "/uploads/**",
       },
     ],
   },

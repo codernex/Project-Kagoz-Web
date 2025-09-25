@@ -9,6 +9,7 @@ import { TextInput } from '@/components/shared/text-input';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import GoogleContinueButton from '@/components/shared/google-continue';
 
 const SignupForm = () => {
   const router = useRouter();
@@ -125,7 +126,7 @@ const SignupForm = () => {
           <p className="text-center text-gray-500 whitespace-pre mx-1.5">Or sign up with</p>
           <div className="h-px bg-[#E4E4E4] w-full"></div>
         </div>
-        <Button
+        {/* <Button
           variant="outline"
           className="w-full flex cursor-pointer text-[#111827] items-center justify-center gap-2"
         >
@@ -137,7 +138,8 @@ const SignupForm = () => {
             className="w-[16px] h-[16px]"
           />
           Continue with Google
-        </Button>
+        </Button> */}
+        <GoogleContinueButton />
 
         <p className="text-center common-text text-[#2D3643] ">
           Already have an account?{" "}
