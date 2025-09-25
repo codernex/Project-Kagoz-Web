@@ -32,7 +32,7 @@ interface StepProps {
   isNextDisabled?: boolean
 }
 
-export function StepBusinessInfo({ onPrev, onNext }: StepProps) {
+export function StepBusinessInfo({ onPrev, onNext, updateBusinessData }: StepProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [registerBusiness, { isLoading }] = useRegisterBusinessMutation()
   const { slug } = useParams() as { slug?: string }
@@ -64,7 +64,12 @@ export function StepBusinessInfo({ onPrev, onNext }: StepProps) {
           ? `${(d.startingDate as any).year}-${(d.startingDate as any).month}-${(d.startingDate as any).day}`
           : d.startingDate,
       }
-      // await registerBusiness(payload).unwrap()
+      const created = await registerBusiness(payload).unwrap()
+      // capture slug from response if available
+      const slug = (created as any)?.slug || (created as any)?.data?.slug || (created as any)?._id || (created as any)?.id
+      if (slug) {
+        updateBusinessData("slug", String(slug))
+      }
       onNext()
     } catch (err) {
       // errors handled by RTK

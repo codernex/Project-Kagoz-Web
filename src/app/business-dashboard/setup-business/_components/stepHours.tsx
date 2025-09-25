@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Clock, Copy, X, Calendar, ChevronLeft } from "lucide-react"
 import { JSX, useState, useEffect } from "react"
+import { useParams } from "next/navigation"
+import { useSetOpeningHoursMutation } from "@/redux/api"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 const DAY_NAMES = {
@@ -40,6 +42,8 @@ interface StepProps {
 }
 
 export function StepHours({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
+  const { slug } = useParams() as { slug?: string }
+  const [setOpeningHours, { isLoading }] = useSetOpeningHoursMutation()
   const [businessHours, setBusinessHours] = useState<{ [key: string]: DayHours }>(() => {
     // If businessData.businessHours exists, hydrate from it
     if (businessData.businessHours && typeof businessData.businessHours === 'object') {
@@ -197,7 +201,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
   };
 
   const timeOptions = generateTimeOptions();
-  const hasSelectedDays = Object.values(businessHours).some((day: DayHours) => day.isOpen);
+  const hasSelectedDays = Object.values(businessHours || {}).some((day: DayHours) => !!day && day.isOpen === true);
 
   // Initialize business hours on component mount
   useEffect(() => {
@@ -236,6 +240,48 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
       updateHours(newHours);
     }
   }, [businessData.closedOnHolidays, businessData.is24x7]);
+
+  const parseTime = (t: string) => {
+    const m = t?.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!m) {
+      return { hours: "12", minutes: "00", period: "AM" } as const;
+    }
+    const period = (m[3] || "AM").toUpperCase();
+    return { hours: m[1] || "12", minutes: m[2] || "00", period } as const;
+  };
+
+  const handleNext = async () => {
+    const targetSlug = slug || (businessData as any)?.slug;
+    if (!targetSlug) {
+      onNext();
+      return;
+    }
+
+    let payload: any;
+    if (businessData.is24x7) {
+      payload = { isOpen247: true };
+    } else {
+      const days: any[] = [];
+      DAYS.forEach((abbr) => {
+        const conf = businessHours[abbr];
+        if (!conf?.isOpen) return;
+        const dayName = DAY_NAMES[abbr as keyof typeof DAY_NAMES];
+        const timeRanges = (conf.timeSlots || []).map((slot) => ({
+          from: parseTime(slot.startTime),
+          to: parseTime(slot.endTime),
+        }));
+        days.push({ day: dayName, isOpen: true, timeRanges });
+      });
+      payload = { days };
+    }
+
+    try {
+      await setOpeningHours({ slug: targetSlug, ...payload }).unwrap();
+      onNext();
+    } catch (_e) {
+      // handled by rtk toast
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 xl:p-1 p-2">
@@ -376,7 +422,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
                 <ChevronLeft /><span>Previous</span>
               </button>
               <button
-                onClick={onNext}
+                onClick={handleNext}
                 disabled={!!isNextDisabled}
                 aria-disabled={!!isNextDisabled}
                 className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
@@ -385,7 +431,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
                     : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
                 }`}
               >
-                <span>Next</span>
+                <span>{isLoading ? "Saving..." : "Next"}</span>
               </button>
             </div>
       </div>

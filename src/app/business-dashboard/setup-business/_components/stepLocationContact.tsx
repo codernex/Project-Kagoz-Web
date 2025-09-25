@@ -27,7 +27,7 @@ export function StepLocationContact({
 }: StepProps) {
   const { slug } = useParams() as { slug?: string }
   const { data: existingBusiness } = useGetBusinessBySlugQuery(slug as string, { skip: !slug })
-  const [update] = useUpdateBusinessMutation()
+  const [updateBusiness, { isLoading }] = useUpdateBusinessMutation()
 
   type LocationContactInput = {
     streetAddress: string
@@ -74,14 +74,17 @@ export function StepLocationContact({
   const onSubmit: SubmitHandler<LocationContactInput> = async (d) => {
     // reflect back to parent state
     Object.entries(d).forEach(([k, v]) => updateBusinessData(k, v))
-    if (!slug) {
+    // prefer slug from URL, fall back to parent state
+    const targetSlug = slug || (businessData as any)?.slug
+    if (!targetSlug) {
+      // no slug yet; skip remote update and just move next
       onNext()
       return
     }
     const formData = new FormData()
     Object.entries(d).forEach(([key, value]) => formData.append(key, value as string))
     try {
-      await update({ slug, data: formData }).unwrap()
+      await updateBusiness({ slug: targetSlug, data: formData }).unwrap()
       onNext()
     } catch (_e) {
    
@@ -184,15 +187,15 @@ export function StepLocationContact({
         </button>
         <button
           onClick={form.handleSubmit(onSubmit)}
-          disabled={!!isNextDisabled}
-          aria-disabled={!!isNextDisabled}
+          disabled={!!isNextDisabled || isLoading}
+          aria-disabled={!!isNextDisabled || isLoading}
           className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
-            isNextDisabled
+            isNextDisabled || isLoading
               ? "bg-[#CDD1D8] text-white cursor-not-allowed"
               : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
           }`}
         >
-          <span>Next</span>
+          <span>{isLoading ? "Saving..." : "Next"}</span>
         </button>
       </div>
         </div>

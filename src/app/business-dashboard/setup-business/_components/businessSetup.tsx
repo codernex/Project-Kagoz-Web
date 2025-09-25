@@ -28,6 +28,7 @@ interface MediaBrandingData {
 }
 
 export interface BusinessData {
+  slug?: string
   name: string
   tagline: string
   about: string
