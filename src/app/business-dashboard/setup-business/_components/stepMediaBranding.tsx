@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Building2, Camera, ChevronLeft, Clock, Star } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
 import { DateSelector } from "@/components/bizness/select-date"
+import { useParams } from "next/navigation"
+import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation, useUpdateLicenseMutation, useUpdateBusinessMediaMutation } from "@/redux/api"
 
 
 interface UploadedFile {
@@ -32,12 +34,19 @@ interface StepProps {
 }
 
 export function StepMediaBranding({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
+  const { slug } = useParams() as { slug?: string }
   const [formData, setFormData] = useState<MediaBrandingData>({
     logo: null,
     banner: null,
     license: [],
     gallery: []
   })
+  const [saving, setSaving] = useState(false)
+  const [addBanner] = useAddBannerMutation()
+  const [updateBusiness] = useUpdateBusinessMutation()
+  const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
+  const [uploadPhoto] = useUploadPhotoMutation()
+  const [updateLicense] = useUpdateLicenseMutation()
   
   const [errors, setErrors] = useState<{ 
     logo?: string
@@ -115,11 +124,70 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      console.log("Form is valid, proceeding...")
-    } else {
-      console.log("Form has errors:", errors)
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+    const targetSlug = slug || (businessData as any)?.slug
+    if (!targetSlug) { onNext(); return }
+
+    try {
+      setSaving(true)
+      
+      // Create a single FormData object for logo and banner
+      const fd = new FormData()
+      
+      // Add logo if present
+      if (formData.logo?.file) {
+        fd.append('logo', formData.logo.file as any)
+      }
+      
+      // Add banner if present
+      if (formData.banner?.file) {
+        fd.append('banner', formData.banner.file as any)
+      }
+      
+      // Send both logo and banner in a single request
+      if (formData.logo?.file || formData.banner?.file) {
+        await updateBusinessMedia({ slug: targetSlug, data: fd }).unwrap()
+      }
+
+      // Upload first license file with date if present
+      if (formData.license && formData.license.length > 0) {
+        const licenseFd = new FormData()
+        // Build date as YYYY-MM-DD, only if all parts are valid numbers
+        const issue = (businessData as any)?.issueDate || { year: '', month: '', day: '' }
+        const monthMap: Record<string, number> = {
+          January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
+          July: 7, August: 8, September: 9, October: 10, November: 11, December: 12
+        }
+        const yearNum = Number.parseInt((issue?.year ?? '').toString(), 10)
+        const monthRaw = (issue?.month ?? '').toString()
+        const monthNum = monthMap[monthRaw as keyof typeof monthMap] ?? Number.parseInt(monthRaw, 10)
+        const dayNum = Number.parseInt((issue?.day ?? '').toString(), 10)
+        const isValidDateParts = Number.isFinite(yearNum) && Number.isFinite(monthNum) && Number.isFinite(dayNum)
+          && yearNum > 1900 && monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31
+        if (isValidDateParts) {
+          const ymd = `${String(yearNum).padStart(4, '0')}-${String(monthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
+          licenseFd.append('date', ymd as any)
+        }
+        const firstLicense = formData.license[0] as UploadedFile
+        if (firstLicense?.file) {
+          licenseFd.append('image', firstLicense.file as any)
+        }
+        await updateLicense({ slug: targetSlug, data: licenseFd }).unwrap()
+      }
+
+      // Upload gallery images
+      if (formData.gallery && formData.gallery.length) {
+        for (const g of formData.gallery) {
+          const galleryFd = new FormData()
+          galleryFd.append('image', g.file as any)
+          await uploadPhoto({ slug: targetSlug, data: galleryFd }).unwrap()
+        }
+      }
+
+      onNext()
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -239,7 +307,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                 <ChevronLeft /><span>Previous</span>
               </button>
               <button
-                onClick={onNext}
+                onClick={handleSubmit}
                 disabled={!!isNextDisabled}
                 aria-disabled={!!isNextDisabled}
                 className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
@@ -248,7 +316,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                     : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
                 }`}
               >
-                <span>Next</span>
+                <span>{saving ? "Saving..." : "Next"}</span>
               </button>
             </div>
         </div>

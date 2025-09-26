@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Camera } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
-import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation } from "@/redux/api/business"
+import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation, useUpdateBusinessMediaMutation } from "@/redux/api/business"
 import { useParams } from "next/navigation"
 // import FileUploader from "@/components/ui/file-upload"
 
@@ -33,6 +33,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const [formData, setFormData] = useState<MediaBrandingData>(data)
   const [errors, setErrors] = useState<{ logo?: string }>({})
   const [updateBusiness] = useUpdateBusinessMutation()
+  const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
   const [addBanner] = useAddBannerMutation()
   const [uploadPhoto] = useUploadPhotoMutation()
   const params = useParams() as { slug?: string }
@@ -80,22 +81,31 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const handleSubmit = async () => {
     if (!validateForm()) return
     try {
+      // Create a single FormData object for logo and banner
+      const fd = new FormData()
+      
+      // Add logo if present
       if (formData.logo?.file) {
-        const fd = new FormData()
         fd.append('logo', formData.logo.file)
-        await updateBusiness({ slug, data: fd }).unwrap()
       }
+      
+      // Add banner if present
       if (formData.banner?.file) {
-        const fd = new FormData()
         fd.append('banner', formData.banner.file)
-        await addBanner({ slug, data: fd }).unwrap()
       }
+      
+      // Send both logo and banner in a single request
+      if (formData.logo?.file || formData.banner?.file) {
+        await updateBusinessMedia({ slug, data: fd }).unwrap()
+      }
+      
+      // Upload gallery images separately
       if (formData.gallery && formData.gallery.length) {
         for (const g of formData.gallery) {
           if (g.file) {
-            const fd = new FormData()
-            fd.append('image', g.file)
-            await uploadPhoto({ slug, data: fd }).unwrap()
+            const galleryFd = new FormData()
+            galleryFd.append('image', g.file)
+            await uploadPhoto({ slug, data: galleryFd }).unwrap()
           }
         }
       }

@@ -71,6 +71,22 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Business"],
     }),
+    // New: send logo and banner together via multipart/form-data (POST)
+    updateBusinessMedia: builder.mutation<IBusiness, { slug: string; data: FormData }>({
+      query: ({ slug, data }) => ({
+        url: `/business/${slug}`,
+        data,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Business media updated succesfully");
+      },
+      invalidatesTags: ["Business"],
+    }),
     addBanner: builder.mutation<IBusiness, { slug: string; data: FormData }>({
       query: ({ slug, data }) => ({
         url: `/business/${slug}/banner`,
@@ -288,6 +304,7 @@ export const {
   useAddFeaturedClientMutation,
   useGetFeauturedClientsQuery,
   useUpdateBusinessMutation,
+  useUpdateBusinessMediaMutation,
   useAddCategoryToBusinessMutation,
   useGetFaqsQuery,
   useAddFaqMutation,

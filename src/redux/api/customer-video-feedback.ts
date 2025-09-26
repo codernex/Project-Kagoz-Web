@@ -10,14 +10,15 @@ const feedback = baseApi.injectEndpoints({
       }),
       providesTags: ["VideoFeedback"],
     }),
-    addVideoFeedback: builder.mutation<
-      IVideo,
-      CreateVideoFeedback & { slug: string }
-    >({
-      query: ({ slug, ...data }) => ({
+    // Multipart version to support logo file, url, rating, name fields
+    addVideoFeedback: builder.mutation<IVideo, any>({
+      query: ({ slug, data }) => ({
         url: `/business/video-feedback/${slug}`,
         data,
         method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         await queryFulfilled;

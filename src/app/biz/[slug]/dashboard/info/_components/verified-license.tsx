@@ -13,7 +13,8 @@ import { toast } from "sonner";
 export const VerifiedLicense = () => {
     const { slug } = useParams() as { slug: string }
     const [files, setFiles] = useState<File[]>([])
-    const form = useForm({
+    const [submitting, setSubmitting] = useState(false)
+    const form = useForm<{ date: string }>({
         defaultValues: {
             date: '',
         }
@@ -24,19 +25,28 @@ export const VerifiedLicense = () => {
             <h2 className="font-bold text-mdx mb-[2.4rem]">Verified License</h2>
             <div>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(d => {
-                        if (!files.length) {
-                            toast.error("You must select an image of your document")
-                            return
+                    <form onSubmit={form.handleSubmit(async d => {
+                        try {
+                            setSubmitting(true)
+                            if (!files.length) {
+                                toast.error("You must select an image of your document")
+                                return
+                            }
+                            const formData = new FormData()
+                            formData.append('date', d.date)
+                            if (files.length) {
+                                formData.append('image', files[0] as any)
+                            }
+                            await updateLicense({ slug, data: formData }).unwrap()
+                            toast.success("Trade license updated")
+                            form.reset()
+                            setFiles([])
+                        } catch (error: any) {
+                            const message = error?.data?.message || 'Failed to update trade license'
+                            toast.error(message)
+                        } finally {
+                            setSubmitting(false)
                         }
-                        const formData = new FormData()
-                        formData.append('date', d.date)
-                        if (files.length) {
-                            formData.append('image', files[0] as any)
-                        }
-                        updateLicense({ slug, data: formData })
-                        form.reset()
-                        setFiles([])
                     })} className="space-y-3">
                         <h3 className="mb-2 font-bold">Trade License</h3>
                         <TextInput control={form.control} name={'date'} type="date" label={'Expiry Date'} placeholder={'DD/MM/YYYY'} />
@@ -49,7 +59,7 @@ export const VerifiedLicense = () => {
                         <div className="flex justify-end">
                             {
                                 form.getFieldState('date').isDirty && files.length ? (
-                                    <CustomButton className="bg-black rounded-xs">Save</CustomButton>
+                                    <CustomButton disabled={submitting} className="bg-black rounded-xs">{submitting ? 'Saving...' : 'Save'}</CustomButton>
                                 ) : null
                             }
                         </div>

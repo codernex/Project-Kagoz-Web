@@ -1,12 +1,16 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Star, Play, Youtube, User, Building, CirclePlay } from 'lucide-react'
 import FileUploader from '@/components/bizness/file-upload'
 import { TextInput } from '@/components/shared/text-input'
 import { useForm, FormProvider } from 'react-hook-form'
+import { useParams } from 'next/navigation'
+import { useAddFeaturedClientMutation, useAddFeaturedOfferMutation, useAddVideoFeedbackMutation } from '@/redux/api'
+import { useBusinessStore } from '@/hooks/selectedBusiness'
+import { toast } from 'sonner'
 
 
 interface UploadedFile {
@@ -31,6 +35,9 @@ interface SpecialFeaturesData {
 }
 
 export default function SpecialFeaturesPage() {
+  const { slug } = useParams() as { slug?: string }
+  const { selectedSlug, loadSelectedSlug } = useBusinessStore()
+  useEffect(() => { loadSelectedSlug() }, [loadSelectedSlug])
   const methods = useForm<SpecialFeaturesData>({
     defaultValues: {
       promoVideoUrl: '',
@@ -49,6 +56,10 @@ export default function SpecialFeaturesPage() {
   const { watch, setValue, handleSubmit: formHandleSubmit } = methods;
   const formData = watch();
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const [addFeaturedClient] = useAddFeaturedClientMutation()
+  const [addFeaturedOffer] = useAddFeaturedOfferMutation()
+  const [addVideoFeedback] = useAddVideoFeedbackMutation()
 
   const handleError = (error: string) => {
     alert(error)
@@ -91,12 +102,38 @@ export default function SpecialFeaturesPage() {
     setIsSubmitting(true)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      console.log('Submitting Special Features Data:', data)
-      
-      // Simulate success
+      const targetSlug = (slug as string) || (selectedSlug as string)
+      if (!targetSlug || targetSlug === 'null') {
+        toast.error('No business selected. Please select a business first.')
+        return
+      }
+      // 1) Upload customer logos (featured clients)
+      if (data.customerLogos?.length) {
+        for (const logo of data.customerLogos) {
+          const fd = new FormData()
+          fd.append('image', logo.file as any)
+          await addFeaturedClient({ slug: targetSlug, data: fd }).unwrap()
+        }
+      }
+
+      // 2) Upload customer video feedback (multipart fields: logo, url, rating, name)
+      if (data.customerFeedback?.customerImage?.[0]) {
+        const fd = new FormData()
+        fd.append('logo', data.customerFeedback.customerImage[0].file as any)
+        fd.append('url', data.customerFeedback.youtubeUrl)
+        fd.append('rating', String(data.customerFeedback.rating))
+        fd.append('name', data.customerFeedback.name)
+        await addVideoFeedback({ slug: targetSlug, data: fd }).unwrap()
+      }
+
+      // 3) Upload featured offers
+      if (data.featuredOffers?.length) {
+        for (const offer of data.featuredOffers) {
+          const fd = new FormData()
+          fd.append('image', offer.file as any)
+          await addFeaturedOffer({ slug: targetSlug, data: fd }).unwrap()
+        }
+      }
       alert('Special features saved successfully!')
       
     } catch (error) {
