@@ -37,7 +37,7 @@ export function DateSelector({ label, name, required, onChange, control }: DateS
     if (year && month && day && onChange) {
       onChange({ year, month, day })
     }
-  }, [year, month, day, onChange])
+  }, [year, month, day])
 
   const Core = (
     <div className="space-y-2">

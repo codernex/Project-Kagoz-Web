@@ -26,7 +26,7 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
    const [isSubmitting, setIsSubmitting] = useState(false)
   const [updateBusiness] = useUpdateBusinessMutation()
   const params = useParams() as { slug?: string }
-  const slug = (params?.slug as string) || ""
+  const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
   const route = useRouter();
   const categories = [
     { value: "pharmacy", label: "Pharmacy" },

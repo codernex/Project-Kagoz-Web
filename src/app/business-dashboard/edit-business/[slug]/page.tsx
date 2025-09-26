@@ -1,12 +1,20 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { useEffect } from "react"
+import { useBusinessStore } from "@/hooks/selectedBusiness"
 import BusinessForm from "./_components/BusinessForm"
 import { useGetBusinessBySlugQuery } from "@/redux/api/business"
 
 export default function EditBusiness() {
   const params = useParams()
-  const slug = params.slug as string
+  const raw = params.slug as string
+  const paramSlug = decodeURIComponent(raw || "").trim().toLowerCase().replace(/\s+/g, "-")
+  const { selectedSlug, loadSelectedSlug } = useBusinessStore()
+  useEffect(() => { loadSelectedSlug() }, [loadSelectedSlug])
+  // Prefer stored slug; if not yet available, try reading it directly from localStorage to avoid a wrong initial fetch
+  const stored = typeof window !== 'undefined' ? (localStorage.getItem('selectedBusinessSlug') || null) : null
+  const slug = (stored && stored !== 'null') ? stored : ((selectedSlug && selectedSlug !== 'null') ? selectedSlug : paramSlug)
   
   const { data } = useGetBusinessBySlugQuery(slug, { skip: !slug })
 

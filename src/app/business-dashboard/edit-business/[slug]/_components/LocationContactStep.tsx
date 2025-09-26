@@ -40,7 +40,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
   // Redux API hook
   const [updateBusiness] = useUpdateBusinessMutation()
   const params = useParams() as { slug?: string }
-  const slug = (params?.slug as string) || ""
+  const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
 
   // Sync RHF values to parent on change
   useEffect(() => {

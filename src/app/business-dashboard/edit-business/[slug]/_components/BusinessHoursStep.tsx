@@ -61,7 +61,7 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [setOpeningHours] = useSetOpeningHoursMutation()
   const params = useParams() as { slug?: string }
-  const slug = (params?.slug as string) || ""
+  const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
 
   // Initialize business hours if not already set
   useEffect(() => {

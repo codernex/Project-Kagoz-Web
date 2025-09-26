@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import type { BusinessData } from "./businessSetup"
 import { Label } from "@/components/ui/label"
 import { Building2, Camera, ChevronLeft, Clock, Star } from "lucide-react"
@@ -47,6 +47,8 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
   const [uploadPhoto] = useUploadPhotoMutation()
   const [updateLicense] = useUpdateLicenseMutation()
+  // Track last auto-sent license payload to avoid duplicate requests
+  const [lastLicenseSentKey, setLastLicenseSentKey] = useState<string | null>(null)
   
   const [errors, setErrors] = useState<{ 
     logo?: string
@@ -84,6 +86,43 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
       setErrors(prev => ({ ...prev, license: undefined }))
     }
   }
+
+  // Auto-upload trade license when both date and at least one file are present
+  React.useEffect(() => {
+    const targetSlug = (slug || (businessData as any)?.slug) as string | undefined
+    const issue = (businessData as any)?.issueDate || { year: '', month: '', day: '' }
+    const monthMap: Record<string, number> = {
+      January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
+      July: 7, August: 8, September: 9, October: 10, November: 11, December: 12
+    }
+    const yearNum = Number.parseInt((issue?.year ?? '').toString(), 10)
+    const monthRaw = (issue?.month ?? '').toString()
+    const monthNum = monthMap[monthRaw as keyof typeof monthMap] ?? Number.parseInt(monthRaw, 10)
+    const dayNum = Number.parseInt((issue?.day ?? '').toString(), 10)
+    const isValidDateParts = Number.isFinite(yearNum) && Number.isFinite(monthNum) && Number.isFinite(dayNum)
+      && yearNum > 1900 && monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31
+
+    const firstLicense = formData.license?.[0]
+    const key = isValidDateParts && firstLicense ? `${yearNum}-${monthNum}-${dayNum}|${firstLicense.id}` : null
+
+    if (!targetSlug || !isValidDateParts || !firstLicense?.file) return
+    if (key && key === lastLicenseSentKey) return
+
+    const send = async () => {
+      try {
+        const ymd = `${String(yearNum).padStart(4, '0')}-${String(monthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
+        const licenseFd = new FormData()
+        licenseFd.append('date', ymd as any)
+        licenseFd.append('image', firstLicense.file as any)
+        await updateLicense({ slug: targetSlug, data: licenseFd }).unwrap()
+        setLastLicenseSentKey(key)
+      } catch (_) {
+        // swallow here; explicit error handling occurs on manual submit
+      }
+    }
+
+    void send()
+  }, [formData.license, businessData?.issueDate, slug, updateLicense, lastLicenseSentKey])
 
   const handleGalleryChange = (files: UploadedFile[]) => {
     const newData = { ...formData, gallery: files }
@@ -244,6 +283,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
             <DateSelector
           name="licenseIssueDate"
           required
+          onChange={(v) => updateBusinessData('issueDate', v)}
         />
             </div>
             {/* Business License */}

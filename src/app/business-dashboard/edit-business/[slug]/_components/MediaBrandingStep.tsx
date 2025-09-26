@@ -37,7 +37,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const [addBanner] = useAddBannerMutation()
   const [uploadPhoto] = useUploadPhotoMutation()
   const params = useParams() as { slug?: string }
-  const slug = (params?.slug as string) || ""
+  const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
 
   const handleLogoChange = (files: UploadedFile[]) => {
     const newData = { ...formData, logo: files[0] || null }
