@@ -42,11 +42,17 @@ export interface BusinessData {
   houseInfo: string
   localArea: string
   city: string
+  state: string
   postalCode: string
   country: string
   mobile: string
+  email: string
   website: string
+  youtubeVideo: string
   facebook: string
+  linkedin: string
+  instagram: string
+  twitter: string
   businessHours: {
     [key: string]: {
       isOpen: boolean
@@ -73,6 +79,7 @@ export function BusinessSetupWizard() {
   const [currentStep, setCurrentStep] = useState(0)
   const [showFullPreview, setShowFullPreview] = useState(false)
   const [isPublished, setIsPublished] = useState(false)
+  const [businessSlug, setBusinessSlug] = useState<string | null>(null)
 
   const defaultValues: BusinessData = {
     name: "",
@@ -88,11 +95,17 @@ export function BusinessSetupWizard() {
     houseInfo: "",
     localArea: "",
     city: "",
+    state: "",
     postalCode: "",
     country: "",
     mobile: "",
+    email: "",
     website: "",
+    youtubeVideo: "",
     facebook: "",
+    linkedin: "",
+    instagram: "",
+    twitter: "",
     businessHours: {
       Mon: { isOpen: false, openTime: "9:00 AM", closeTime: "6:00 PM" },
       Tue: { isOpen: false, openTime: "9:00 AM", closeTime: "6:00 PM" },
@@ -115,10 +128,17 @@ export function BusinessSetupWizard() {
     }))
   }
 
-  const nextStep = async () => {
+  const nextStep = async (data?: any) => {
     if (currentStep < STEPS.length - 1) {
-      if (currentStep === 3) {
-        await submitBusiness()
+      // If moving from step 2 (business hours), capture the data
+      if (currentStep === 2 && data) {
+        // Update all business hours data in a single state update to avoid multiple re-renders
+        setBusinessData((prev) => ({
+          ...prev,
+          businessHours: data.businessHours,
+          is24x7: data.is24x7,
+          closedOnHolidays: data.closedOnHolidays
+        }));
       }
       setCurrentStep(currentStep + 1)
     }
@@ -131,7 +151,8 @@ export function BusinessSetupWizard() {
       case 1: 
         return businessData.streetAddress && businessData.city && businessData.mobile
       case 2: 
-        return Object.values(businessData.businessHours).some(hours => hours.isOpen) || businessData.is24x7
+        // For step 2 (business hours), always allow next since we handle validation internally
+        return true
       case 3: 
         return true 
       default:
@@ -231,6 +252,7 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
             onPrev={prevStep}
             onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
+            businessSlug={businessSlug}
           />
         );
       case 4:
@@ -260,7 +282,12 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
               businessData={businessData}
               completionPercentage={Math.round(((currentStep + 1) / STEPS.length) * 100)}
               onPreviewClick={() => setShowFullPreview(true)}
-              onPublish={async () => {
+              onPrevious={prevStep}
+              onPublish={async (businessResult?: any) => {
+                // Store the business slug from the API response
+                if (businessResult?.slug) {
+                  setBusinessSlug(businessResult.slug);
+                }
                 setIsPublished(true);
               }}
             />
@@ -274,18 +301,35 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
 
   const submitBusiness = async () => {
     try {
-      const formData = businessData
-      console.log("Submitting business data:", formData)
-      // const response = await fetch("/api/business/setup", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(formData),
-      // })
-      // if (!response.ok) {
-      //   console.error("Failed to submit business data")
-      // }
+      // Prepare the final payload for the API
+      const payload = {
+        name: businessData.name,
+        tagline: businessData.tagline,
+        about: businessData.about,
+        startingDate: `${businessData.startingDate.year}-${businessData.startingDate.month}-${businessData.startingDate.day}`,
+        category: businessData.category,
+        streetAddress: businessData.streetAddress,
+        houseInfo: businessData.houseInfo,
+        localArea: businessData.localArea,
+        city: businessData.city,
+        postalCode: businessData.postalCode,
+        country: businessData.country,
+        mobile: businessData.mobile,
+        website: businessData.website,
+        facebook: businessData.facebook,
+        businessHours: businessData.businessHours,
+        is24x7: businessData.is24x7,
+        closedOnHolidays: businessData.closedOnHolidays,
+        // Media branding data will be handled separately if needed
+        mediaBranding: businessData.mediaBranding
+      }
+      
+      console.log("Submitting business data:", payload)
+      // This will be called from CompletionAndPublish component
+      return payload
     } catch (error) {
-      console.error("Error submitting business data", error)
+      console.error("Error preparing business data", error)
+      throw error
     }
   }
 

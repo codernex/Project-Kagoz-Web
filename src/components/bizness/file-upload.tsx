@@ -33,7 +33,7 @@ export default function FileUploader({
   required = false,
   max = 1,
   maxSizeMB = 10,
-  acceptedTypes = ["image/png", "image/jpeg", "image/jpg"],
+  acceptedTypes = ["image/png"],
   recommendedSize,
   value = [],
   onChange,

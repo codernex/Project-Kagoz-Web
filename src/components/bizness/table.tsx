@@ -121,7 +121,7 @@ export default function Table({
 
       {/* Pagination */}
       {pagination && setPage && (
-       <div className="flex justify-center items-center absolute bottom-0 left-0 right-0">
+       <div className="flex justify-center items-center mt-12">
          <Pagination totalPages={totalPages} page={page} setPage={setPage} />
          </div>
       )}

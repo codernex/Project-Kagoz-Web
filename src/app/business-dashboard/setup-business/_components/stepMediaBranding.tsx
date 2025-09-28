@@ -31,24 +31,22 @@ interface StepProps {
   onPrev: () => void
   onNext: () => void
   isNextDisabled?: boolean
+  businessSlug?: string | null
 }
 
-export function StepMediaBranding({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
+export function StepMediaBranding({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled, businessSlug }: StepProps) {
   const { slug } = useParams() as { slug?: string }
-  const [formData, setFormData] = useState<MediaBrandingData>({
-    logo: null,
-    banner: null,
-    license: [],
-    gallery: []
+  
+  // Media files will be submitted in CompletionAndPublish component
+  const [formData, setFormData] = useState<MediaBrandingData>(() => {
+    // Initialize from businessData if available
+    return businessData.mediaBranding || {
+      logo: null,
+      banner: null,
+      license: [],
+      gallery: []
+    }
   })
-  const [saving, setSaving] = useState(false)
-  const [addBanner] = useAddBannerMutation()
-  const [updateBusiness] = useUpdateBusinessMutation()
-  const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
-  const [uploadPhoto] = useUploadPhotoMutation()
-  const [updateLicense] = useUpdateLicenseMutation()
-  // Track last auto-sent license payload to avoid duplicate requests
-  const [lastLicenseSentKey, setLastLicenseSentKey] = useState<string | null>(null)
   
   const [errors, setErrors] = useState<{ 
     logo?: string
@@ -60,7 +58,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const handleLogoChange = (files: UploadedFile[]) => {
     const newData = { ...formData, logo: files[0] || null }
     setFormData(newData)
-    updateBusinessData('mediaBranding', newData)
+    // updateBusinessData is handled by useEffect
     
     if (errors.logo) {
       setErrors(prev => ({ ...prev, logo: undefined }))
@@ -70,7 +68,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const handleBannerChange = (files: UploadedFile[]) => {
     const newData = { ...formData, banner: files[0] || null }
     setFormData(newData)
-    updateBusinessData('mediaBranding', newData)
+    // updateBusinessData is handled by useEffect
     
     if (errors.banner) {
       setErrors(prev => ({ ...prev, banner: undefined }))
@@ -80,54 +78,22 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const handleLicenseChange = (files: UploadedFile[]) => {
     const newData = { ...formData, license: files }
     setFormData(newData)
-    updateBusinessData('mediaBranding', newData)
+    // updateBusinessData is handled by useEffect
     
     if (errors.license) {
       setErrors(prev => ({ ...prev, license: undefined }))
     }
   }
 
-  // Auto-upload trade license when both date and at least one file are present
+  // Update parent state when form data changes - removed updateBusinessData from dependencies to avoid infinite loops
   React.useEffect(() => {
-    const targetSlug = (slug || (businessData as any)?.slug) as string | undefined
-    const issue = (businessData as any)?.issueDate || { year: '', month: '', day: '' }
-    const monthMap: Record<string, number> = {
-      January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
-      July: 7, August: 8, September: 9, October: 10, November: 11, December: 12
-    }
-    const yearNum = Number.parseInt((issue?.year ?? '').toString(), 10)
-    const monthRaw = (issue?.month ?? '').toString()
-    const monthNum = monthMap[monthRaw as keyof typeof monthMap] ?? Number.parseInt(monthRaw, 10)
-    const dayNum = Number.parseInt((issue?.day ?? '').toString(), 10)
-    const isValidDateParts = Number.isFinite(yearNum) && Number.isFinite(monthNum) && Number.isFinite(dayNum)
-      && yearNum > 1900 && monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31
-
-    const firstLicense = formData.license?.[0]
-    const key = isValidDateParts && firstLicense ? `${yearNum}-${monthNum}-${dayNum}|${firstLicense.id}` : null
-
-    if (!targetSlug || !isValidDateParts || !firstLicense?.file) return
-    if (key && key === lastLicenseSentKey) return
-
-    const send = async () => {
-      try {
-        const ymd = `${String(yearNum).padStart(4, '0')}-${String(monthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
-        const licenseFd = new FormData()
-        licenseFd.append('date', ymd as any)
-        licenseFd.append('image', firstLicense.file as any)
-        await updateLicense({ slug: targetSlug, data: licenseFd }).unwrap()
-        setLastLicenseSentKey(key)
-      } catch (_) {
-        // swallow here; explicit error handling occurs on manual submit
-      }
-    }
-
-    void send()
-  }, [formData.license, businessData?.issueDate, slug, updateLicense, lastLicenseSentKey])
+    updateBusinessData('mediaBranding', formData)
+  }, [formData]) // Removed updateBusinessData from dependencies
 
   const handleGalleryChange = (files: UploadedFile[]) => {
     const newData = { ...formData, gallery: files }
     setFormData(newData)
-    updateBusinessData('mediaBranding', newData)
+    // updateBusinessData is handled by useEffect
     
     if (errors.gallery) {
       setErrors(prev => ({ ...prev, gallery: undefined }))
@@ -165,70 +131,14 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-    const targetSlug = slug || (businessData as any)?.slug
-    if (!targetSlug) { onNext(); return }
-
-    try {
-      setSaving(true)
-      
-      // Create a single FormData object for logo and banner
-      const fd = new FormData()
-      
-      // Add logo if present
-      if (formData.logo?.file) {
-        fd.append('logo', formData.logo.file as any)
-      }
-      
-      // Add banner if present
-      if (formData.banner?.file) {
-        fd.append('banner', formData.banner.file as any)
-      }
-      
-      // Send both logo and banner in a single request
-      if (formData.logo?.file || formData.banner?.file) {
-        await updateBusinessMedia({ slug: targetSlug, data: fd }).unwrap()
-      }
-
-      // Upload first license file with date if present
-      if (formData.license && formData.license.length > 0) {
-        const licenseFd = new FormData()
-        // Build date as YYYY-MM-DD, only if all parts are valid numbers
-        const issue = (businessData as any)?.issueDate || { year: '', month: '', day: '' }
-        const monthMap: Record<string, number> = {
-          January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
-          July: 7, August: 8, September: 9, October: 10, November: 11, December: 12
-        }
-        const yearNum = Number.parseInt((issue?.year ?? '').toString(), 10)
-        const monthRaw = (issue?.month ?? '').toString()
-        const monthNum = monthMap[monthRaw as keyof typeof monthMap] ?? Number.parseInt(monthRaw, 10)
-        const dayNum = Number.parseInt((issue?.day ?? '').toString(), 10)
-        const isValidDateParts = Number.isFinite(yearNum) && Number.isFinite(monthNum) && Number.isFinite(dayNum)
-          && yearNum > 1900 && monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31
-        if (isValidDateParts) {
-          const ymd = `${String(yearNum).padStart(4, '0')}-${String(monthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
-          licenseFd.append('date', ymd as any)
-        }
-        const firstLicense = formData.license[0] as UploadedFile
-        if (firstLicense?.file) {
-          licenseFd.append('image', firstLicense.file as any)
-        }
-        await updateLicense({ slug: targetSlug, data: licenseFd }).unwrap()
-      }
-
-      // Upload gallery images
-      if (formData.gallery && formData.gallery.length) {
-        for (const g of formData.gallery) {
-          const galleryFd = new FormData()
-          galleryFd.append('image', g.file as any)
-          await uploadPhoto({ slug: targetSlug, data: galleryFd }).unwrap()
-        }
-      }
-
-      onNext()
-    } finally {
-      setSaving(false)
-    }
+    
+    // Update parent state with media branding data
+    updateBusinessData('mediaBranding', formData)
+    
+    // Media files will be submitted in CompletionAndPublish component
+    onNext()
   }
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -356,7 +266,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                     : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
                 }`}
               >
-                <span>{saving ? "Saving..." : "Next"}</span>
+                <span>Next</span>
               </button>
             </div>
         </div>
@@ -507,6 +417,19 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
               </div>
               
               <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">License Documents</span>
+                {formData.license.length > 0 ? (
+                  <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                ) : (
+                  <span className="text-sm text-red-500">Required</span>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Gallery Images</span>
                 <span className="text-sm text-gray-700">{formData.gallery.length}/5 uploaded</span>
               </div>
@@ -518,7 +441,6 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
             <p className="text-[14px] text-gray-700 mb-1">
               Update your business card with logos, banners, and images instantly, giving you a sense of progress and ownership.
             </p>
-           
           </div>
         </div>
       </div>

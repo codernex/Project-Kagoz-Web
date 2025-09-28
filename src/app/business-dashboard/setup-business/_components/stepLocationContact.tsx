@@ -27,13 +27,13 @@ export function StepLocationContact({
 }: StepProps) {
   const { slug } = useParams() as { slug?: string }
   const { data: existingBusiness } = useGetBusinessBySlugQuery(slug as string, { skip: !slug })
-  const [updateBusiness, { isLoading }] = useUpdateBusinessMutation()
 
   type LocationContactInput = {
     streetAddress: string
     houseInfo: string
     localArea: string
     city: string
+    state: string
     postalCode: string
     country: string
     mobile: string
@@ -53,6 +53,7 @@ export function StepLocationContact({
     postalCode: api.postalCode || businessData.postalCode || "",
     streetAddress: api.streetAddress || businessData.streetAddress || "",
     website: api.website || businessData.website || "",
+    state: api.state || businessData.state || "",
   }
 
   const form = useForm<LocationContactInput>({
@@ -72,23 +73,9 @@ export function StepLocationContact({
   }, [form])
 
   const onSubmit: SubmitHandler<LocationContactInput> = async (d) => {
-    // reflect back to parent state
+    // Update parent state with form data
     Object.entries(d).forEach(([k, v]) => updateBusinessData(k, v))
-    // prefer slug from URL, fall back to parent state
-    const targetSlug = slug || (businessData as any)?.slug
-    if (!targetSlug) {
-      // no slug yet; skip remote update and just move next
-      onNext()
-      return
-    }
-    const formData = new FormData()
-    Object.entries(d).forEach(([key, value]) => formData.append(key, value as string))
-    try {
-      await updateBusiness({ slug: targetSlug, data: formData }).unwrap()
-      onNext()
-    } catch (_e) {
-   
-    }
+    onNext()
   }
 
   return (
@@ -135,6 +122,13 @@ export function StepLocationContact({
               label="City"
               width="100%"
               placeholder="Enter city"
+            />
+            <TextInput
+              name="state"
+              control={form.control}
+              label="State/Province"
+              width="100%"
+              placeholder="Enter state or province"
             />
             <TextInput
               name="postalCode"
@@ -187,15 +181,15 @@ export function StepLocationContact({
         </button>
         <button
           onClick={form.handleSubmit(onSubmit)}
-          disabled={!!isNextDisabled || isLoading}
-          aria-disabled={!!isNextDisabled || isLoading}
+          disabled={!!isNextDisabled}
+          aria-disabled={!!isNextDisabled}
           className={`flex items-center justify-center w-full rounded-[8px] px-6 py-[10px] transition-colors ${
-            isNextDisabled || isLoading
+            isNextDisabled
               ? "bg-[#CDD1D8] text-white cursor-not-allowed"
               : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
           }`}
         >
-          <span>{isLoading ? "Saving..." : "Next"}</span>
+          <span>Next</span>
         </button>
       </div>
         </div>
@@ -237,6 +231,7 @@ export function StepLocationContact({
                       <p className="text-gray-600">
                         {businessData.streetAddress}, {businessData.houseInfo},{" "}
                         {businessData.localArea}, {businessData.city},{" "}
+                        {businessData.state && `${businessData.state}, `}
                         {businessData.postalCode}, {businessData.country}
                       </p>
                     </div>

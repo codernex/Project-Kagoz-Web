@@ -32,21 +32,22 @@ interface StepProps {
   isNextDisabled?: boolean
 }
 
-export function StepBusinessInfo({ onPrev, onNext, updateBusinessData }: StepProps) {
+export function StepBusinessInfo({ businessData, onPrev, onNext, updateBusinessData }: StepProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [registerBusiness, { isLoading }] = useRegisterBusinessMutation()
   const { slug } = useParams() as { slug?: string }
 
   // fetch business data (skip if no slug on this route)
   const { data: existingBusiness } = useGetBusinessBySlugQuery(slug as string, { skip: !slug })
 
-  // form setup
+  // form setup - prioritize businessData from parent state
   const defaultValues: BusinessInfoInput = {
-    name: (existingBusiness as any)?.name || "",
-    tagline: (existingBusiness as any)?.tagline || "",
-    about: (existingBusiness as any)?.about || "",
-    startingDate: (existingBusiness as any)?.startingDate || "",
-    category: (existingBusiness as any)?.category || "",
+    name: businessData.name || (existingBusiness as any)?.name || "",
+    tagline: businessData.tagline || (existingBusiness as any)?.tagline || "",
+    about: businessData.about || (existingBusiness as any)?.about || "",
+    startingDate: businessData.startingDate.year && businessData.startingDate.month && businessData.startingDate.day 
+      ? `${businessData.startingDate.year}-${businessData.startingDate.month}-${businessData.startingDate.day}`
+      : (existingBusiness as any)?.startingDate || "",
+    category: businessData.category || (existingBusiness as any)?.category || "",
   }
 
   const form = useForm<BusinessInfoInput>({
@@ -58,21 +59,23 @@ export function StepBusinessInfo({ onPrev, onNext, updateBusinessData }: StepPro
 
   const onSubmit: SubmitHandler<BusinessInfoInput> = async (d) => {
     try {
-      const payload = {
-        ...d,
-        startingDate: typeof d.startingDate === "object"
-          ? `${(d.startingDate as any).year}-${(d.startingDate as any).month}-${(d.startingDate as any).day}`
-          : d.startingDate,
+      // Update parent state with form data
+      updateBusinessData("name", d.name)
+      updateBusinessData("tagline", d.tagline)
+      updateBusinessData("about", d.about)
+      updateBusinessData("category", d.category)
+      
+      // Handle starting date
+      if (typeof d.startingDate === "object") {
+        updateBusinessData("startingDate", d.startingDate)
+      } else if (typeof d.startingDate === "string" && d.startingDate.includes("-")) {
+        const [year, month, day] = d.startingDate.split("-")
+        updateBusinessData("startingDate", { year, month, day })
       }
-      const created = await registerBusiness(payload).unwrap()
-      // capture slug from response if available
-      const slug = (created as any)?.slug || (created as any)?.data?.slug || (created as any)?._id || (created as any)?.id
-      if (slug) {
-        updateBusinessData("slug", String(slug))
-      }
+      
       onNext()
     } catch (err) {
-      // errors handled by RTK
+      console.error("Error updating business data:", err)
     }
   }
 
@@ -190,14 +193,14 @@ export function StepBusinessInfo({ onPrev, onNext, updateBusinessData }: StepPro
           </div>
           <button
             type="submit"
-            disabled={!form.formState.isValid || isLoading}
+            disabled={!form.formState.isValid}
             className={`flex items-center w-full my-[26px] rounded-[8px] px-6 py-[12px]  ${
-              !form.formState.isValid || isLoading
+              !form.formState.isValid
                 ? "bg-gray-400 cursor-not-allowed text-white"
                 : "bg-[#6F00FF] hover:bg-purple-700 text-white"
             }`}
           >
-            <span className="mx-auto">{isLoading ? "Saving..." : "Next"}</span>
+            <span className="mx-auto">Next</span>
           </button>
         </div>
 

@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Clock, Copy, X, Calendar, ChevronLeft } from "lucide-react"
-import { JSX, useState, useEffect } from "react"
+import { JSX, useState } from "react"
 import { useParams } from "next/navigation"
-import { useSetOpeningHoursMutation } from "@/redux/api"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 const DAY_NAMES = {
@@ -37,74 +36,43 @@ interface StepProps {
   businessData: BusinessData
   updateBusinessData: (field: string, value: any) => void
   onPrev: () => void
-  onNext: () => void
+  onNext: (data?: any) => void
   isNextDisabled?: boolean
 }
 
 export function StepHours({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
   const { slug } = useParams() as { slug?: string }
-  const [setOpeningHours, { isLoading }] = useSetOpeningHoursMutation()
+  
+  // Initialize business hours state - simplified to avoid infinite loops
   const [businessHours, setBusinessHours] = useState<{ [key: string]: DayHours }>(() => {
-    // If businessData.businessHours exists, hydrate from it
-    if (businessData.businessHours && typeof businessData.businessHours === 'object') {
-      const hydrated: { [key: string]: DayHours } = {};
-      DAYS.forEach(day => {
-        const dayData = businessData.businessHours[day];
-        hydrated[day] = {
-          isOpen: dayData?.isOpen || false,
-          timeSlots: [
-            {
-              id: `${day}-1`,
-              startTime: dayData?.openTime || "12:00 AM",
-              endTime: dayData?.closeTime || "12:00 PM"
-            }
-          ]
-        };
-      });
-      return hydrated;
-    }
-    // Default fallback: all days open, slot 12:00 AM - 12:00 PM
     const hours: { [key: string]: DayHours } = {};
     DAYS.forEach(day => {
       hours[day] = {
-        isOpen: true,
+        isOpen: false, // Start with all days closed
         timeSlots: [{
           id: `${day}-1`,
-          startTime: "12:00 AM",
-          endTime: "12:00 PM"
+          startTime: "9:00 AM",
+          endTime: "6:00 PM"
         }]
       };
     });
     return hours;
   });
 
-  // Update business data when hours change
+  // Local state for toggles to avoid immediate parent updates
+  const [is24x7, setIs24x7] = useState(businessData.is24x7 || false);
+  const [closedOnHolidays, setClosedOnHolidays] = useState(businessData.closedOnHolidays || false);
+
+  // Update business data when hours change - simplified to avoid infinite loops
   const updateHours = (newHours: { [key: string]: DayHours }) => {
     setBusinessHours(newHours);
-    const formattedHours: { [key: string]: { isOpen: boolean; openTime: string; closeTime: string } } = {};
-    Object.entries(newHours).forEach(([day, hours]) => {
-      if (hours?.timeSlots && hours.timeSlots.length > 0) {
-        // For multiple time slots, combine them into a readable format
-        const timeRanges = hours.timeSlots.map(slot => `${slot.startTime} - ${slot.endTime}`).join(', ');
-        formattedHours[day] = {
-          isOpen: hours?.isOpen ?? false,
-          openTime: timeRanges,
-          closeTime: timeRanges // We'll use this field to store the full time range
-        };
-      } else {
-        formattedHours[day] = {
-          isOpen: hours?.isOpen ?? false,
-          openTime: "9:00 AM",
-          closeTime: "6:00 PM"
-        };
-      }
-    });
-    updateBusinessData("businessHours", formattedHours);
+    // Don't immediately update parent state to avoid infinite loops
+    // This will be handled in handleNext
   };
 
   // Handle 24/7 toggle
   const handle24x7Toggle = (checked: boolean) => {
-    updateBusinessData("is24x7", checked);
+    setIs24x7(checked);
     if (checked) {
       // When 24/7 is enabled, set all days to open
       const newHours: { [key: string]: DayHours } = {};
@@ -114,13 +82,13 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
           timeSlots: [{ id: `${day}-1`, startTime: "12:00 AM", endTime: "11:59 PM" }]
         };
       });
-      updateHours(newHours);
+      setBusinessHours(newHours);
     }
   };
 
   // Handle public holidays toggle
   const handleHolidaysToggle = (checked: boolean) => {
-    updateBusinessData("closedOnHolidays", checked);
+    setClosedOnHolidays(checked);
   };
 
   // Toggle day open/closed
@@ -128,7 +96,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
     const newHours = { ...businessHours };
     if (newHours[day]) {
       newHours[day]!.isOpen = !newHours[day]!.isOpen;
-      updateHours(newHours);
+      setBusinessHours(newHours);
     }
   };
 
@@ -143,7 +111,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
       startTime: "9:00 AM",
       endTime: "6:00 PM"
     });
-    updateHours(newHours);
+    setBusinessHours(newHours);
   };
 
   // Remove time slot from a day
@@ -151,7 +119,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
     const newHours = { ...businessHours };
     if (newHours[day]?.timeSlots) {
       newHours[day]!.timeSlots = newHours[day]!.timeSlots.filter(slot => slot.id !== slotId);
-      updateHours(newHours);
+      setBusinessHours(newHours);
     }
   };
 
@@ -161,7 +129,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
     const slot = newHours[day]?.timeSlots?.find(s => s.id === slotId);
     if (slot) {
       slot[field] = value;
-      updateHours(newHours);
+      setBusinessHours(newHours);
     }
   };
 
@@ -179,7 +147,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
         newHours[day]!.isOpen = true;
       }
     });
-    updateHours(newHours);
+    setBusinessHours(newHours);
   };
 
   // Generate time options
@@ -203,44 +171,6 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
   const timeOptions = generateTimeOptions();
   const hasSelectedDays = Object.values(businessHours || {}).some((day: DayHours) => !!day && day.isOpen === true);
 
-  // Initialize business hours on component mount
-  useEffect(() => {
-    if (!businessData.businessHours || Object.keys(businessData.businessHours).length === 0) {
-      updateHours(businessHours);
-    }
-  }, []);
-
-  // Set default hours for Fri-Sun as closed when closedOnHolidays is enabled
-  useEffect(() => {
-    if (businessData.closedOnHolidays && !businessData.is24x7) {
-      const newHours: { [key: string]: DayHours } = { ...businessHours };
-      DAYS.forEach(day => {
-        // Friday, Saturday, Sunday closed by default
-        if (["Fri", "Sat", "Sun"].includes(day)) {
-          newHours[day] = {
-            isOpen: false,
-            timeSlots: [{
-              id: `${day}-1`,
-              startTime: "12:00 AM",
-              endTime: "12:00 PM"
-            }]
-          };
-        } else {
-          newHours[day] = {
-            isOpen: true,
-            timeSlots: [{
-              id: `${day}-1`,
-              startTime: "12:00 AM",
-              endTime: "12:00 PM"
-            }]
-          };
-        }
-      });
-      setBusinessHours(newHours);
-      updateHours(newHours);
-    }
-  }, [businessData.closedOnHolidays, businessData.is24x7]);
-
   const parseTime = (t: string) => {
     const m = t?.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
     if (!m) {
@@ -251,36 +181,31 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
   };
 
   const handleNext = async () => {
-    const targetSlug = slug || (businessData as any)?.slug;
-    if (!targetSlug) {
-      onNext();
-      return;
-    }
-
-    let payload: any;
-    if (businessData.is24x7) {
-      payload = { isOpen247: true };
-    } else {
-      const days: any[] = [];
-      DAYS.forEach((abbr) => {
-        const conf = businessHours[abbr];
-        if (!conf?.isOpen) return;
-        const dayName = DAY_NAMES[abbr as keyof typeof DAY_NAMES];
-        const timeRanges = (conf.timeSlots || []).map((slot) => ({
-          from: parseTime(slot.startTime),
-          to: parseTime(slot.endTime),
-        }));
-        days.push({ day: dayName, isOpen: true, timeRanges });
-      });
-      payload = { days };
-    }
-
-    try {
-      await setOpeningHours({ slug: targetSlug, ...payload }).unwrap();
-      onNext();
-    } catch (_e) {
-      // handled by rtk toast
-    }
+    // Format the business hours data
+    const formattedHours: { [key: string]: { isOpen: boolean; openTime: string; closeTime: string } } = {};
+    Object.entries(businessHours).forEach(([day, hours]) => {
+      if (hours?.timeSlots && hours.timeSlots.length > 0) {
+        const timeRanges = hours.timeSlots.map(slot => `${slot.startTime} - ${slot.endTime}`).join(', ');
+        formattedHours[day] = {
+          isOpen: hours?.isOpen ?? false,
+          openTime: timeRanges,
+          closeTime: timeRanges
+        };
+      } else {
+        formattedHours[day] = {
+          isOpen: hours?.isOpen ?? false,
+          openTime: "9:00 AM",
+          closeTime: "6:00 PM"
+        };
+      }
+    });
+    
+    // Pass the data to the parent component
+    onNext({
+      businessHours: formattedHours,
+      is24x7: is24x7,
+      closedOnHolidays: closedOnHolidays
+    });
   };
 
   return (
@@ -300,7 +225,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
           </Label>
           <div className="grid grid-cols-4 gap-[10px] mb-4">
             {DAYS.map((day) => {
-              const bothOff = !businessData.is24x7 && !businessData.closedOnHolidays;
+              const bothOff = !is24x7 && !closedOnHolidays;
               const isActive = businessHours[day]?.isOpen && !bothOff;
               return (
                 <button
@@ -327,7 +252,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
           <div className="space-y-4">
             <div className="flex items-center ">
               <Switch
-                checked={businessData.is24x7}
+                checked={is24x7}
                 onCheckedChange={handle24x7Toggle}
               />
               <Label className="ml-[12px] text-[14px] text-[#353535] font-normal">24/7 Open</Label>
@@ -335,7 +260,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
             
             <div className="flex items-center ">
               <Switch
-                checked={businessData.closedOnHolidays}
+                checked={closedOnHolidays}
                 onCheckedChange={handleHolidaysToggle}
               />
               <Label className="ml-[12px] text-[14px] text-[#353535] font-normal">Closed on Public Holidays</Label>
@@ -349,7 +274,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
         </div>
 
             {/* Only show slots if closedOnHolidays is ON and is24x7 is OFF */}
-            {!businessData.is24x7 && businessData.closedOnHolidays && hasSelectedDays && (
+            {!is24x7 && closedOnHolidays && hasSelectedDays && (
               <div>
                 <h3 className="text-[16px] text-[#111827] font-medium mb-4">Opening Hours</h3>
                 <div className="space-y-4">
@@ -431,7 +356,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
                     : "bg-[#6F00FF] text-white hover:bg-[#6F00FF]"
                 }`}
               >
-                <span>{isLoading ? "Saving..." : "Next"}</span>
+                <span>Next</span>
               </button>
             </div>
       </div>
