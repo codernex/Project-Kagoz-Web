@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Calendar, Copy, X, Clock, ArrowRight } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import {  Copy, X, Clock } from "lucide-react"
+
 import { useSetOpeningHoursMutation } from "@/redux/api/business"
 import { useParams } from "next/navigation"
 
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+const days: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 const dayAbbr = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 // Generate time options from 12:00 AM to 11:59 PM
@@ -33,6 +33,100 @@ const generateTimeOptions = () => {
 
 const timeOptions = generateTimeOptions()
 
+// Transform form data to API format
+const transformToApiFormat = (formData: BusinessHoursData) => {
+  if (formData.is24Hours) {
+    // If 24/7, send only isOpen247
+    return {
+      isOpen247: true
+    }
+  } else {
+    // If not 24/7, send detailed days structure
+    const daysArray: any[] = []
+    
+    Object.entries(formData.businessHours).forEach(([day, schedule]) => {
+      if (schedule.isOpen) {
+        const timeRanges = schedule.slots.map(slot => ({
+          from: slot.start,
+          to: slot.end
+        }))
+        
+        daysArray.push({
+          day: day,
+          isOpen: true,
+          timeRanges: timeRanges
+        })
+      } else {
+        daysArray.push({
+          day: day,
+          isOpen: false,
+          timeRanges: []
+        })
+      }
+    })
+    
+    return {
+      isOpen247: false,
+      days: daysArray
+    }
+  }
+}
+
+// Transform API data to form format
+const transformFromApiFormat = (apiData: any, daysList: string[]): BusinessHoursData => {
+  if (apiData?.isOpen247) {
+    // If 24/7, set all days as open with default hours
+    const businessHours: Record<string, DaySchedule> = {}
+    daysList.forEach(day => {
+      businessHours[day] = {
+        isOpen: true,
+        slots: [{ start: "9:00 AM", end: "6:00 PM" }]
+      }
+    })
+    
+    return {
+      is24Hours: true,
+      closedOnHolidays: false,
+      businessHours: businessHours
+    }
+  } else if (apiData?.days) {
+    // If detailed days structure, parse it
+    const businessHours: Record<string, DaySchedule> = {}
+    
+    apiData.days.forEach((dayData: any) => {
+      const dayName = dayData.day
+      if (dayData.isOpen && dayData.timeRanges?.length > 0) {
+        const slots = dayData.timeRanges.map((range: any) => ({
+          start: range.from,
+          end: range.to
+        }))
+        businessHours[dayName] = {
+          isOpen: true,
+          slots: slots
+        }
+      } else {
+        businessHours[dayName] = {
+          isOpen: false,
+          slots: []
+        }
+      }
+    })
+    
+    return {
+      is24Hours: false,
+      closedOnHolidays: false,
+      businessHours: businessHours
+    }
+  }
+  
+  // Default fallback
+  return {
+    is24Hours: false,
+    closedOnHolidays: false,
+    businessHours: {}
+  }
+}
+
 interface TimeSlot {
   start: string
   end: string
@@ -51,38 +145,56 @@ interface BusinessHoursData {
 
 interface BusinessHoursStepProps {
   data: BusinessHoursData
+  businessData?: any // Main business data from parent
   onUpdate: (data: BusinessHoursData) => void
   onNext: () => void
   onBack: () => void
 }
 
-export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: BusinessHoursStepProps) {
+export default function BusinessHoursStep({ data, businessData, onUpdate, onNext, onBack }: BusinessHoursStepProps) {
   const [formData, setFormData] = useState<BusinessHoursData>(data)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [setOpeningHours] = useSetOpeningHoursMutation()
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
+  const hasLoadedData = useRef(false)
+  
+  // Get opening hours from main business data
+  const existingHours = businessData?.openingHours || businessData?.businessHours
+  
+  console.log("🚀 Business Data from main API:", businessData)
+  console.log("🚀 Opening Hours from business data:", existingHours)
 
-  // Initialize business hours if not already set
+  // Load existing business hours from main business data
   useEffect(() => {
-    const initializedData = { ...formData }
-    let needsUpdate = false
+    if (existingHours && existingHours.length > 0) {
+      console.log("📋 Loading existing business hours from main business data")
+      const apiData = transformFromApiFormat(existingHours, days)
+      console.log("📋 Transformed business data to form format:", apiData)
+      setFormData(apiData)
+      onUpdate(apiData)
+    } else if (businessData && !existingHours) {
+      // If business data exists but no opening hours, use default
+      console.log("📋 No opening hours found, using default values")
+      const initializedData = { ...formData }
+      let needsUpdate = false
 
-    days.forEach(day => {
-      if (!initializedData.businessHours[day]) {
-        initializedData.businessHours[day] = {
-          isOpen: day !== "Friday", // Default: closed on Friday
-          slots: [{ start: "9:00 AM", end: "6:00 PM" }]
+      days.forEach(day => {
+        if (!initializedData.businessHours[day]) {
+          initializedData.businessHours[day] = {
+            isOpen: day !== "Friday", // Default: closed on Friday
+            slots: [{ start: "9:00 AM", end: "6:00 PM" }]
+          }
+          needsUpdate = true
         }
-        needsUpdate = true
-      }
-    })
+      })
 
-    if (needsUpdate) {
-      setFormData(initializedData)
-      onUpdate(initializedData)
+      if (needsUpdate) {
+        setFormData(initializedData)
+        onUpdate(initializedData)
+      }
     }
-  }, [])
+  }, [businessData, existingHours]) // Removed onUpdate from dependencies
 
   const validateTimeSlot = (start: string, end: string): boolean => {
     const startTime = new Date(`2000-01-01 ${start}`)
@@ -239,11 +351,9 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
   const handleNext = async () => {
     if (!validateForm()) return
     try {
-      const payload = {
-        businessHours: formData.businessHours,
-        is24Hours: formData.is24Hours,
-        closedOnHolidays: formData.closedOnHolidays,
-      }
+      // Transform data to match API structure
+      const payload = transformToApiFormat(formData)
+      console.log("🚀 Business Hours API Payload:", payload)
       await setOpeningHours({ slug, ...payload }).unwrap()
       onNext()
     } catch (e) {
@@ -254,11 +364,9 @@ export default function BusinessHoursStep({ data, onUpdate, onNext, onBack }: Bu
   const handleSaveAndBack = async () => {
     if (!validateForm()) return
     try {
-      const payload = {
-        businessHours: formData.businessHours,
-        is24Hours: formData.is24Hours,
-        closedOnHolidays: formData.closedOnHolidays,
-      }
+      // Transform data to match API structure
+      const payload = transformToApiFormat(formData)
+      console.log("🚀 Business Hours API Payload:", payload)
       await setOpeningHours({ slug, ...payload }).unwrap()
       onBack()
     } catch (e) {

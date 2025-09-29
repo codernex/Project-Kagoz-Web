@@ -73,8 +73,15 @@ export function StepLocationContact({
   }, [form])
 
   const onSubmit: SubmitHandler<LocationContactInput> = async (d) => {
+    // Debug: Log form data before updating parent state
+    console.log("LocationContact form data:", d);
+    console.log("State value:", d.state);
+    
     // Update parent state with form data
-    Object.entries(d).forEach(([k, v]) => updateBusinessData(k, v))
+    Object.entries(d).forEach(([k, v]) => {
+      console.log(`Updating ${k} with value:`, v);
+      updateBusinessData(k, v || "")
+    })
     onNext()
   }
 

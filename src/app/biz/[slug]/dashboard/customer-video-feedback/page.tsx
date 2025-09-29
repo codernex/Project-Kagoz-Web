@@ -12,10 +12,10 @@ import { useActivatePremiumFeatureMutation, useAddVideoFeedbackMutation, useGetV
 import { CreateVideoFeedback, CreateVideoFeedbackSchema } from "@/schema/video-feedback";
 import { FeatureType } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { XIcon } from "lucide-react";
+import { XIcon, Star, Upload, Building2, User, Play } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Player from "react-player/youtube";
 
@@ -25,10 +25,15 @@ export default function CustomerVideoFeedback() {
   const [videoUrl, setVideoUrl] = useState("");
   const [openPlayer, setOpenPlayer] = useState(false);
   const [showRemoveBtn, setShowRemoveBtn] = useState(false)
+  const [editingVideo, setEditingVideo] = useState<any>(null)
 
   const form = useForm<CreateVideoFeedback>({
     defaultValues: {
-      url: ''
+      name: '',
+      companyName: '',
+      url: '',
+      rating: 1,
+      logo: null
     },
     resolver: zodResolver(CreateVideoFeedbackSchema)
   })
@@ -47,10 +52,52 @@ export default function CustomerVideoFeedback() {
    */
   const [addVideo, { isLoading: videoAddLoading }] = useAddVideoFeedbackMutation()
 
-  const onSubmit: SubmitHandler<CreateVideoFeedback> = (d) => {
-    addVideo({ ...d, slug })
-    form.reset()
-    setOpen(false)
+  // Populate form when editing a video
+  useEffect(() => {
+    if (editingVideo) {
+      form.reset({
+        name: editingVideo.customerName || '',
+        companyName: editingVideo.companyName || '',
+        url: editingVideo.videoUrl || '',
+        rating: editingVideo.rating || 1,
+        logo: null // We don't pre-populate file uploads
+      });
+    } else {
+      form.reset({
+        name: '',
+        companyName: '',
+        url: '',
+        rating: 1,
+        logo: null
+      });
+    }
+  }, [editingVideo, form]);
+
+  const onSubmit: SubmitHandler<CreateVideoFeedback> = async (data) => {
+    try {
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      
+      // Add text fields
+      formData.append('name', data.name);
+      formData.append('url', data.url);
+      formData.append('rating', data.rating.toString());
+      
+      if (data.companyName) {
+        formData.append('companyName', data.companyName);
+      }
+      
+      // Add logo file if provided
+      if (data.logo && data.logo instanceof File) {
+        formData.append('logo', data.logo);
+      }
+      
+      await addVideo({ slug, data: formData }).unwrap();
+      form.reset();
+      setOpen(false);
+    } catch (error) {
+      console.error('Error submitting video feedback:', error);
+    }
   }
 
   /**
@@ -82,7 +129,12 @@ export default function CustomerVideoFeedback() {
         </div>
         <Button
           disabled={!data?.hasFeatureActive}
-          className="h-16 bg-black rounded-sm" onClick={() => setOpen(true)}>
+          className="h-16 bg-black rounded-sm" 
+          onClick={() => {
+            setEditingVideo(null);
+            setOpen(true);
+          }}
+        >
           Add Feedback
         </Button>
       </div>
@@ -91,30 +143,152 @@ export default function CustomerVideoFeedback() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl !rounded-xs">
           <DialogHeader>
-            <DialogTitle className="!text-black text-mdx">Add new video feedback</DialogTitle>
+            <DialogTitle className="!text-black text-mdx">
+              {editingVideo ? 'Edit video feedback' : 'Add new video feedback'}
+            </DialogTitle>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Customer Name */}
               <FormField
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>
-                        Video Url (youtube) *
-                      </FormLabel>
-                      <FormDescription className="!text-muted text-xsm">
-                        You can copy the url from youtube search bar, or you can click share button below the video
-                      </FormDescription>
-                      <FormControl>
-                        <Input placeholder="eg: https://www.youtube.com/watch?v=yk52rBqJ4nQ " {...field} />
-                      </FormControl>
-                      <FormMessage className="!text-red-500 text-xsm" />
-                    </FormItem>
-                  )
-                }}
-                control={form.control} name="url" />
-              <CustomButton isLoading={videoAddLoading} className="h-16 bg-black rounded-sm">
-                Submit
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Customer Name *
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Customer Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Company Name */}
+              <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4" />
+                      Company Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Company Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Customer Image/Logo Upload */}
+              <FormField
+                control={form.control}
+                name="logo"
+                render={({ field: { onChange, value, ...field } }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Upload className="w-4 h-4" />
+                      Customer Image/Logo
+                    </FormLabel>
+                    <FormDescription className="text-sm text-gray-500">
+                      PNG up to 10MB • Recommended size: 500x500 px
+                    </FormDescription>
+                    <FormControl>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => onChange(e.target.files?.[0] || null)}
+                          className="hidden"
+                          id="logo-upload"
+                          {...field}
+                        />
+                        <label htmlFor="logo-upload" className="cursor-pointer">
+                          <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                          <p className="text-sm text-gray-600">
+                            Drop your image here or click to browse
+                          </p>
+                        </label>
+                        {value && (
+                          <div className="mt-2">
+                            <p className="text-sm text-green-600">File selected: {value.name}</p>
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* YouTube Link */}
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Play className="w-4 h-4" />
+                      YouTube Link *
+                    </FormLabel>
+                    <FormDescription className="text-sm text-gray-500">
+                      You can copy the url from youtube search bar, or you can click share button below the video
+                    </FormDescription>
+                    <FormControl>
+                      <Input placeholder="Paste Youtube link" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Rating */}
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Star className="w-4 h-4" />
+                      Rating *
+                    </FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => field.onChange(star)}
+                            className={`p-1 ${
+                              star <= field.value
+                                ? 'text-yellow-400'
+                                : 'text-gray-300'
+                            } hover:text-yellow-400 transition-colors`}
+                          >
+                            <Star className="w-6 h-6 fill-current" />
+                          </button>
+                        ))}
+                        <span className="ml-2 text-sm text-gray-600">
+                          {field.value} star{field.value !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <CustomButton 
+                type="submit" 
+                isLoading={videoAddLoading} 
+                className="w-full h-12 bg-black rounded-sm"
+              >
+                {editingVideo ? 'Update Feedback' : 'Submit Feedback'}
               </CustomButton>
             </form>
           </Form>
@@ -170,10 +344,23 @@ export default function CustomerVideoFeedback() {
                     />
                   </svg>
                 </div>
-                <XIcon onClick={() => {
-                  console.log("Hello");
-
-                }} className={cn('absolute z-30 top-0 right-0 text-white cursor-pointer', showRemoveBtn ? 'visible' : 'hidden')} />
+                <div className="absolute z-30 top-2 right-2 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setEditingVideo(video);
+                      setOpen(true);
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white p-1 rounded-full transition-colors"
+                    title="Edit video feedback"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <XIcon onClick={() => {
+                    console.log("Delete video:", video.id);
+                  }} className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full cursor-pointer transition-colors" />
+                </div>
               </div>
             )
           })

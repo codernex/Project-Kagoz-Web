@@ -57,13 +57,50 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, updateBusinessD
     reValidateMode: "onChange"
   })
 
+  // Add form validation rules
+  const validateForm = () => {
+    const values = form.getValues()
+    const errors: any = {}
+    
+    if (!values.name || values.name.trim() === '') {
+      errors.name = 'Business name is required'
+    }
+    
+    if (!values.tagline || values.tagline.trim() === '') {
+      errors.tagline = 'Tagline is required'
+    }
+    
+    if (!values.about || values.about.trim() === '') {
+      errors.about = 'About section is required'
+    }
+    
+    // Fix startingDate validation - handle both string and object formats
+    if (!values.startingDate) {
+      errors.startingDate = 'Starting date is required'
+    } else if (typeof values.startingDate === 'string' && values.startingDate.trim() === '') {
+      errors.startingDate = 'Starting date is required'
+    } else if (typeof values.startingDate === 'object' && values.startingDate !== null) {
+      const dateObj = values.startingDate as { year?: string; month?: string; day?: string }
+      if (!dateObj.year || !dateObj.month || !dateObj.day) {
+        errors.startingDate = 'Starting date is required'
+      }
+    }
+    
+    return Object.keys(errors).length === 0
+  }
+
   const onSubmit: SubmitHandler<BusinessInfoInput> = async (d) => {
     try {
       // Update parent state with form data
       updateBusinessData("name", d.name)
       updateBusinessData("tagline", d.tagline)
       updateBusinessData("about", d.about)
-      updateBusinessData("category", d.category)
+      
+      // Find the category name from the selected category ID
+      const selectedCategory = categories.find(cat => cat.value === d.category)
+      const categoryName = selectedCategory ? selectedCategory.label : d.category
+      
+      updateBusinessData("category", categoryName)
       
       // Handle starting date
       if (typeof d.startingDate === "object") {
@@ -153,7 +190,11 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, updateBusinessD
                   <FormLabel>Business Category</FormLabel>
                   <Select
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      // Also update the form state immediately
+                      form.setValue("category", value);
+                    }}
                   >
                     <SelectTrigger className="w-full h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E] focus:ring-2 focus:ring-[#23272E] placeholder:text-[#6B7280] shadow-sm">
                       <SelectValue placeholder="Search categories..." />
@@ -193,15 +234,16 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, updateBusinessD
           </div>
           <button
             type="submit"
-            disabled={!form.formState.isValid}
+            disabled={!validateForm()}
             className={`flex items-center w-full my-[26px] rounded-[8px] px-6 py-[12px]  ${
-              !form.formState.isValid
+              !validateForm()
                 ? "bg-gray-400 cursor-not-allowed text-white"
                 : "bg-[#6F00FF] hover:bg-purple-700 text-white"
             }`}
           >
             <span className="mx-auto">Next</span>
           </button>
+          
         </div>
 
         {/* Right side preview */}

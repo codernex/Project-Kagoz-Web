@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Table from "@/components/bizness/table"
-import { Button } from "@/components/ui/button"
+
 import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business"
 import { useAuth } from "@/context/AuthContext"
 
@@ -17,6 +17,20 @@ interface Business {
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
   const { isAuth } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Get page from URL parameters on component mount
+  useEffect(() => {
+    const pageParam = searchParams.get('page')
+    if (pageParam) {
+      const pageNumber = parseInt(pageParam, 10)
+      if (!isNaN(pageNumber) && pageNumber > 0) {
+        setCurrentPage(pageNumber)
+      }
+    }
+  }, [searchParams])
+
   const { data: businessData, isLoading, isFetching, refetch } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: currentPage }, { skip: !isAuth })
 console.log(businessData)
   const columns = [
@@ -27,13 +41,25 @@ console.log(businessData)
     },
   ];
 
-  const tableRows = (businessData?.business ?? []).map((b) => ({
+  const tableRows = (businessData?.business ?? []).map((b: IBusiness) => ({
     id: b.id,
     name: b.name,
+    slug: b.slug, // Add slug to the row data
     status: b.isApproved ? "Active" : "Pending",
   }))
 
-  const route = useRouter();
+  const handleEditClick = (row: any) => {
+    router.push(`/business-dashboard/edit-business/${row.slug}`)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Update URL with new page parameter
+    const url = new URL(window.location.href)
+    url.searchParams.set('page', page.toString())
+    router.push(url.pathname + url.search)
+  }
+
   return (
     <main className="p-4 lg:p-8">
       <Table
@@ -45,18 +71,18 @@ console.log(businessData)
           <button
             className="bg-[#6F00FF] text-white px-[20px] py-[10px] rounded-[8px] font-medium text-sm flex items-center gap-2  transition"
             onClick={() => {
-              route.push("/business-dashboard/setup-business");
+              router.push("/business-dashboard/setup-business");
             }}
           >
             + Add Business
           </button>
         }
-        onEdit={(row) => route.push(`/business-dashboard/edit-business/${row.name}-${row.id}`)}
+        onEdit={handleEditClick}
         indexed
         pagination
         totalPages={businessData?.totalPages ?? 1}
         page={businessData?.currentPage ?? currentPage}
-        setPage={setCurrentPage}
+        setPage={handlePageChange}
       />
     </main>
   )

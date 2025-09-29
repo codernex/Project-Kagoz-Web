@@ -28,6 +28,12 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
   const route = useRouter();
+
+  // Debug: Log form state on component mount
+  console.log("🔍 BusinessInfoStep - Form values on mount:", form.getValues())
+  console.log("🔍 BusinessInfoStep - Data prop:", data)
+  console.log("🔍 BusinessInfoStep - Form watch all:", form.watch())
+  console.log("🔍 BusinessInfoStep - Form errors:", form.formState.errors)
   const categories = [
     { value: "pharmacy", label: "Pharmacy" },
     { value: "restaurant", label: "Restaurant" },
@@ -62,26 +68,51 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
   )
 
   const handleNext = async (values: any) => {
+    // Get the current form values directly from the form
+    const currentFormValues = form.getValues()
+    
+    // Check if form has any data
+    const hasData = currentFormValues.name || currentFormValues.tagline || currentFormValues.about || currentFormValues.category
+    
+    console.log("🔍 Form values being submitted:", values)
+    console.log("🔍 Form current values:", currentFormValues)
+    console.log("🔍 Form has data:", hasData)
+    
+    if (!hasData) {
+      console.error("❌ Form has no data! Form values:", currentFormValues)
+      alert("Form has no data. Please check if the business data is loaded correctly.")
+      return
+    }
+    
     if (onUpdate) {
       onUpdate({
-        businessName: values?.name ?? "",
-        tagline: values?.tagline ?? "",
-        about: values?.about ?? "",
+        businessName: currentFormValues?.name ?? "",
+        tagline: currentFormValues?.tagline ?? "",
+        about: currentFormValues?.about ?? "",
         startYear: "",
         startMonth: "",
         startDay: "",
-        category: values?.category ?? "",
+        category: currentFormValues?.category ?? "",
       })
     }
 
     const formData = new FormData()
     ;[
-      ["name", values?.name ?? ""],
-      ["tagline", values?.tagline ?? ""],
-      ["about", values?.about ?? ""],
-      ["startingDate", values?.startingDate ?? ""],
-      ["category", values?.category ?? ""],
-    ].forEach(([k, v]) => formData.append(k as string, v as string))
+      ["name", currentFormValues?.name ?? ""],
+      ["tagline", currentFormValues?.tagline ?? ""],
+      ["about", currentFormValues?.about ?? ""],
+      ["startingDate", currentFormValues?.startingDate ?? ""],
+      ["category", currentFormValues?.category ?? ""],
+    ].forEach(([k, v]) => {
+      console.log(`🔍 Adding to FormData: ${k} = ${v}`)
+      formData.append(k as string, v as string)
+    })
+
+    // Debug: Log the FormData contents
+    console.log("🔍 FormData contents:")
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`)
+    }
 
     try {
       await updateBusiness({ slug, data: formData }).unwrap()
@@ -90,6 +121,13 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
       
       console.error("Failed to save business info", e)
     }
+  }
+
+  // Debug: Add a test button to see current form values
+  const testFormValues = () => {
+    console.log("🔍 Test - Current form values:", form.getValues())
+    console.log("🔍 Test - Form is valid:", form.formState.isValid)
+    console.log("🔍 Test - Form errors:", form.formState.errors)
   }
 
   return (
@@ -147,6 +185,7 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
           control={form.control}
         />
 
+
         {/* Business Category */}
         <FormField
           control={form.control}
@@ -194,13 +233,24 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
           )}
         />
 
+        {/* Debug Test Button */}
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={testFormValues}
+            className="px-4 py-2 bg-yellow-500 text-white rounded"
+          >
+            Test Form Values (Debug)
+          </button>
+        </div>
+
         {/* Buttons */}
           <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
         <button
           disabled={isSubmitting}
           onClick={() => {
             setIsSubmitting(true);
-            route.push('/business-dashboard/businesses');
+            route.push('/business-dashboard');
           }}
           className="lg:px-20 px-4 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >

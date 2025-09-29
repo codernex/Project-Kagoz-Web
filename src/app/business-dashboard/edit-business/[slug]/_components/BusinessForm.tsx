@@ -7,7 +7,6 @@ import LocationContactStep from "./LocationContactStep"
 import BusinessHoursStep from "./BusinessHoursStep"
 import MediaBrandingStep from "./MediaBrandingStep"
 import { useForm } from "react-hook-form"
-import { useGetBusinessBySlugQuery, useGetBusinessByCurrentUserQuery } from "@/redux/api/business"
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -61,6 +60,8 @@ interface MediaBrandingData {
   logo: UploadedFile | null
   banner: UploadedFile | null
   gallery: UploadedFile[]
+  tradeLicense: UploadedFile | null
+  tradeLicenseExpireDate: string
 }
 
 interface FormData {
@@ -99,6 +100,8 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
       mobile: "",
       website: "",
       facebook: "",
+      tradeLicenseUrl: "",
+      tradeLicenseExpireDate: ""
     },
   })
 
@@ -137,11 +140,13 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
         {} as Record<string, DaySchedule>,
       ),
     },
-    mediaBranding: {
-      logo: null,
-      banner: null,
-      gallery: []
-    }
+     mediaBranding: {
+       logo: null,
+       banner: null,
+       gallery: [],
+       tradeLicense: null,
+       tradeLicenseExpireDate: ""
+     }
   })
 
   const tabs = [
@@ -151,23 +156,9 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
     "Media & Business Branding",
   ]
 
-  // Use passed business data or fetch if not provided
-  const isLikelyObjectId = typeof businessId === 'string' && /^[a-f\d]{24}$/i.test(businessId)
-  const slugQuery = useGetBusinessBySlugQuery(
-    businessId || "",
-    { skip: mode !== 'edit' || !businessId || isLikelyObjectId || !!businessData }
-  )
-
-  const userBizQuery = useGetBusinessByCurrentUserQuery(
-    { page: 1, limit: 100, all: true },
-    { skip: mode !== 'edit' || !businessId || !isLikelyObjectId || !!businessData }
-  )
-
-  const fetchedBusiness = businessData || 
-    slugQuery?.data ||
-    (userBizQuery?.data?.business as any[])?.find((b: any) => b?._id === businessId || b?.id === businessId || b?.slug === businessId) ||
-    null
-  const isFetching = !businessData && (slugQuery?.isFetching || userBizQuery?.isFetching || false)
+  // Use the passed business data directly since we're fetching it in the parent component
+  const fetchedBusiness = businessData
+  const isFetching = false // No need to fetch here since parent component handles it
 
   useEffect(() => {
     const loading = mode === 'edit' && !!businessId && isFetching
@@ -177,36 +168,90 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
   useEffect(() => {
     if (fetchedBusiness) {
       const b = fetchedBusiness as any
+      
+      // Parse starting date if available
+      let startYear = "", startMonth = "", startDay = ""
+      if (b?.startingDate) {
+        const dateParts = b.startingDate.split('-')
+        if (dateParts.length === 3) {
+          startYear = dateParts[0]
+          startMonth = dateParts[1]
+          startDay = dateParts[2]
+        }
+      }
+      
       const transformed: FormData = {
         businessInfo: {
           businessName: b?.name || "",
           tagline: b?.tagline || "",
           about: b?.about || "",
-          startYear: "",
-          startMonth: "",
-          startDay: "",
-          category: b?.category || "",
+          startYear: startYear,
+          startMonth: startMonth,
+          startDay: startDay,
+          category: b?.primaryCategory || b?.category || "",
         },
         locationContact: {
-          streetAddress: b?.address?.streetAddress || b?.streetAddress || "",
-          houseRoad: b?.address?.houseRoad || b?.houseRoad || "",
-          localArea: b?.address?.localArea || b?.localArea || "",
-          city: b?.address?.city || b?.city || "",
-          postalCode: b?.address?.postalCode || b?.postalCode || "",
-          country: b?.address?.country || b?.country || "",
-          mobile: b?.contact?.mobile || b?.mobile || "",
-          website: b?.contact?.website || b?.website || "",
-          facebook: b?.contact?.facebook || b?.facebook || "",
+          streetAddress: b?.streetAddress || "",
+          houseRoad: b?.house || "",
+          localArea: b?.localArea || "",
+          city: b?.city || "",
+          postalCode: b?.postalCode || "",
+          country: b?.country || "",
+          mobile: b?.mobile || "",
+          website: b?.website || "",
+          facebook: b?.facebook || "",
         },
-        businessHours: formData.businessHours,
-        mediaBranding: formData.mediaBranding,
+        businessHours: {
+          is24Hours: false, // Default values, will be updated from API if available
+          closedOnHolidays: true,
+          businessHours: days.reduce(
+            (acc, day) => {
+              acc[day] = {
+                isOpen: day !== "Friday",
+                slots: [{ start: "9:00 AM", end: "6:00 PM" }],
+              }
+              return acc
+            },
+            {} as Record<string, DaySchedule>,
+          ),
+        },
+         mediaBranding: {
+           logo: b?.logoUrl ? { 
+             id: 'existing-logo',
+             file: null as any, 
+             preview: b.logoUrl,
+             name: b.logoUrl.split('/').pop() || 'logo.png',
+             size: '0 KB'
+           } : null,
+           banner: b?.bannerUrl ? { 
+             id: 'existing-banner',
+             file: null as any, 
+             preview: b.bannerUrl,
+             name: b.bannerUrl.split('/').pop() || 'banner.png',
+             size: '0 KB'
+           } : null,
+           gallery: [],
+           tradeLicense: b?.tradeLicenseUrl ? {
+             id: 'existing-trade-license',
+             file: null as any,
+             preview: b.tradeLicenseUrl,
+             name: b.tradeLicenseUrl.split('/').pop() || 'trade-license.pdf',
+             size: '0 KB'
+           } : null,
+           tradeLicenseExpireDate: b?.tradeLicenseExpireDate || ""
+         },
       }
+      
       setFormData(transformed)
-      rhfForm.reset({
+      
+      // Reset react-hook-form with the fetched data
+      const resetValues = {
         name: transformed.businessInfo.businessName,
         tagline: transformed.businessInfo.tagline,
         about: transformed.businessInfo.about,
-        startingDate: `${transformed.businessInfo.startYear}-${transformed.businessInfo.startMonth}-${transformed.businessInfo.startDay}`.replace(/--/g, ""),
+        startingDate: startYear && startMonth && startDay 
+          ? `${startYear}-${startMonth}-${startDay}` 
+          : b?.startingDate || "",
         category: transformed.businessInfo.category,
         streetAddress: transformed.locationContact.streetAddress,
         houseRoad: transformed.locationContact.houseRoad,
@@ -217,7 +262,42 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
         mobile: transformed.locationContact.mobile,
         website: transformed.locationContact.website,
         facebook: transformed.locationContact.facebook,
+        tradeLicenseUrl: b?.tradeLicenseUrl || "",
+        tradeLicenseExpireDate: b?.tradeLicenseExpireDate || "",
+      }
+      
+      console.log("🔍 BusinessForm - Resetting form with values:", resetValues)
+      rhfForm.reset(resetValues)
+      
+      // Debug: Check form values after reset
+      setTimeout(() => {
+        console.log("🔍 BusinessForm - Form values after reset:", rhfForm.getValues())
+      }, 100)
+      
+      console.log("📋 BusinessForm - Processing API Data:", {
+        original: b,
+        transformed: transformed,
+        formValues: rhfForm.getValues()
       })
+      
+      // Debug: Log each field to ensure proper mapping
+      console.log("🔍 Field Mappings from API to Form:", {
+        name: b?.name,
+        tagline: b?.tagline,
+        about: b?.about,
+        category: b?.primaryCategory || b?.category,
+        streetAddress: b?.streetAddress,
+        house: b?.house,
+        localArea: b?.localArea,
+        city: b?.city,
+        postalCode: b?.postalCode,
+        country: b?.country,
+        mobile: b?.mobile,
+        website: b?.website,
+        facebook: b?.facebook
+      })
+      
+      console.log("✅ Form Fields Populated Successfully!")
     }
   }, [fetchedBusiness, rhfForm])
 
@@ -236,6 +316,14 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
   const updateMediaBranding = (data: MediaBrandingData) => {
     setFormData(prev => ({ ...prev, mediaBranding: data }))
   }
+
+  // Debug: Watch form changes
+  useEffect(() => {
+    const subscription = rhfForm.watch((values) => {
+      console.log("Form values changed:", values)
+    })
+    return () => subscription.unsubscribe()
+  }, [rhfForm])
 
   const handleNext = () => {
     if (currentTab < tabs.length - 1) {
@@ -325,6 +413,7 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
         return (
           <BusinessHoursStep
             data={formData.businessHours}
+            businessData={fetchedBusiness}
             onUpdate={updateBusinessHours}
             onNext={handleNext}
             onBack={handleBack}

@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "./button";
+
 import { cn } from "@/lib/utils";
 
 type PaginateProps = {
@@ -10,9 +10,10 @@ type PaginateProps = {
   page: number;
   setPage: (page: number) => void;
   className?: string;
+  dataLength?: number;
 };
 
-export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentPage, setPage, className }) => {
+export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentPage, setPage, className, dataLength = 0 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -79,10 +80,13 @@ export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentP
 
       <button
         onClick={() => updatePage(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="flex items-center justify-center py-4  space-x-[1.2rem] max-w-[17rem]"
+        disabled={currentPage === totalPages || dataLength < 9}
+        className={`flex items-center justify-center py-4 space-x-[1.2rem] max-w-[17rem] ${
+          currentPage === totalPages || dataLength < 9 
+            ? 'opacity-50 cursor-not-allowed' 
+            : 'hover:bg-gray-100'
+        }`}
       >
-
         <ChevronRight />
       </button>
     </div>

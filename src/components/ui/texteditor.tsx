@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import { Bold, ClipboardMinus, Italic, LinkIcon, List } from "lucide-react"
 import Image from "next/image"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Control, FieldPath } from "react-hook-form"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
@@ -46,6 +46,12 @@ function EditorCore({
         onChange(editor.getHTML())
       }
     },
+    onBlur: ({ editor }) => {
+      // Ensure the value is saved when the editor loses focus
+      if (onChange) {
+        onChange(editor.getHTML())
+      }
+    },
     editorProps: {
       attributes: {
         class:
@@ -68,6 +74,13 @@ function EditorCore({
 
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run()
   }, [editor])
+
+  // Sync editor content with value prop
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value, false)
+    }
+  }, [editor, value])
 
   if (!editor) return null
 

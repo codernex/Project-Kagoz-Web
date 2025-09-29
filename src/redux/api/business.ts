@@ -71,6 +71,20 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Business"],
     }),
+
+    // Dedicated YouTube URL update mutation
+    updateBusinessYouTubeVideo: builder.mutation<IBusiness, { slug: string; youtubeVideo: string }>({
+      query: ({ slug, youtubeVideo }) => ({
+        url: `/business/${slug}`,
+        data: { youtubeVideo },
+        method: "PATCH",
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Promo video updated successfully");
+      },
+      invalidatesTags: ["Business"],
+    }),
     // New: send logo and banner together via multipart/form-data (POST)
     updateBusinessMedia: builder.mutation<IBusiness, { slug: string; data: FormData }>({
       query: ({ slug, data }) => ({
@@ -321,6 +335,7 @@ export const {
   useAddFeaturedClientMutation,
   useGetFeauturedClientsQuery,
   useUpdateBusinessMutation,
+  useUpdateBusinessYouTubeVideoMutation,
   useUpdateBusinessMediaMutation,
   useAddCategoryToBusinessMutation,
   useGetFaqsQuery,

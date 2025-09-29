@@ -61,6 +61,7 @@ export const baseApi = createApi({
   refetchOnReconnect: true,
   tagTypes: [
     "Business",
+    "BusinessHours",
     "Gallery",
     "FeaturedClient",
     "VideoFeedback",

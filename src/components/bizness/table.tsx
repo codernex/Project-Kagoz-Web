@@ -75,7 +75,7 @@ export default function Table({
               <tr>
                 <td colSpan={columns.length + (indexed ? 2 : 1) + 1} className="px-6 py-4 text-center">Loading...</td>
               </tr>
-            ) : (
+            ) : data && data.length > 0 ? (
               data?.map((row, rowIndex) => (
                 <tr key={row.id || rowIndex} className="border-b border-[#0000001A]  ">
                   {/* Index */}
@@ -114,15 +114,29 @@ export default function Table({
                   </td>
                 </tr>
               ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length + (indexed ? 2 : 1) + 1} className="px-6 py-8 text-center text-gray-500">
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <p className="text-lg font-medium text-gray-900">No businesses found</p>
+                    <p className="text-sm text-gray-500">Get started by adding your first business</p>
+                  </div>
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      {pagination && setPage && (
+      {pagination && setPage && data && data.length > 0 && (
        <div className="flex justify-center items-center mt-12">
-         <Pagination totalPages={totalPages} page={page} setPage={setPage} />
+         <Pagination totalPages={totalPages} page={page} setPage={setPage} dataLength={data.length} />
          </div>
       )}
     </div>

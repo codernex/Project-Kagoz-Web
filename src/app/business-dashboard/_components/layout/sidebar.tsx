@@ -2,9 +2,11 @@
 import { Button } from "@/components/ui/button"
 import { Home, LogOut, X, Award, Crown } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
 import { useAuth } from "@/context/AuthContext"
+import { useBusinessStore } from "@/hooks/selectedBusiness"
+import { toast } from "sonner"
 
 interface SidebarProps {
   sidebarOpen: boolean
@@ -13,12 +15,35 @@ interface SidebarProps {
 
 export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const pathname = usePathname();
-   const { user,logout } = useAuth()
-  const navItems = [
+  const router = useRouter();
+  const { user,logout } = useAuth()
+
+  // Extract slug from pathname if on edit-business page
+  const isEditBusinessPage = pathname.includes('/business-dashboard/edit-business/')
+  const businessSlug = isEditBusinessPage ? pathname.split('/business-dashboard/edit-business/')[1] : null
+
+  const handleSpecialFeaturesClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    
+    if (businessSlug) {
+      router.push(`/business-dashboard/features/${businessSlug}`)
+    }
+  }
+
+  // Base navigation items
+  const baseNavItems: Array<{ label: string; href: string; icon: any; onClick?: (e: React.MouseEvent) => void }> = [
     { label: "Home", href: "/business-dashboard", icon: Home },
-    { label: "Special Features", href: "/business-dashboard/features", icon: Award },
     { label: "Page Upgrades", href: "/business-dashboard/page-upgrade", icon: Crown },
-  ];
+  ]
+
+  // Add Special Features only if on edit-business page
+  const navItems = isEditBusinessPage 
+    ? [
+        ...baseNavItems.slice(0, 1), // Home
+        { label: "Special Features", href: "#", icon: Award, onClick: handleSpecialFeaturesClick },
+        ...baseNavItems.slice(1) // Page Upgrades
+      ]
+    : baseNavItems
   return (
     <>
       {/* Mobile sidebar overlay */}
@@ -45,20 +70,39 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 p-4">
           <div className="space-y-4">
-            {navItems.map(({ label, href, icon: Icon }) => (
-              <Link
-                key={label}
-                href={href}
-                className={`flex items-center w-full px-[17px] py-[12px] rounded transition justify-start text-[18px]  leading-6 ${
-                  pathname === href
-                    ? "bg-[#F1EBFF] border border-[#6F00FF] text-[#6F00FF] rounded-[8px] font-medium"
-                    : "text-[#353535] hover:text-gray-900 hover:bg-gray-100 font-normal"
-                }`}
-              >
-                <Icon className="mr-3 size-6" />
-                {label}
-              </Link>
-            ))}
+            {navItems.map(({ label, href, icon: Icon, onClick }) => {
+              if (onClick) {
+                return (
+                  <button
+                    key={label}
+                    onClick={onClick}
+                    className={`flex items-center w-full px-[17px] py-[12px] rounded transition justify-start text-[18px] leading-6 ${
+                      pathname.includes('/business-dashboard/features') && pathname.includes(businessSlug || '')
+                        ? "bg-[#F1EBFF] border border-[#6F00FF] text-[#6F00FF] rounded-[8px] font-medium"
+                        : "text-[#353535] hover:text-gray-900 hover:bg-gray-100 font-normal"
+                    }`}
+                  >
+                    <Icon className="mr-3 size-6" />
+                    {label}
+                  </button>
+                )
+              }
+              
+              return (
+                <Link
+                  key={label}
+                  href={href}
+                  className={`flex items-center w-full px-[17px] py-[12px] rounded transition justify-start text-[18px]  leading-6 ${
+                    pathname === href
+                      ? "bg-[#F1EBFF] border border-[#6F00FF] text-[#6F00FF] rounded-[8px] font-medium"
+                      : "text-[#353535] hover:text-gray-900 hover:bg-gray-100 font-normal"
+                  }`}
+                >
+                  <Icon className="mr-3 size-6" />
+                  {label}
+                </Link>
+              )
+            })}
           </div>
         </nav>
 

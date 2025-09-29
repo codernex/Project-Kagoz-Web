@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import { X, Upload, Camera } from "lucide-react"
+import Image from "next/image"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import { cn, appendApi } from "@/lib/utils"
 
 interface UploadedFile {
   id: string
@@ -42,7 +43,25 @@ export default function FileUploader({
 }: FileUploaderProps) {
   const [files, setFiles] = React.useState<UploadedFile[]>(value)
   const [isDragOver, setIsDragOver] = React.useState(false)
+  const [imageErrors, setImageErrors] = React.useState<Set<string>>(new Set())
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
+
+
+  // Handle image load errors
+  const handleImageError = (fileId: string | undefined) => {
+    if (!fileId) return;
+    setImageErrors(prev => new Set(prev).add(fileId));
+  }
+
+  // Handle successful image loads
+  const handleImageLoad = (fileId: string | undefined) => {
+    if (!fileId) return;
+    setImageErrors(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(fileId);
+      return newSet;
+    });
+  }
 
   React.useEffect(() => {
     setFiles(value)
@@ -202,11 +221,21 @@ export default function FileUploader({
           // File preview (single file)
           <div className="border border-gray-200 rounded-[8px] p-4 bg-white">
             <div className="flex items-center gap-3">
-              <img
-                src={files[0]?.preview}
-                alt={files[0]?.name}
-                className="w-12 h-12 sm:h-[80px] sm:w-[80px] object-cover rounded"
-              />
+              {files[0] && imageErrors.has(files[0].id) ? (
+                <div className="w-12 h-12 sm:h-[80px] sm:w-[80px] bg-gray-200 rounded flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-gray-400" />
+                </div>
+              ) : files[0] ? (
+                <Image
+                  width={80}
+                  height={80}
+                  src={appendApi(files[0].preview)}
+                  alt={files[0].name || 'Uploaded file'}
+                  className="w-12 h-12 sm:h-[80px] sm:w-[80px] object-cover rounded"
+                  onError={() => handleImageError(files[0]?.id)}
+                  onLoad={() => handleImageLoad(files[0]?.id)}
+                />
+              ) : null}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {files[0]?.name}
@@ -266,11 +295,21 @@ export default function FileUploader({
         <div className="flex gap-3 overflow-x-auto py-3">
           {files.map((file) => (
             <div key={file.id} className="relative flex-shrink-0">
-              <img
-                src={file.preview}
-                alt={file.name}
-                className="w-20 h-20 sm:h-[80px] sm:w-[150px] object-cover rounded-[8px]"
-              />
+              {imageErrors.has(file.id) ? (
+                <div className="w-20 h-20 sm:h-[80px] sm:w-[150px] bg-gray-200 rounded-[8px] flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-gray-400" />
+                </div>
+              ) : (
+                <Image
+                  width={150}
+                  height={80}
+                  src={appendApi(file.preview)}
+                  alt={file.name || 'Uploaded file'}
+                  className="w-20 h-20 sm:h-[80px] sm:w-[150px] object-cover rounded-[8px]"
+                  onError={() => handleImageError(file.id)}
+                  onLoad={() => handleImageLoad(file.id)}
+                />
+              )}
               <button
                 type="button"
                 onClick={() => removeFile(file.id)}
