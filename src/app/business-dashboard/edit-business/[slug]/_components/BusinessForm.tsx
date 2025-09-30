@@ -12,7 +12,7 @@ const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 
 interface BusinessInfoData {
   businessName: string
-  tagline: string
+  tagLine: string
   about: string
   startYear: string
   startMonth: string
@@ -87,9 +87,9 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
   const rhfForm = useForm({
     defaultValues: {
       name: "",
-      tagline: "",
+      tagLine: "",
       about: "",
-      startingDate: "",
+      startingDate: { year: "", month: "", day: "" },
       category: "",
       streetAddress: "",
       houseRoad: "",
@@ -108,7 +108,7 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
   const [formData, setFormData] = useState<FormData>({
     businessInfo: {
       businessName: "",
-      tagline: "",
+      tagLine: "",
       about: "",
       startYear: "",
       startMonth: "",
@@ -171,24 +171,32 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
       
       // Parse starting date if available
       let startYear = "", startMonth = "", startDay = ""
+      console.log("🔍 BusinessForm - Starting date from API:", b?.startingDate)
       if (b?.startingDate) {
         const dateParts = b.startingDate.split('-')
+        console.log("🔍 BusinessForm - Date parts:", dateParts)
         if (dateParts.length === 3) {
           startYear = dateParts[0]
-          startMonth = dateParts[1]
-          startDay = dateParts[2]
+          const monthNum = parseInt(dateParts[1])
+          const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+          ]
+          startMonth = monthNames[monthNum - 1] || ""
+          startDay = String(parseInt(dateParts[2]) || dateParts[2]) // Normalize day - remove leading zeros
+          console.log("🔍 BusinessForm - Parsed date:", { startYear, startMonth, startDay })
         }
       }
       
       const transformed: FormData = {
         businessInfo: {
           businessName: b?.name || "",
-          tagline: b?.tagline || "",
+          tagLine: b?.tagLine || "",
           about: b?.about || "",
           startYear: startYear,
           startMonth: startMonth,
           startDay: startDay,
-          category: b?.primaryCategory || b?.category || "",
+          category: b?.primaryCategory?.slug || b?.primaryCategory?.name || b?.category || "",
         },
         locationContact: {
           streetAddress: b?.streetAddress || "",
@@ -247,11 +255,40 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
       // Reset react-hook-form with the fetched data
       const resetValues = {
         name: transformed.businessInfo.businessName,
-        tagline: transformed.businessInfo.tagline,
+        tagLine: transformed.businessInfo.tagLine,
         about: transformed.businessInfo.about,
-        startingDate: startYear && startMonth && startDay 
-          ? `${startYear}-${startMonth}-${startDay}` 
-          : b?.startingDate || "",
+        startingDate: (() => {
+          // Use the parsed values if available
+          if (startYear && startMonth && startDay) {
+            console.log("🔍 BusinessForm - Using parsed values:", { startYear, startMonth, startDay })
+            return { year: startYear, month: startMonth, day: startDay }
+          }
+          
+          // Fallback to parsing from API string
+          if (b?.startingDate) {
+            const dateStr = b.startingDate;
+            console.log("🔍 BusinessForm - Parsing from API string:", dateStr)
+            if (typeof dateStr === 'string' && dateStr.includes('-')) {
+              const [year, month, day] = dateStr.split('-');
+              const monthNum = parseInt(month);
+              const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ];
+              const monthName = monthNames[monthNum - 1] || "";
+              const result = { 
+                year: year || "", 
+                month: monthName, 
+                day: String(parseInt(day) || day || "") // Normalize day - remove leading zeros
+              };
+              console.log("🔍 BusinessForm - Parsed result:", result)
+              return result;
+            }
+          }
+          
+          console.log("🔍 BusinessForm - Using default empty values")
+          return { year: "", month: "", day: "" };
+        })(),
         category: transformed.businessInfo.category,
         streetAddress: transformed.locationContact.streetAddress,
         houseRoad: transformed.locationContact.houseRoad,
@@ -267,11 +304,16 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
       }
       
       console.log("🔍 BusinessForm - Resetting form with values:", resetValues)
+      console.log("🔍 BusinessForm - Starting date value:", resetValues.startingDate)
+      console.log("🔍 BusinessForm - Category value:", resetValues.category)
       rhfForm.reset(resetValues)
       
-      // Debug: Check form values after reset
+      // Debug: Check what was actually set
       setTimeout(() => {
-        console.log("🔍 BusinessForm - Form values after reset:", rhfForm.getValues())
+        const formValues = rhfForm.getValues()
+        console.log("🔍 BusinessForm - Form values after reset:", formValues)
+        console.log("🔍 BusinessForm - Starting date after reset:", formValues.startingDate)
+        console.log("🔍 BusinessForm - Category after reset:", formValues.category)
       }, 100)
       
       console.log("📋 BusinessForm - Processing API Data:", {
@@ -283,7 +325,7 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
       // Debug: Log each field to ensure proper mapping
       console.log("🔍 Field Mappings from API to Form:", {
         name: b?.name,
-        tagline: b?.tagline,
+        tagLine: b?.tagLine,
         about: b?.about,
         category: b?.primaryCategory || b?.category,
         streetAddress: b?.streetAddress,

@@ -1,9 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+
 import { MapPin, Building, Phone, Globe, Facebook } from "lucide-react"
 import { TextInput } from "@/components/shared/text-input"
 import { useUpdateBusinessMutation } from "@/redux/api/business"
@@ -93,11 +91,12 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
 
     setIsSubmitting(true)
     try {
-      const formDataToSubmit = new FormData()
-      
-      // Add location contact fields
+      // Get current form values
       const currentValues = form.getValues()
-      Object.entries({
+      console.log("🔍 LocationContactStep - Current form values:", currentValues)
+      
+      // Create JSON payload instead of FormData
+      const jsonPayload = {
         streetAddress: currentValues.streetAddress || "",
         houseRoad: currentValues.houseRoad || "",
         localArea: currentValues.localArea || "",
@@ -107,11 +106,11 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
         mobile: currentValues.mobile || "",
         website: currentValues.website || "",
         facebook: currentValues.facebook || "",
-      }).forEach(([key, value]) => {
-        formDataToSubmit.append(key, value)
-      })
+      }
+      
+      console.log("🔍 LocationContactStep - JSON payload:", jsonPayload)
 
-      await updateBusiness({ slug, data: formDataToSubmit }).unwrap()
+      await updateBusiness({ slug, data: jsonPayload }).unwrap()
       toast.success("Location and contact information saved successfully!")
       onSaveAndBack()
     } catch (error) {
@@ -127,11 +126,11 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
 
     setIsSubmitting(true)
     try {
-      const formDataToSubmit = new FormData()
-      
-      // Add location contact fields
+      // Get current form values
       const currentValues = form.getValues()
-      Object.entries({
+      
+      // Create JSON payload instead of FormData
+      const jsonPayload = {
         streetAddress: currentValues.streetAddress || "",
         houseRoad: currentValues.houseRoad || "",
         localArea: currentValues.localArea || "",
@@ -141,11 +140,11 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
         mobile: currentValues.mobile || "",
         website: currentValues.website || "",
         facebook: currentValues.facebook || "",
-      }).forEach(([key, value]) => {
-        formDataToSubmit.append(key, value)
-      })
+      }
+      
+      console.log("🔍 LocationContactStep - JSON payload (handleNext):", jsonPayload)
 
-      await updateBusiness({ slug, data: formDataToSubmit }).unwrap()
+      await updateBusiness({ slug, data: jsonPayload }).unwrap()
       toast.success("Location and contact information saved successfully!")
       onNext()
     } catch (error) {

@@ -30,7 +30,7 @@ interface MediaBrandingData {
 export interface BusinessData {
   slug?: string
   name: string
-  tagline: string
+  tagLine: string
   about: string
   startingDate: { year: string; month: string; day: string }
   issueDate: { year: string; month: string; day: string }
@@ -83,7 +83,7 @@ export function BusinessSetupWizard() {
 
   const defaultValues: BusinessData = {
     name: "",
-    tagline: "",
+    tagLine: "",
     about: "",
     startingDate: { year: "", month: "", day: "" },
     issueDate: { year: "", month: "", day: "" },
@@ -147,7 +147,7 @@ export function BusinessSetupWizard() {
   const isCurrentStepValid = () => {
     switch (currentStep) {
       case 0: 
-        return businessData.name && businessData.tagline && businessData.about
+        return businessData.name && businessData.tagLine && businessData.about
       case 1: 
         return businessData.streetAddress && businessData.city && businessData.mobile
       case 2: 
@@ -238,10 +238,9 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
         return (
           <StepHours
           businessData={businessData}
-          setFormValue={setFormValue}
           onPrev={prevStep}
           onNext={nextStep}
-            isNextDisabled={!isCurrentStepValid()}
+          isNextDisabled={!isCurrentStepValid()}
           />
         );
       case 3:

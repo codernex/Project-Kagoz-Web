@@ -41,15 +41,36 @@ const transformToApiFormat = (formData: BusinessHoursData) => {
       isOpen247: true
     }
   } else {
-    // If not 24/7, send detailed days structure
+    // If not 24/7, send detailed days structure in the format expected by API
     const daysArray: any[] = []
     
     Object.entries(formData.businessHours).forEach(([day, schedule]) => {
       if (schedule.isOpen) {
-        const timeRanges = schedule.slots.map(slot => ({
-          from: slot.start,
-          to: slot.end
-        }))
+        const timeRanges = schedule.slots.map(slot => {
+          // Convert display format (9:00 AM) to API format (fromHours, fromMinutes, fromPeriod)
+          const parseTime = (timeStr: string) => {
+            const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
+            if (!match) return { hours: "12", minutes: "00", period: "AM" }
+            
+            return {
+              hours: match[1] || "12",
+              minutes: match[2] || "00",
+              period: (match[3] || "AM").toUpperCase()
+            }
+          }
+          
+          const startTime = parseTime(slot.start)
+          const endTime = parseTime(slot.end)
+          
+          return {
+            fromHours: startTime.hours,
+            fromMinutes: startTime.minutes,
+            fromPeriod: startTime.period,
+            toHours: endTime.hours,
+            toMinutes: endTime.minutes,
+            toPeriod: endTime.period
+          }
+        })
         
         daysArray.push({
           day: day,
@@ -86,6 +107,53 @@ const transformFromApiFormat = (apiData: any, daysList: string[]): BusinessHours
     
     return {
       is24Hours: true,
+      closedOnHolidays: false,
+      businessHours: businessHours
+    }
+  } else if (Array.isArray(apiData)) {
+    // Handle openingHours array format from API
+    const businessHours: Record<string, DaySchedule> = {}
+    
+    // Initialize all days as closed first
+    daysList.forEach(day => {
+      businessHours[day] = {
+        isOpen: false,
+        slots: [{ start: "9:00 AM", end: "6:00 PM" }]
+      }
+    })
+    
+    // Process each day from API data
+    apiData.forEach((dayData: any) => {
+      const dayName = dayData.day
+      if (dayData.isOpen && dayData.timeRanges?.length > 0) {
+        const slots = dayData.timeRanges.map((range: any) => {
+          // Convert API format (fromHours, fromMinutes, fromPeriod) to display format
+          const formatTime = (hours: string, minutes: string, period: string) => {
+            const h = hours.padStart(2, '0')
+            const m = minutes.padStart(2, '0')
+            return `${h}:${m} ${period}`
+          }
+          
+          return {
+            start: formatTime(range.fromHours, range.fromMinutes, range.fromPeriod),
+            end: formatTime(range.toHours, range.toMinutes, range.toPeriod)
+          }
+        })
+        
+        businessHours[dayName] = {
+          isOpen: true,
+          slots: slots
+        }
+      } else {
+        businessHours[dayName] = {
+          isOpen: false,
+          slots: [{ start: "9:00 AM", end: "6:00 PM" }]
+        }
+      }
+    })
+    
+    return {
+      is24Hours: false,
       closedOnHolidays: false,
       businessHours: businessHours
     }
@@ -331,7 +399,12 @@ export default function BusinessHoursStep({ data, businessData, onUpdate, onNext
   }
 
   const handleToggle24Hours = (checked: boolean) => {
-    const newData: BusinessHoursData = { ...formData, is24Hours: checked };
+    const newData: BusinessHoursData = { 
+      ...formData, 
+      is24Hours: checked,
+      // When 24/7 is enabled, disable holidays toggle
+      closedOnHolidays: checked ? false : formData.closedOnHolidays
+    };
     setFormData(newData);
     onUpdate(newData);
     // Clear general errors when toggling 24/7
@@ -343,9 +416,12 @@ export default function BusinessHoursStep({ data, businessData, onUpdate, onNext
   }
 
   const handleToggleHolidays = (checked: boolean) => {
-  const newData: BusinessHoursData = { ...formData, closedOnHolidays: checked };
-  setFormData(newData);
-  onUpdate(newData);
+    // Don't allow holidays toggle when 24/7 is enabled
+    if (formData.is24Hours) return;
+    
+    const newData: BusinessHoursData = { ...formData, closedOnHolidays: checked };
+    setFormData(newData);
+    onUpdate(newData);
   }
 
   const handleNext = async () => {
@@ -433,8 +509,9 @@ export default function BusinessHoursStep({ data, businessData, onUpdate, onNext
             id="holidays"
             checked={formData.closedOnHolidays}
             onCheckedChange={handleToggleHolidays}
+            disabled={formData.is24Hours}
           />
-        <h2 className="text-sm font-normal">Closed on Public Holidays</h2>
+        <h2 className={`text-sm font-normal ${formData.is24Hours ? 'text-gray-400' : ''}`}>Closed on Public Holidays</h2>
          </div>
       </div>
 
@@ -547,7 +624,7 @@ export default function BusinessHoursStep({ data, businessData, onUpdate, onNext
       <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
         <button
          
-          onClick={handleNext}
+          onClick={handleSaveAndBack}
           className="!px-20 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg"
         >
           Save & Back to Businesses

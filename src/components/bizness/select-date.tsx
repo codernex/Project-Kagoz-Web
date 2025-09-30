@@ -28,6 +28,8 @@ export function DateSelector({ label, name, required, onChange, control, value }
   const [day, setDay] = React.useState(value?.day || "")
 
   const years = Array.from({ length: 50 }, (_, i) => `${2000 + i}`)
+  console.log("🔍 DateSelector - Available years:", years.slice(0, 10), "...")
+  console.log("🔍 DateSelector - Current year state:", year)
   const months = [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December",
@@ -36,9 +38,21 @@ export function DateSelector({ label, name, required, onChange, control, value }
 
   // Sync with external value prop
   React.useEffect(() => {
-    if (value?.year) setYear(value.year)
-    if (value?.month) setMonth(value.month)
-    if (value?.day) setDay(value.day)
+    console.log("🔍 DateSelector - Value prop changed:", value)
+    if (value?.year !== undefined) {
+      console.log("🔍 DateSelector - Setting year:", value.year)
+      setYear(value.year)
+    }
+    if (value?.month !== undefined) {
+      console.log("🔍 DateSelector - Setting month:", value.month)
+      setMonth(value.month)
+    }
+    if (value?.day !== undefined) {
+      // Normalize day value - remove leading zeros
+      const normalizedDay = String(parseInt(value.day) || value.day)
+      console.log("🔍 DateSelector - Setting day:", value.day, "-> normalized:", normalizedDay)
+      setDay(normalizedDay)
+    }
   }, [value])
 
   React.useEffect(() => {

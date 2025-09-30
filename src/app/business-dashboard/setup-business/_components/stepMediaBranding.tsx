@@ -327,7 +327,7 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
                   <div className="flex-1">
                     <h3 className="font-medium sm:text-[20px] text-[16px] text-gray-900">{businessData.name }</h3>
                     <p className="text-[14px] text-gray-600 mt-1">
-                      {businessData.tagline }
+                      {businessData.tagLine }
                     </p>
                   </div>
                 </div>

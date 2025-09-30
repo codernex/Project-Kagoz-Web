@@ -11,7 +11,9 @@ import { Textarea } from "@/components/bizness/textarea"
 import { TiptapEditor } from "@/components/ui/texteditor"
 import { DateSelector } from "@/components/bizness/select-date"
 import { useUpdateBusinessMutation } from "@/redux/api/business"
+import { useGetCategoriesQuery } from "@/redux/api/category"
 import { useParams, useRouter } from "next/navigation"
+import * as React from "react"
 
 
 interface BusinessInfoStepProps {
@@ -25,54 +27,147 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
   const [searchQuery, setSearchQuery] = useState("")
    const [isSubmitting, setIsSubmitting] = useState(false)
   const [updateBusiness] = useUpdateBusinessMutation()
+  const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery()
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
   const route = useRouter();
 
-  // Debug: Log form state on component mount
-  console.log("🔍 BusinessInfoStep - Form values on mount:", form.getValues())
-  console.log("🔍 BusinessInfoStep - Data prop:", data)
-  console.log("🔍 BusinessInfoStep - Form watch all:", form.watch())
-  console.log("🔍 BusinessInfoStep - Form errors:", form.formState.errors)
-  const categories = [
-    { value: "pharmacy", label: "Pharmacy" },
-    { value: "restaurant", label: "Restaurant" },
-    { value: "retail-store", label: "Retail Store" },
-    { value: "grocery-store", label: "Grocery Store" },
-    { value: "clothing-store", label: "Clothing Store" },
-    { value: "electronics-shop", label: "Electronics Shop" },
-    { value: "beauty-salon", label: "Beauty Salon" },
-    { value: "barbershop", label: "Barbershop" },
-    { value: "cafe", label: "Cafe" },
-    { value: "bakery", label: "Bakery" },
-    { value: "bookstore", label: "Bookstore" },
-    { value: "gym-fitness", label: "Gym/Fitness Center" },
-    { value: "medical-clinic", label: "Medical Clinic" },
-    { value: "dental-clinic", label: "Dental Clinic" },
-    { value: "law-firm", label: "Law Firm" },
-    { value: "accounting-firm", label: "Accounting Firm" },
-    { value: "real-estate", label: "Real Estate" },
-    { value: "travel-agency", label: "Travel Agency" },
-    { value: "photography-studio", label: "Photography Studio" },
-    { value: "auto-repair", label: "Auto Repair" },
-    { value: "pet-store", label: "Pet Store" },
-    { value: "jewelry-store", label: "Jewelry Store" },
-    { value: "hardware-store", label: "Hardware Store" },
-    { value: "flower-shop", label: "Flower Shop" },
-    { value: "laundry-service", label: "Laundry Service" },
-    { value: "other", label: "Other" },
-  ]
+  
+  // Transform API categories to the format expected by the component
+  const categories = React.useMemo(() => {
+    if (!categoriesData) return []
+    return categoriesData.map(category => ({
+      value: category.slug || category.id?.toString() || "",
+      label: category.name || "",
+      id: category.id
+    }))
+  }, [categoriesData])
 
   const filteredCategories = categories.filter((c) =>
     c.label.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  // Hydrate form with incoming data (including tagLine, starting date, and category)
+  React.useEffect(() => {
+    if (!data) {
+      console.log("🔍 No data provided to BusinessInfoStep")
+      return
+    }
+    
+    console.log("🔍 BusinessInfoStep - Hydrating form with data:", data)
+    console.log("🔍 BusinessInfoStep - Current form startingDate:", form.getValues().startingDate)
+
+    const monthMap: Record<string, string> = {
+      january: "01",
+      february: "02",
+      march: "03",
+      april: "04",
+      may: "05",
+      june: "06",
+      july: "07",
+      august: "08",
+      september: "09",
+      october: "10",
+      november: "11",
+      december: "12",
+    }
+
+    const parseStartingDate = (v: any): { year: string; month: string; day: string } | undefined => {
+      if (!v) return undefined
+      if (typeof v === "object" && v.year && v.month && v.day) {
+        return { year: String(v.year), month: String(v.month), day: String(v.day) }
+      }
+      if (typeof v === "string") {
+        const parts = v.split(/[-/]/)
+        if (parts.length >= 3) {
+          const year = parts[0] ?? ""
+          let month: string = parts[1] ?? ""
+          const day = parts[2] ?? ""
+          const lower = month.toLowerCase()
+          if (monthMap[lower]) month = monthMap[lower]
+          return { year: String(year ?? ""), month: String(month ?? ""), day: String(day ?? "") }
+        }
+      }
+      return undefined
+    }
+
+    const nextValues: Record<string, any> = {}
+    if (data.name) nextValues["name"] = data.name
+    // API sometimes returns tagLine instead of tagLine
+    if (data.tagLine) nextValues["tagLine"] = data.tagLine
+    if (data.about) nextValues["about"] = data.about
+
+    // startingDate is already handled by BusinessForm.tsx, no need to parse again
+    // Check if startingDate is already set in the form
+    const currentStartingDate = form.getValues().startingDate
+    console.log("🔍 BusinessInfoStep - Current form startingDate:", currentStartingDate)
+    if (currentStartingDate && typeof currentStartingDate === 'object' && currentStartingDate.year) {
+      console.log("🔍 BusinessInfoStep - startingDate already set, not overriding")
+    } else {
+      console.log("🔍 BusinessInfoStep - startingDate not set, will not set it here as BusinessForm handles it")
+    }
+
+    // Category: try a few common shapes and find matching value from categories list
+    const categoryFromData = data.primaryCategory?.slug || data.primaryCategory?.name || data.category
+    console.log("🔍 BusinessInfoStep - Category from data:", categoryFromData)
+    console.log("🔍 BusinessInfoStep - Primary category object:", data.primaryCategory)
+    console.log("🔍 BusinessInfoStep - Available categories:", categories)
+    
+    if (categoryFromData && categories.length > 0) {
+      // Try to find the category in our categories list
+      const foundCategory = categories.find(c => 
+        c.value === categoryFromData || 
+        c.label === categoryFromData ||
+        c.value === String(categoryFromData) ||
+        c.label.toLowerCase() === String(categoryFromData).toLowerCase() ||
+        c.id === data.primaryCategory?.id
+      )
+      
+      console.log("🔍 BusinessInfoStep - Found category:", foundCategory)
+      
+      if (foundCategory) {
+        nextValues["category"] = foundCategory.value
+        console.log("🔍 BusinessInfoStep - Setting category to:", foundCategory.value)
+      } else {
+        // If not found, use the raw value
+        nextValues["category"] = String(categoryFromData)
+        console.log("🔍 BusinessInfoStep - Category not found in list, using raw value:", categoryFromData)
+      }
+    } else if (categoryFromData) {
+      // If categories haven't loaded yet, store the raw value
+      nextValues["category"] = String(categoryFromData)
+      console.log("🔍 BusinessInfoStep - Categories not loaded yet, using raw value:", categoryFromData)
+    }
+
+    console.log("🔍 Setting form values:", nextValues)
+    
+    // Set values into the form without wiping other fields
+    Object.entries(nextValues).forEach(([k, v]) => {
+      console.log(`🔍 Setting ${k} to:`, v)
+      form.setValue(k, v, { shouldDirty: false, shouldValidate: true })
+    })
+    
+    // Debug: Check form values after setting
+    setTimeout(() => {
+      console.log("🔍 BusinessInfoStep - Form values after setting:", form.getValues())
+      console.log("🔍 BusinessInfoStep - Category field value:", form.getValues().category)
+    }, 100)
+  }, [data, form, categories])
+
+  // Debug: Watch form changes
+  React.useEffect(() => {
+    const subscription = form.watch((value: any, { name, type }: { name?: string; type?: string }) => {
+      console.log("🔍 Form field changed:", { name, type, value })
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
 
   const handleNext = async (values: any) => {
     // Get the current form values directly from the form
     const currentFormValues = form.getValues()
     
     // Check if form has any data
-    const hasData = currentFormValues.name || currentFormValues.tagline || currentFormValues.about || currentFormValues.category
+    const hasData = currentFormValues.name || currentFormValues.tagLine || currentFormValues.about || currentFormValues.category
     
     console.log("🔍 Form values being submitted:", values)
     console.log("🔍 Form current values:", currentFormValues)
@@ -87,7 +182,7 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
     if (onUpdate) {
       onUpdate({
         businessName: currentFormValues?.name ?? "",
-        tagline: currentFormValues?.tagline ?? "",
+        tagLine: currentFormValues?.tagLine ?? "",
         about: currentFormValues?.about ?? "",
         startYear: "",
         startMonth: "",
@@ -96,38 +191,46 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
       })
     }
 
-    const formData = new FormData()
-    ;[
-      ["name", currentFormValues?.name ?? ""],
-      ["tagline", currentFormValues?.tagline ?? ""],
-      ["about", currentFormValues?.about ?? ""],
-      ["startingDate", currentFormValues?.startingDate ?? ""],
-      ["category", currentFormValues?.category ?? ""],
-    ].forEach(([k, v]) => {
-      console.log(`🔍 Adding to FormData: ${k} = ${v}`)
-      formData.append(k as string, v as string)
-    })
-
-    // Debug: Log the FormData contents
-    console.log("🔍 FormData contents:")
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`)
+    // Handle startingDate properly - convert object to string format
+    let startingDateValue = ""
+    if (currentFormValues?.startingDate && typeof currentFormValues.startingDate === 'object') {
+      const { year, month, day } = currentFormValues.startingDate
+      if (year && month && day) {
+        // Convert month name to number
+        const monthNames = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ]
+        const monthNum = monthNames.indexOf(month) + 1
+        startingDateValue = `${year}-${monthNum.toString().padStart(2, '0')}-${day.padStart(2, '0')}`
+      }
+    } else if (currentFormValues?.startingDate) {
+      startingDateValue = String(currentFormValues.startingDate)
     }
+    
+    // Create JSON payload instead of FormData
+    const updateData = {
+      name: currentFormValues?.name ?? "",
+      tagLine: currentFormValues?.tagLine ?? "",
+      about: currentFormValues?.about ?? "",
+      startingDate: startingDateValue,
+      category: currentFormValues?.category ?? "",
+    }
+
+    // Debug: Log the JSON payload
+    console.log("🔍 JSON payload being sent:")
+    console.log(JSON.stringify(updateData, null, 2))
 
     try {
-      await updateBusiness({ slug, data: formData }).unwrap()
+      console.log("🔍 Sending update request with slug:", slug)
+      
+      const result = await updateBusiness({ slug, data: updateData }).unwrap()
+      console.log("🔍 Update successful:", result)
       onNext()
     } catch (e) {
-      
-      console.error("Failed to save business info", e)
+      console.error("❌ Failed to save business info", e)
+      alert("Failed to update business information. Please try again.")
     }
-  }
-
-  // Debug: Add a test button to see current form values
-  const testFormValues = () => {
-    console.log("🔍 Test - Current form values:", form.getValues())
-    console.log("🔍 Test - Form is valid:", form.formState.isValid)
-    console.log("🔍 Test - Form errors:", form.formState.errors)
   }
 
   return (
@@ -155,12 +258,12 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
           control={form.control}
         />
 
-        {/* Tagline */}
+        {/* tagLine */}
         <Textarea
           placeholderIcon={Tag}
-          label="Tagline"
+          label="tagLine"
           required
-          name="tagline"
+          name="tagLine"
           control={form.control}
           character={150}
           rows={2}
@@ -183,6 +286,11 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
           name="startingDate"
           required
           control={form.control}
+          value={(() => {
+            const watchedValue = form.watch("startingDate")
+            console.log("🔍 BusinessInfoStep - DateSelector value prop:", watchedValue)
+            return watchedValue
+          })()}
         />
 
 
@@ -233,16 +341,6 @@ export default function BusinessInfoStep({ form, onNext ,data, onUpdate }: Busin
           )}
         />
 
-        {/* Debug Test Button */}
-        <div className="mb-4">
-          <button
-            type="button"
-            onClick={testFormValues}
-            className="px-4 py-2 bg-yellow-500 text-white rounded"
-          >
-            Test Form Values (Debug)
-          </button>
-        </div>
 
         {/* Buttons */}
           <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">

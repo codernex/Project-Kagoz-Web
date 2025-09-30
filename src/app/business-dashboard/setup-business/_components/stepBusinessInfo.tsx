@@ -18,7 +18,7 @@ import { useForm, SubmitHandler } from "react-hook-form"
 
 type BusinessInfoInput = {
   name: string
-  tagline: string
+  tagLine: string
   about: string
   startingDate: string | { year: string; month: string; day: string }
   category: string
@@ -59,7 +59,7 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
   // form setup - prioritize businessData from parent state
   const defaultValues: BusinessInfoInput = {
     name: businessData.name || (existingBusiness as any)?.name || "",
-    tagline: businessData.tagline || (existingBusiness as any)?.tagline || "",
+    tagLine: businessData.tagLine || (existingBusiness as any)?.tagLine || "",
     about: businessData.about || (existingBusiness as any)?.about || "",
     startingDate: defaultStartingDate,
     // Keep the category ID in state to match the Select options
@@ -82,8 +82,8 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
       errors.name = 'Business name is required'
     }
     
-    if (!values.tagline || values.tagline.trim() === '') {
-      errors.tagline = 'Tagline is required'
+    if (!values.tagLine || values.tagLine.trim() === '') {
+      errors.tagLine = 'tagLine is required'
     }
     
     if (!values.about || values.about.trim() === '') {
@@ -109,7 +109,7 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
     try {
       // Update parent state with form data
       setFormValue("name", d.name)
-      setFormValue("tagline", d.tagline)
+      setFormValue("tagLine", d.tagLine)
       setFormValue("about", d.about)
       
       // Persist the selected category VALUE (ID) to keep Select hydrated when returning
@@ -169,9 +169,9 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
 
             <Textarea
               placeholderIcon={Tag}
-              label="Tagline"
+              label="tagLine"
               required
-              name="tagline"
+              name="tagLine"
               control={form.control}
               character={150}
               rows={2}

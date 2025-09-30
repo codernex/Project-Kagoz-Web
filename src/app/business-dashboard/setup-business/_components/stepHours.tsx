@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Clock, Copy, X, Calendar, ChevronLeft } from "lucide-react"
-import { JSX, useState } from "react"
+import { JSX, useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -34,13 +34,13 @@ interface DayHours {
 
 interface StepProps {
   businessData: BusinessData
-  updateBusinessData: (field: string, value: any) => void
+  setFormValue?: (field: string, value: any) => void
   onPrev: () => void
   onNext: (data?: any) => void
   isNextDisabled?: boolean
 }
 
-export function StepHours({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled }: StepProps) {
+export function StepHours({ businessData, setFormValue, onPrev, onNext, isNextDisabled }: StepProps) {
   const { slug } = useParams() as { slug?: string }
   
   // Initialize business hours state - simplified to avoid infinite loops
@@ -63,6 +63,52 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
   const [is24x7, setIs24x7] = useState(businessData.is24x7 || false);
   const [closedOnHolidays, setClosedOnHolidays] = useState(businessData.closedOnHolidays || false);
   const [activeDay, setActiveDay] = useState<string | null>(null);
+
+  // Hydrate from API openingHours if present (Edit flow)
+  useEffect(() => {
+    const opening = (businessData as any)?.openingHours
+    if (!opening || !Array.isArray(opening)) return
+
+    const dayKeyMap: Record<string, string> = {
+      Monday: "Mon",
+      Tuesday: "Tue",
+      Wednesday: "Wed",
+      Thursday: "Thu",
+      Friday: "Fri",
+      Saturday: "Sat",
+      Sunday: "Sun",
+    }
+
+    const format = (h?: string, m?: string, p?: string) => {
+      const hours = (h ?? "12").toString()
+      const minutes = (m ?? "00").toString().padStart(2, "0")
+      const period = (p ?? "AM").toUpperCase()
+      return `${hours}:${minutes} ${period}`
+    }
+
+    const newHours: { [key: string]: DayHours } = { ...businessHours }
+
+    opening.forEach((d: any) => {
+      const key = dayKeyMap[d?.day as string]
+      if (!key || !newHours[key]) return
+      const isOpen = !!d?.isOpen
+      const ranges = Array.isArray(d?.timeRanges) ? d.timeRanges : []
+      const slots: TimeSlot[] = ranges.map((r: any, idx: number) => ({
+        id: `${key}-${idx + 1}`,
+        startTime: format(r?.fromHours, r?.fromMinutes, r?.fromPeriod),
+        endTime: format(r?.toHours, r?.toMinutes, r?.toPeriod),
+      }))
+      newHours[key] = {
+        isOpen,
+        timeSlots: isOpen && slots.length > 0 ? slots : [{ id: `${key}-1`, startTime: "9:00 AM", endTime: "6:00 PM" }],
+      }
+    })
+
+    setBusinessHours(newHours)
+    const firstOpen = Object.keys(newHours).find((k) => newHours[k]?.isOpen)
+    setActiveDay(firstOpen || null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [(businessData as any)?.openingHours])
 
   // Update business data when hours change - simplified to avoid infinite loops
   const updateHours = (newHours: { [key: string]: DayHours }) => {

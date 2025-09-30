@@ -168,13 +168,13 @@ export function CompletionAndPublish({
     
     try {
       // Validate required fields
-      if (!businessData.name || !businessData.tagline || !businessData.about) {
+      if (!businessData.name || !businessData.tagLine || !businessData.about) {
         throw new Error("Missing required business information")
       }
 
       const payload = {
         name: businessData.name,
-        tagLine: businessData.tagline,
+        tagLine: businessData.tagLine,
         about: businessData.about || "Business description not provided",
         categoryId: businessData.category && businessData.category !== "" ? parseInt(businessData.category) : null,
         subCategories: [],
@@ -456,7 +456,7 @@ export function CompletionAndPublish({
                       {businessData.name || "Business Name"}
                     </h3>
                     <p className="text-gray-600 mt-1">
-                      {businessData.tagline || "Business tagline will appear here"}
+                      {businessData.tagLine || "Business tagLine will appear here"}
                     </p>
                   </div>
                 </div>
