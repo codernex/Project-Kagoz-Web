@@ -10,7 +10,7 @@ interface SuccessDialogProps {
 
 export function SuccessDialog({ onContinue }: SuccessDialogProps) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-[60vh] bg-white">
       {/* Header with Progress Bar */}
      
 

@@ -19,12 +19,13 @@ interface DateSelectorProps {
   required?: boolean
   onChange?: (date: { year: string; month: string; day: string }) => void
   control?: Control<any>
+  value?: { year: string; month: string; day: string }
 }
 
-export function DateSelector({ label, name, required, onChange, control }: DateSelectorProps) {
-  const [year, setYear] = React.useState("")
-  const [month, setMonth] = React.useState("")
-  const [day, setDay] = React.useState("")
+export function DateSelector({ label, name, required, onChange, control, value }: DateSelectorProps) {
+  const [year, setYear] = React.useState(value?.year || "")
+  const [month, setMonth] = React.useState(value?.month || "")
+  const [day, setDay] = React.useState(value?.day || "")
 
   const years = Array.from({ length: 50 }, (_, i) => `${2000 + i}`)
   const months = [
@@ -32,6 +33,13 @@ export function DateSelector({ label, name, required, onChange, control }: DateS
     "July","August","September","October","November","December",
   ]
   const days = Array.from({ length: 31 }, (_, i) => `${i + 1}`)
+
+  // Sync with external value prop
+  React.useEffect(() => {
+    if (value?.year) setYear(value.year)
+    if (value?.month) setMonth(value.month)
+    if (value?.day) setDay(value.day)
+  }, [value])
 
   React.useEffect(() => {
     if (year && month && day && onChange) {
@@ -48,7 +56,7 @@ export function DateSelector({ label, name, required, onChange, control }: DateS
       )}
       <div className="flex gap-4 mt-1">
         {/* Year */}
-        <Select onValueChange={setYear}>
+        <Select value={year} onValueChange={setYear}>
           <SelectTrigger className="w-[120px] h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E]  focus:ring-[#23272E] placeholder:text-[#6B7280] shadow-sm">
             <SelectValue placeholder="Year" />
           </SelectTrigger>
@@ -62,7 +70,7 @@ export function DateSelector({ label, name, required, onChange, control }: DateS
         </Select>
 
         {/* Month */}
-        <Select onValueChange={setMonth}>
+        <Select value={month} onValueChange={setMonth}>
           <SelectTrigger className="w-[140px] h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E] outline-none focus:ring-[#23272E] placeholder:text-[#6B7280] shadow-sm">
             <SelectValue placeholder="Month" />
           </SelectTrigger>
@@ -76,7 +84,7 @@ export function DateSelector({ label, name, required, onChange, control }: DateS
         </Select>
 
         {/* Day */}
-        <Select onValueChange={setDay}>
+        <Select value={day} onValueChange={setDay}>
           <SelectTrigger className="w-[100px] h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E] outline-none focus:ring-[#23272E] placeholder:text-[#6B7280] shadow-sm">
             <SelectValue placeholder="Day" />
           </SelectTrigger>
@@ -106,15 +114,15 @@ export function DateSelector({ label, name, required, onChange, control }: DateS
         control={control}
         name={name as FieldPath<any>}
         render={({ field }) => {
-          // hydrate from existing field value
+          // hydrate from existing field value (reactive to changes)
           React.useEffect(() => {
             const v: any = field.value
             if (v && typeof v === 'object') {
-              if (v.year) setYear(v.year)
-              if (v.month) setMonth(v.month)
-              if (v.day) setDay(v.day)
+              if (v.year && v.year !== year) setYear(v.year)
+              if (v.month && v.month !== month) setMonth(v.month)
+              if (v.day && v.day !== day) setDay(v.day)
             }
-          }, [])
+          }, [field.value])
           // push updates to RHF when local state changes
           React.useEffect(() => {
             if (year && month && day) {

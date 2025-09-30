@@ -121,7 +121,7 @@ export function BusinessSetupWizard() {
 
   const [businessData, setBusinessData] = useState<BusinessData>(defaultValues)
 
-  const updateBusinessData = (field: string, value: any) => {
+  const setFormValue = (field: string, value: any) => {
     setBusinessData((prev) => ({
       ...prev,
       [field]: value,
@@ -217,40 +217,40 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
       case 0:
         return (
           <StepBusinessInfo
-            businessData={businessData}
-            updateBusinessData={updateBusinessData}
-            onPrev={prevStep}
-            onNext={nextStep}
+          businessData={businessData}
+          setFormValue={setFormValue}
+          onPrev={prevStep}
+          onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
         );
       case 1:
         return (
           <StepLocationContact
-            businessData={businessData}
-            updateBusinessData={updateBusinessData}
-            onPrev={prevStep}
-            onNext={nextStep}
+          businessData={businessData}
+          setFormValue={setFormValue}
+          onPrev={prevStep}
+          onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
         );
       case 2:
         return (
           <StepHours
-            businessData={businessData}
-            updateBusinessData={updateBusinessData}
-            onPrev={prevStep}
-            onNext={nextStep}
+          businessData={businessData}
+          setFormValue={setFormValue}
+          onPrev={prevStep}
+          onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
           />
         );
       case 3:
         return (
           <StepMediaBranding
-            businessData={businessData}
-            updateBusinessData={updateBusinessData}
-            onPrev={prevStep}
-            onNext={nextStep}
+          businessData={businessData}
+          setFormValue={setFormValue}
+          onPrev={prevStep}
+          onNext={nextStep}
             isNextDisabled={!isCurrentStepValid()}
             businessSlug={businessSlug}
           />
@@ -297,41 +297,6 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
         return null;
     }
   };
-    
-
-  const submitBusiness = async () => {
-    try {
-      // Prepare the final payload for the API
-      const payload = {
-        name: businessData.name,
-        tagline: businessData.tagline,
-        about: businessData.about,
-        startingDate: `${businessData.startingDate.year}-${businessData.startingDate.month}-${businessData.startingDate.day}`,
-        category: businessData.category,
-        streetAddress: businessData.streetAddress,
-        houseInfo: businessData.houseInfo,
-        localArea: businessData.localArea,
-        city: businessData.city,
-        postalCode: businessData.postalCode,
-        country: businessData.country,
-        mobile: businessData.mobile,
-        website: businessData.website,
-        facebook: businessData.facebook,
-        businessHours: businessData.businessHours,
-        is24x7: businessData.is24x7,
-        closedOnHolidays: businessData.closedOnHolidays,
-        // Media branding data will be handled separately if needed
-        mediaBranding: businessData.mediaBranding
-      }
-      
-      console.log("Submitting business data:", payload)
-      // This will be called from CompletionAndPublish component
-      return payload
-    } catch (error) {
-      console.error("Error preparing business data", error)
-      throw error
-    }
-  }
 
   // Render progress bar at 90% for step 4 (before publish), 100% after publish, else normal
   let progressBar = null;

@@ -62,6 +62,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
   // Local state for toggles to avoid immediate parent updates
   const [is24x7, setIs24x7] = useState(businessData.is24x7 || false);
   const [closedOnHolidays, setClosedOnHolidays] = useState(businessData.closedOnHolidays || false);
+  const [activeDay, setActiveDay] = useState<string | null>(null);
 
   // Update business data when hours change - simplified to avoid infinite loops
   const updateHours = (newHours: { [key: string]: DayHours }) => {
@@ -79,24 +80,47 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
       DAYS.forEach(day => {
         newHours[day] = {
           isOpen: true,
-          timeSlots: [{ id: `${day}-1`, startTime: "12:00 AM", endTime: "11:59 PM" }]
+          // Use a value that exists in the 30‑minute timeOptions list
+          timeSlots: [{ id: `${day}-1`, startTime: "12:00 AM", endTime: "11:30 PM" }]
         };
       });
       setBusinessHours(newHours);
+      setActiveDay(null);
     }
   };
 
   // Handle public holidays toggle
   const handleHolidaysToggle = (checked: boolean) => {
     setClosedOnHolidays(checked);
+    if (checked) {
+      // When "Closed on Public Holidays" is ON, enable all weekday slots (Mon-Thu)
+      const newHours = { ...businessHours } as { [key: string]: DayHours };
+      ["Mon", "Tue", "Wed", "Thu"].forEach((day) => {
+        if (!newHours[day]) return;
+        newHours[day].isOpen = true;
+        if (!newHours[day].timeSlots || newHours[day].timeSlots.length === 0) {
+          newHours[day].timeSlots = [
+            { id: `${day}-1`, startTime: "9:00 AM", endTime: "6:00 PM" },
+          ];
+        }
+      });
+      setBusinessHours(newHours);
+      // Show all slots, not just one day
+      setActiveDay(null);
+    }
   };
 
   // Toggle day open/closed
   const toggleDay = (day: string) => {
     const newHours = { ...businessHours };
-    if (newHours[day]) {
-      newHours[day]!.isOpen = !newHours[day]!.isOpen;
-      setBusinessHours(newHours);
+    if (!newHours[day]) return;
+    const nextState = !newHours[day]!.isOpen;
+    newHours[day]!.isOpen = nextState;
+    setBusinessHours(newHours);
+    if (nextState) {
+      setActiveDay(day);
+    } else if (activeDay === day) {
+      setActiveDay(null);
     }
   };
 
@@ -148,6 +172,7 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
       }
     });
     setBusinessHours(newHours);
+    setActiveDay('Mon');
   };
 
   // Generate time options
@@ -273,12 +298,12 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
           </div>
         </div>
 
-            {/* Only show slots if closedOnHolidays is ON and is24x7 is OFF */}
-            {!is24x7 && closedOnHolidays && hasSelectedDays && (
+            {/* Show slots: if holidays ON -> show all open days; else -> show currently active day */}
+            {!is24x7 && (closedOnHolidays ? (
               <div>
                 <h3 className="text-[16px] text-[#111827] font-medium mb-4">Opening Hours</h3>
                 <div className="space-y-4">
-                  {DAYS.filter(day => businessHours[day]?.isOpen).map((day) => (
+                  {DAYS.filter((day) => businessHours[day]?.isOpen).map((day) => (
                     <div key={day} className="border border-gray-200 rounded-[8px] p-[16px]">
                       <h3 className="font-medium text-gray-900 mb-3">{DAY_NAMES[day as keyof typeof DAY_NAMES]}</h3>
                       {businessHours[day]?.timeSlots?.map((slot, index) => (
@@ -328,7 +353,6 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
                         </div>
                       ))}
                       <button
-                        
                         onClick={() => addTimeSlot(day)}
                         className="text-[#6F00FF] flex justify-start items-start pt-[6px] !text-start text-[14px] font-medium h-auto"
                       >
@@ -338,7 +362,71 @@ export function StepHours({ businessData, updateBusinessData, onPrev, onNext, is
                   ))}
                 </div>
               </div>
-            )}
+            ) : (activeDay && businessHours[activeDay]?.isOpen && (
+              <div>
+                <h3 className="text-[16px] text-[#111827] font-medium mb-4">Opening Hours</h3>
+                <div className="space-y-4">
+                  {[activeDay].map((day) => (
+                    <div key={day as string} className="border border-gray-200 rounded-[8px] p-[16px]">
+                      <h3 className="font-medium text-gray-900 mb-3">{DAY_NAMES[day as keyof typeof DAY_NAMES]}</h3>
+                      {businessHours[day as string]?.timeSlots?.map((slot, index) => (
+                        <div key={slot.id} className="flex items-center space-y-3 gap-[12px] text-[#353535] mb-3">
+                          <span className="text-gray-500">Time Slot {index + 1}:</span>
+                          <Select
+                            value={slot.startTime}
+                            onValueChange={(value) => updateTimeSlot(day as string, slot.id, 'startTime', value)}
+                          >
+                            <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-[8px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time} value={time} className="text-[#353535]">
+                                  {time}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <span className="text-gray-500">→</span>
+                          <Select
+                            value={slot.endTime}
+                            onValueChange={(value) => updateTimeSlot(day as string, slot.id, 'endTime', value)}
+                          >
+                            <SelectTrigger className="w-[120px] h-[40px] border border-gray-300 rounded-[8px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((time) => (
+                                <SelectItem key={time} value={time} className="text-[#353535]">
+                                  {time}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {(businessHours[day as string]?.timeSlots?.length ?? 0) > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeTimeSlot(day as string, slot.id)}
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="w-[16px] h-[16px]" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        
+                        onClick={() => addTimeSlot(activeDay as string)}
+                        className="text-[#6F00FF] flex justify-start items-start pt-[6px] !text-start text-[14px] font-medium h-auto"
+                      >
+                        + Add Another Time Slot
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )))}
                <div className="flex gap-4 py-[32px] w-full">
               <button
                 onClick={onPrev}

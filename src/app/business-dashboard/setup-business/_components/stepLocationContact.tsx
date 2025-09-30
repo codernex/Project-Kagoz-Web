@@ -6,13 +6,13 @@ import { MapPin, Home, Phone, Globe, Facebook, Building2, ChevronLeft } from "lu
 import { TextInput } from "@/components/shared/text-input";
 import { Form } from "@/components/ui/form";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useGetBusinessBySlugQuery, useUpdateBusinessMutation } from "@/redux/api";
+import { useGetBusinessBySlugQuery } from "@/redux/api";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
 interface StepProps {
   businessData: BusinessData;
-  updateBusinessData: (field: string, value: any) => void;
+  setFormValue: (field: string, value: any) => void;
   onPrev: () => void;
   onNext: () => void;
   isNextDisabled?: boolean;
@@ -20,7 +20,7 @@ interface StepProps {
 
 export function StepLocationContact({
   businessData,
-  updateBusinessData,
+  setFormValue,
   onPrev,
   onNext,
   isNextDisabled
@@ -66,21 +66,16 @@ export function StepLocationContact({
   useEffect(() => {
     const sub = form.watch((values) => {
       Object.entries(values as Record<string, string>).forEach(([k, v]) => {
-        updateBusinessData(k, v || "")
+        setFormValue(k, v || "")
       })
     })
     return () => sub.unsubscribe()
   }, [form])
 
   const onSubmit: SubmitHandler<LocationContactInput> = async (d) => {
-    // Debug: Log form data before updating parent state
-    console.log("LocationContact form data:", d);
-    console.log("State value:", d.state);
-    
     // Update parent state with form data
     Object.entries(d).forEach(([k, v]) => {
-      console.log(`Updating ${k} with value:`, v);
-      updateBusinessData(k, v || "")
+      setFormValue(k, v || "")
     })
     onNext()
   }

@@ -7,7 +7,6 @@ import { Building2, Camera, ChevronLeft, Clock, Star } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
 import { DateSelector } from "@/components/bizness/select-date"
 import { useParams } from "next/navigation"
-import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation, useUpdateLicenseMutation, useUpdateBusinessMediaMutation } from "@/redux/api"
 
 
 interface UploadedFile {
@@ -27,14 +26,14 @@ interface MediaBrandingData {
 
 interface StepProps {
   businessData: BusinessData
-  updateBusinessData: (field: string, value: any) => void
+  setFormValue: (field: string, value: any) => void
   onPrev: () => void
   onNext: () => void
   isNextDisabled?: boolean
   businessSlug?: string | null
 }
 
-export function StepMediaBranding({ businessData, updateBusinessData, onPrev, onNext, isNextDisabled, businessSlug }: StepProps) {
+export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, isNextDisabled, businessSlug }: StepProps) {
   const { slug } = useParams() as { slug?: string }
   
   // Media files will be submitted in CompletionAndPublish component
@@ -47,6 +46,13 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
       gallery: []
     }
   })
+
+  // Sync formData with businessData when navigating back
+  React.useEffect(() => {
+    if (businessData.mediaBranding) {
+      setFormData(businessData.mediaBranding)
+    }
+  }, [businessData.mediaBranding])
   
   const [errors, setErrors] = useState<{ 
     logo?: string
@@ -58,7 +64,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const handleLogoChange = (files: UploadedFile[]) => {
     const newData = { ...formData, logo: files[0] || null }
     setFormData(newData)
-    // updateBusinessData is handled by useEffect
+    // setFormValue is handled by useEffect
     
     if (errors.logo) {
       setErrors(prev => ({ ...prev, logo: undefined }))
@@ -68,7 +74,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const handleBannerChange = (files: UploadedFile[]) => {
     const newData = { ...formData, banner: files[0] || null }
     setFormData(newData)
-    // updateBusinessData is handled by useEffect
+    // setFormValue is handled by useEffect
     
     if (errors.banner) {
       setErrors(prev => ({ ...prev, banner: undefined }))
@@ -78,22 +84,22 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
   const handleLicenseChange = (files: UploadedFile[]) => {
     const newData = { ...formData, license: files }
     setFormData(newData)
-    // updateBusinessData is handled by useEffect
+    // setFormValue is handled by useEffect
     
     if (errors.license) {
       setErrors(prev => ({ ...prev, license: undefined }))
     }
   }
 
-  // Update parent state when form data changes - removed updateBusinessData from dependencies to avoid infinite loops
+  // Update parent state when form data changes - removed setFormValue from dependencies to avoid infinite loops
   React.useEffect(() => {
-    updateBusinessData('mediaBranding', formData)
-  }, [formData]) // Removed updateBusinessData from dependencies
+    setFormValue('mediaBranding', formData)
+  }, [formData]) // Removed setFormValue from dependencies
 
   const handleGalleryChange = (files: UploadedFile[]) => {
     const newData = { ...formData, gallery: files }
     setFormData(newData)
-    // updateBusinessData is handled by useEffect
+    // setFormValue is handled by useEffect
     
     if (errors.gallery) {
       setErrors(prev => ({ ...prev, gallery: undefined }))
@@ -133,7 +139,7 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
     if (!validateForm()) return;
     
     // Update parent state with media branding data
-    updateBusinessData('mediaBranding', formData)
+    setFormValue('mediaBranding', formData)
     
     // Media files will be submitted in CompletionAndPublish component
     onNext()
@@ -158,7 +164,8 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                 description="Logo for your business profile"
                 required={true}
                 max={1}
-                maxSizeMB={10}
+                maxSizeMB={2}
+                acceptedTypes={["image/png"]}
                 recommendedSize="500x500 px"
                 value={formData.logo ? [formData.logo] : []}
                 onChange={handleLogoChange}
@@ -175,7 +182,8 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
                 label="Banner Image"
                 description="Banner image for your business profile"
                 max={1}
-                maxSizeMB={10}
+                maxSizeMB={2}
+                acceptedTypes={["image/png"]}
                 recommendedSize="1200x500 px"
                 value={formData.banner ? [formData.banner] : []}
                 onChange={handleBannerChange}
@@ -193,14 +201,13 @@ export function StepMediaBranding({ businessData, updateBusinessData, onPrev, on
             <DateSelector
           name="licenseIssueDate"
           required
-          onChange={(v) => updateBusinessData('issueDate', v)}
+          value={businessData.issueDate}
+          onChange={(v) => setFormValue('issueDate', v)}
         />
             </div>
             {/* Business License */}
             <div>
             
-
-              {/* Document Upload */}
               <div className="mb-3">
                 <Label className="text-sm font-medium text-gray-700">Document</Label>
               </div>

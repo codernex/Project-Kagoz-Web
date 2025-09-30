@@ -11,7 +11,7 @@ import { Textarea } from "@/components/bizness/textarea"
 import { TiptapEditor } from "@/components/ui/texteditor"
 import { DateSelector } from "@/components/bizness/select-date"
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useRegisterBusinessMutation, useGetBusinessBySlugQuery } from "@/redux/api"
+import { useGetBusinessBySlugQuery } from "@/redux/api"
 import { useGetCategoriesQuery } from "@/redux/api/category"
 import { useParams } from "next/navigation"
 import { useForm, SubmitHandler } from "react-hook-form"
@@ -20,33 +20,49 @@ type BusinessInfoInput = {
   name: string
   tagline: string
   about: string
-  startingDate: string
+  startingDate: string | { year: string; month: string; day: string }
   category: string
 }
 
 interface StepProps {
   businessData: BusinessData
-  updateBusinessData: (field: string, value: any) => void
+  setFormValue: (field: string, value: any) => void
   onPrev: () => void
   onNext: () => void
   isNextDisabled?: boolean
 }
 
-export function StepBusinessInfo({ businessData, onPrev, onNext, updateBusinessData }: StepProps) {
+export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }: StepProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const { slug } = useParams() as { slug?: string }
 
   // fetch business data (skip if no slug on this route)
   const { data: existingBusiness } = useGetBusinessBySlugQuery(slug as string, { skip: !slug })
 
+  // Prepare starting date default as an object so DateSelector can hydrate
+  const defaultStartingDate = ((): { year: string; month: string; day: string } | "" => {
+    if (businessData.startingDate?.year && businessData.startingDate?.month && businessData.startingDate?.day) {
+      return {
+        year: businessData.startingDate.year,
+        month: businessData.startingDate.month,
+        day: businessData.startingDate.day,
+      }
+    }
+    const apiDate: string | undefined = (existingBusiness as any)?.startingDate
+    if (apiDate && apiDate.includes("-")) {
+      const [y, m, d] = apiDate.split("-") as [string, string, string]
+      return { year: y ?? "", month: m ?? "", day: d ?? "" }
+    }
+    return ""
+  })()
+
   // form setup - prioritize businessData from parent state
   const defaultValues: BusinessInfoInput = {
     name: businessData.name || (existingBusiness as any)?.name || "",
     tagline: businessData.tagline || (existingBusiness as any)?.tagline || "",
     about: businessData.about || (existingBusiness as any)?.about || "",
-    startingDate: businessData.startingDate.year && businessData.startingDate.month && businessData.startingDate.day 
-      ? `${businessData.startingDate.year}-${businessData.startingDate.month}-${businessData.startingDate.day}`
-      : (existingBusiness as any)?.startingDate || "",
+    startingDate: defaultStartingDate,
+    // Keep the category ID in state to match the Select options
     category: businessData.category || (existingBusiness as any)?.category || "",
   }
 
@@ -92,27 +108,24 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, updateBusinessD
   const onSubmit: SubmitHandler<BusinessInfoInput> = async (d) => {
     try {
       // Update parent state with form data
-      updateBusinessData("name", d.name)
-      updateBusinessData("tagline", d.tagline)
-      updateBusinessData("about", d.about)
+      setFormValue("name", d.name)
+      setFormValue("tagline", d.tagline)
+      setFormValue("about", d.about)
       
-      // Find the category name from the selected category ID
-      const selectedCategory = categories.find(cat => cat.value === d.category)
-      const categoryName = selectedCategory ? selectedCategory.label : d.category
-      
-      updateBusinessData("category", categoryName)
+      // Persist the selected category VALUE (ID) to keep Select hydrated when returning
+      setFormValue("category", d.category)
       
       // Handle starting date
       if (typeof d.startingDate === "object") {
-        updateBusinessData("startingDate", d.startingDate)
+        setFormValue("startingDate", d.startingDate)
       } else if (typeof d.startingDate === "string" && d.startingDate.includes("-")) {
         const [year, month, day] = d.startingDate.split("-")
-        updateBusinessData("startingDate", { year, month, day })
+        setFormValue("startingDate", { year, month, day })
       }
       
       onNext()
     } catch (err) {
-      console.error("Error updating business data:", err)
+      console.error("Error updating form value:", err)
     }
   }
 

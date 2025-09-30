@@ -34,7 +34,7 @@ export default function FileUploader({
   required = false,
   max = 1,
   maxSizeMB = 10,
-  acceptedTypes = ["image/png"],
+  acceptedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"],
   recommendedSize,
   value = [],
   onChange,
@@ -45,6 +45,12 @@ export default function FileUploader({
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [imageErrors, setImageErrors] = React.useState<Set<string>>(new Set())
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
+  const resolvePreviewSrc = (src?: string): string => {
+    if (!src) return ""
+    // For data URLs or blob URLs, use as-is. Only append API base for relative paths.
+    if (src.startsWith("data:") || src.startsWith("blob:")) return src
+    return appendApi(src)
+  }
 
 
   // Handle image load errors
@@ -91,7 +97,10 @@ export default function FileUploader({
 
     // Check file type
     if (!acceptedTypes.includes(file.type)) {
-      return `File type not supported. Please upload ${acceptedTypes.join(', ')}`
+      const readableTypes = acceptedTypes
+        .map(t => (t.startsWith('image/') ? t.split('/')[1].toUpperCase() : t))
+        .join(', ')
+      return `No supported file type. Allowed: ${readableTypes}`
     }
 
     return null
@@ -229,7 +238,7 @@ export default function FileUploader({
                 <Image
                   width={80}
                   height={80}
-                  src={appendApi(files[0].preview)}
+                  src={resolvePreviewSrc(files[0].preview)}
                   alt={files[0].name || 'Uploaded file'}
                   className="w-12 h-12 sm:h-[80px] sm:w-[80px] object-cover rounded"
                   onError={() => handleImageError(files[0]?.id)}
@@ -303,7 +312,7 @@ export default function FileUploader({
                 <Image
                   width={150}
                   height={80}
-                  src={appendApi(file.preview)}
+                  src={resolvePreviewSrc(file.preview)}
                   alt={file.name || 'Uploaded file'}
                   className="w-20 h-20 sm:h-[80px] sm:w-[150px] object-cover rounded-[8px]"
                   onError={() => handleImageError(file.id)}
