@@ -14,7 +14,7 @@ import { SuccessDialog } from "./successDialog"
 
 interface UploadedFile {
   id: string
-  file: File
+  file: File | null
   preview: string
   name: string
   size: string
@@ -48,6 +48,7 @@ export interface BusinessData {
   mobile: string
   email: string
   website: string
+  openingHours?: any
   youtubeVideo: string
   facebook: string
   linkedin: string
@@ -137,7 +138,9 @@ export function BusinessSetupWizard() {
           ...prev,
           businessHours: data.businessHours,
           is24x7: data.is24x7,
-          closedOnHolidays: data.closedOnHolidays
+          closedOnHolidays: data.closedOnHolidays,
+          // Add the new openingHours structure
+          openingHours: data.openingHours
         }));
       }
       setCurrentStep(currentStep + 1)

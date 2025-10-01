@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-
 import { MapPin, Building, Phone, Globe, Facebook } from "lucide-react"
 import { TextInput } from "@/components/shared/text-input"
 import { useUpdateBusinessMutation } from "@/redux/api/business"
@@ -30,15 +29,22 @@ interface LocationContactStepProps {
   form: any
 }
 
-export default function LocationContactStep({ data, onUpdate, onNext, onBack, onSaveAndBack, form }: LocationContactStepProps) {
+export default function LocationContactStep({
+  data,
+  onUpdate,
+  onNext,
+  onSaveAndBack,
+  form,
+}: LocationContactStepProps) {
   const [formData, setFormData] = useState<LocationContactData>(data)
   const [errors, setErrors] = useState<Partial<LocationContactData>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Redux API hook
   const [updateBusiness] = useUpdateBusinessMutation()
   const params = useParams() as { slug?: string }
-  const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
+  const slug = decodeURIComponent((params?.slug as string) || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
 
   // Sync RHF values to parent on change
   useEffect(() => {
@@ -62,7 +68,7 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
 
   const validateForm = () => {
     const newErrors: Partial<LocationContactData> = {}
-    
+
     if (!(form.getValues("streetAddress") || "").trim()) {
       newErrors.streetAddress = "Street address is required"
     }
@@ -89,13 +95,8 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
   const handleSaveAndBack = async () => {
     if (!validateForm()) return
 
-    setIsSubmitting(true)
     try {
-      // Get current form values
       const currentValues = form.getValues()
-      console.log("🔍 LocationContactStep - Current form values:", currentValues)
-      
-      // Create JSON payload instead of FormData
       const jsonPayload = {
         streetAddress: currentValues.streetAddress || "",
         houseRoad: currentValues.houseRoad || "",
@@ -107,32 +108,23 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
         website: currentValues.website || "",
         facebook: currentValues.facebook || "",
       }
-      
-      console.log("🔍 LocationContactStep - JSON payload:", jsonPayload)
 
       await updateBusiness({ slug, data: jsonPayload }).unwrap()
       toast.success("Location and contact information saved successfully!")
       onSaveAndBack()
     } catch (error) {
-      console.error('Error saving location contact:', error)
       toast.error("Failed to save location and contact information. Please try again.")
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
   const handleNext = async () => {
     if (!validateForm()) return
 
-    setIsSubmitting(true)
     try {
-      // Get current form values
       const currentValues = form.getValues()
-      
-      // Create JSON payload instead of FormData
       const jsonPayload = {
         streetAddress: currentValues.streetAddress || "",
-        houseRoad: currentValues.houseRoad || "",
+        house: currentValues.houseRoad || "",
         localArea: currentValues.localArea || "",
         city: currentValues.city || "",
         postalCode: currentValues.postalCode || "",
@@ -141,142 +133,120 @@ export default function LocationContactStep({ data, onUpdate, onNext, onBack, on
         website: currentValues.website || "",
         facebook: currentValues.facebook || "",
       }
-      
-      console.log("🔍 LocationContactStep - JSON payload (handleNext):", jsonPayload)
 
       await updateBusiness({ slug, data: jsonPayload }).unwrap()
       toast.success("Location and contact information saved successfully!")
       onNext()
     } catch (error) {
-      console.error('Error saving location contact:', error)
       toast.error("Failed to save location and contact information. Please try again.")
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
   return (
     <Form {...form}>
-    <form onSubmit={(e) => { e.preventDefault() }} className="space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+        <div className="flex items-center gap-2 mb-4">
           <MapPin className="w-[24px] h-[24px] text-[#9333EA]" />
-       
-        <h3 className="auth-heading !font-medium text-[#111827]">Location & Contact</h3>
-      </div>
-      <p className="text-[#2D3643] Subheading !text-start mb-6">Where is your business located?</p>
+          <h3 className="auth-heading !font-medium text-[#111827]">
+            Location & Contact
+          </h3>
+        </div>
+        <p className="text-[#2D3643] Subheading !text-start mb-6">
+          Where is your business located?
+        </p>
 
-    <div className="grid lg:grid-cols-2 grid-cols-1 gap-5">
-    <TextInput
-      name="streetAddress"
-      control={form.control}
-      label="streetAddress"
-      placeholderIcon={Building}
-      required
-      width="100%"
-    />
-    <TextInput
-      name="houseRoad"
-      control={form.control}
-      label="House / Road Info"
-      required
-      width="100%"
- 
-    />
-    <TextInput
-      name="localArea"
-      control={form.control}
-      required
-      label="localArea"
-      width="100%"
-     
-    />
-    <TextInput
-      name="city"
-      control={form.control}
-      label="city"
-      required
-      width="100%"
-    />
-    <TextInput
-      name="postalCode"
-      control={form.control}
-      label="postal Code"
-      required
-      width="100%"
-      
-    />
-    <TextInput
-      name="country"
-      control={form.control}
-      label="country"
-      readOnly
-      width="100%"
-      className="mt-1"
-    />
-    </div>
+        <div className="grid lg:grid-cols-2 grid-cols-1 gap-5">
+          <TextInput
+            name="streetAddress"
+            control={form.control}
+            label="Street Address"
+            placeholderIcon={Building}
+            required
+            width="100%"
+          />
+          <TextInput
+            name="houseRoad"
+            control={form.control}
+            label="House / Road Info"
+            required
+            width="100%"
+          />
+          <TextInput
+            name="localArea"
+            control={form.control}
+            label="Local Area"
+            required
+            width="100%"
+          />
+          <TextInput
+            name="city"
+            control={form.control}
+            label="City"
+            required
+            width="100%"
+          />
+          <TextInput
+            name="postalCode"
+            control={form.control}
+            label="Postal Code"
+            required
+            width="100%"
+          />
+          <TextInput
+            name="country"
+            control={form.control}
+            label="Country"
+            readOnly
+            width="100%"
+            className="mt-1"
+          />
+        </div>
 
-      <div className="space-y-4">
-       
-
-      
+        <div className="space-y-4">
           <TextInput
             name="mobile"
             control={form.control}
-            placeholder="phone"
+            placeholder="Phone"
             required
             width="100%"
             placeholderIcon={Phone}
             label="Mobile Number"
           />
-        
-       
 
-    
-        
-            <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <TextInput 
-              name="website"
-              control={form.control}
-              label="Website URL (Optional)"
-              placeholderIcon={Globe}
-              width="100%"
-              placeholder="https://www.kagoz.com"
-            />
-          
+          <TextInput
+            name="website"
+            control={form.control}
+            label="Website URL (Optional)"
+            placeholderIcon={Globe}
+            width="100%"
+            placeholder="https://www.example.com"
+          />
 
-    
+          <TextInput
+            name="facebook"
+            control={form.control}
+            width="100%"
+            placeholderIcon={Facebook}
+            label="Facebook Page (Optional)"
+            placeholder="https://facebook.com/example"
+          />
+        </div>
 
-       
-          
-            <TextInput 
-              name="facebook"
-              control={form.control}
-              width="100%"
-              placeholderIcon={Facebook}
-              label="Facebook Page (Optional)"
-              placeholder="https://facebook.com/kagoz"
-            />
-          
-      </div>
-
-      <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
-        <button
-          disabled={isSubmitting}
-          onClick={handleSaveAndBack}
-          className="lg:px-20 px-4 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Saving..." : "Save & Back to Businesses"}
-        </button>
-        <button
-          disabled={isSubmitting}
-          onClick={handleNext}
-          className="lg:px-20 px-4 !py-3 cursor-pointer bg-[#6F00FF] lg:whitespace-pre whitespace-normal text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Saving..." : "Save & Continue"}
-        </button>
-      </div>
-    </form>
+        <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
+          <button
+            onClick={handleSaveAndBack}
+            className="lg:px-20 px-4 !py-3 cursor-pointer border-blue-600 text-white bg-[#163987] rounded-lg"
+          >
+            Save & Back to Businesses
+          </button>
+          <button
+            onClick={handleNext}
+            className="lg:px-20 px-4 !py-3 cursor-pointer bg-[#6F00FF] text-white rounded-lg"
+          >
+            Save & Continue
+          </button>
+        </div>
+      </form>
     </Form>
   )
 }

@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
+import { UserProfile } from "../user-profile"
 import { useAuth } from "@/context/AuthContext"
 import { usePathname, useRouter } from "next/navigation"
 
@@ -50,6 +51,7 @@ export default function BusinessDashboardLayout({
         />
         <main className="pt-[72px]">{children}</main>
       </div>
+      <UserProfile />
     </div>
   )
 }

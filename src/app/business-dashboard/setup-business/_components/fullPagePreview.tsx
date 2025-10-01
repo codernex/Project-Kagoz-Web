@@ -44,33 +44,33 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
   }
 
   const getBusinessHoursDisplay = () => {
-    if (businessData.is24x7) {
+    // Handle the new openingHours structure
+    const openingHours = (businessData as any)?.openingHours
+    
+    if (!openingHours) return []
+    
+    // If 24/7 is enabled
+    if (openingHours.isOpen247) {
       return ["Open 24/7"]
     }
     
-    const days = {
-      Mon: "Monday",
-      Tue: "Tuesday", 
-      Wed: "Wednesday",
-      Thu: "Thursday",
-      Fri: "Friday",
-      Sat: "Saturday",
-      Sun: "Sunday"
-    }
-
-    const hasOpenDays = Object.values(businessData.businessHours).some(hours => hours.isOpen)
-    if (!hasOpenDays) {
-      return []
-    }
-
-    return Object.entries(businessData.businessHours).map(([day, hours]) => {
-      const dayName = days[day as keyof typeof days]
-      if (hours.isOpen) {
-        return `${dayName}: ${hours.openTime} - ${hours.closeTime}`
-      } else {
+    // If custom hours are set
+    if (openingHours.days && Array.isArray(openingHours.days)) {
+      return openingHours.days.map((dayData: any) => {
+        const dayName = dayData.day
+        if (dayData.isOpen && dayData.timeRanges && dayData.timeRanges.length > 0) {
+          const timeSlots = dayData.timeRanges.map((range: any) => {
+            const fromTime = `${range.from.hours}:${range.from.minutes} ${range.from.period}`
+            const toTime = `${range.to.hours}:${range.to.minutes} ${range.to.period}`
+            return `${fromTime} - ${toTime}`
+          }).join(', ')
+          return `${dayName}: ${timeSlots}`
+        }
         return `${dayName}: Closed`
-      }
-    })
+      })
+    }
+    
+    return []
   }
 
   return (

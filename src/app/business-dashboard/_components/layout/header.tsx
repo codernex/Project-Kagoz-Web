@@ -25,9 +25,7 @@ export function Header({ setSidebarOpen,className }: HeaderProps) {
           </Button>
         
         </div>
-        {/* <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-purple-100 text-[#6F00FF]">U</AvatarFallback>
-        </Avatar> */}
+        
          <DropdownMenu>
                   <DropdownMenuTrigger>
                     <div className="w-[32px] h-[32px] rounded-full flex items-center justify-center bg-[#6F00FF] cursor-pointer">

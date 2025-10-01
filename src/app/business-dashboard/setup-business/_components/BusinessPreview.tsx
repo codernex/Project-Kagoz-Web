@@ -43,8 +43,8 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
               <Building2 className="h-[32px] w-[32px] text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm truncate">{businessData.name || "Business Name"}</h3>
-            <p className="text-xs text-gray-600 break-words">{businessData.tagline || "Business tagline"}</p>
+            <h3 className="font-semibold text-sm truncate">{businessData?.name || "Business Name"}</h3>
+            <p className="text-xs text-gray-600 break-words">{businessData?.tagLine || "Business tagline"}</p>
           </div>
         </div>
 
@@ -62,9 +62,17 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
             <div>
               <p className="font-medium">Starting Date</p>
               <p className="text-gray-600">
-                {businessData.startingDate.year && businessData.startingDate.month && businessData.startingDate.day
-                  ? `${businessData.startingDate.year}-${businessData.startingDate.month}-${businessData.startingDate.day}`
-                  : "Not specified"}
+                {(() => {
+                  if (typeof businessData.startingDate === 'object' && businessData.startingDate !== null) {
+                    const date = businessData.startingDate as { year?: string; month?: string; day?: string }
+                    if (date.year && date.month && date.day) {
+                      return `${date.year}-${date.month}-${date.day}`
+                    }
+                  } else if (typeof businessData.startingDate === 'string' && businessData.startingDate !== '') {
+                    return businessData.startingDate
+                  }
+                  return "Not specified"
+                })()}
               </p>
             </div>
           </div>

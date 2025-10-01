@@ -78,7 +78,7 @@ function EditorCore({
   // Sync editor content with value prop
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value, false)
+      editor.commands.setContent(value, { emitUpdate: false })
     }
   }, [editor, value])
 

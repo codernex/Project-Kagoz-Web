@@ -218,7 +218,7 @@ export function StepLocationContact({
                       {businessData.name}
                     </h3>
                     <p className="text-xs text-gray-600 break-words">
-                      {businessData.tagline}
+                      {businessData?.tagLine}
                     </p>
                   </div>
                 </div>

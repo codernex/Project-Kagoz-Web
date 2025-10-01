@@ -5,10 +5,11 @@ import { X, Upload, Camera } from "lucide-react"
 import Image from "next/image"
 import { Label } from "@/components/ui/label"
 import { cn, appendApi } from "@/lib/utils"
+import UploadErrorHandler from "./upload-error-handler"
 
 interface UploadedFile {
   id: string
-  file: File
+  file: File | null
   preview: string
   name: string
   size: string
@@ -44,12 +45,17 @@ export default function FileUploader({
   const [files, setFiles] = React.useState<UploadedFile[]>(value)
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [imageErrors, setImageErrors] = React.useState<Set<string>>(new Set())
+  const [isProcessing, setIsProcessing] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
   const resolvePreviewSrc = (src?: string): string => {
     if (!src) return ""
-    // For data URLs or blob URLs, use as-is. Only append API base for relative paths.
+    // For data URLs or blob URLs, use as-is
     if (src.startsWith("data:") || src.startsWith("blob:")) return src
-    return appendApi(src)
+    // For HTTP URLs, use as-is
+    if (src.startsWith("http")) return src
+    // For relative paths from API, add uploads prefix
+    return `http://localhost:9000/uploads/${src}`
   }
 
 
@@ -98,7 +104,7 @@ export default function FileUploader({
     // Check file type
     if (!acceptedTypes.includes(file.type)) {
       const readableTypes = acceptedTypes
-        .map(t => (t.startsWith('image/') ? t.split('/')[1].toUpperCase() : t))
+        .map(t => (t.startsWith('image/') ? t.split('/')[1]?.toUpperCase() || t : t))
         .join(', ')
       return `No supported file type. Allowed: ${readableTypes}`
     }
@@ -123,39 +129,56 @@ export default function FileUploader({
     }
 
     if (errors.length > 0) {
-      onError?.(errors.join('\n'))
+      const errorMessage = errors.join('\n')
+      setError(errorMessage)
+      onError?.(errorMessage)
       return
     }
 
     // Check if adding these files would exceed the max limit
     if (files.length + validFiles.length > max) {
-      onError?.(`Maximum ${max} file${max > 1 ? 's' : ''} allowed`)
+      const errorMessage = `Maximum ${max} file${max > 1 ? 's' : ''} allowed`
+      setError(errorMessage)
+      onError?.(errorMessage)
       return
     }
 
     const uploadedFiles: UploadedFile[] = []
     
-    for (const file of validFiles) {
-      const preview = await createFilePreview(file)
-      const uploadedFile: UploadedFile = {
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-        preview,
-        name: file.name,
-        size: formatFileSize(file.size)
+    try {
+      setIsProcessing(true)
+      for (const file of validFiles) {
+        const preview = await createFilePreview(file)
+        const uploadedFile: UploadedFile = {
+          id: Math.random().toString(36).substr(2, 9),
+          file,
+          preview,
+          name: file.name,
+          size: formatFileSize(file.size)
+        }
+        uploadedFiles.push(uploadedFile)
       }
-      uploadedFiles.push(uploadedFile)
-    }
 
-    const updatedFiles = max === 1 ? uploadedFiles : [...files, ...uploadedFiles]
-    setFiles(updatedFiles)
-    onChange?.(updatedFiles)
+      const updatedFiles = max === 1 ? uploadedFiles : [...files, ...uploadedFiles]
+      setFiles(updatedFiles)
+      onChange?.(updatedFiles)
+    } catch (error) {
+      const errorMessage = 'Failed to process files. Please try again.'
+      setError(errorMessage)
+      onError?.(errorMessage)
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const removeFile = (id: string) => {
     const newFiles = files.filter(file => file.id !== id)
     setFiles(newFiles)
     onChange?.(newFiles)
+  }
+
+  const clearError = () => {
+    setError(null)
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -195,6 +218,12 @@ export default function FileUploader({
         {description && (
           <p className="text-xs text-gray-500">{description}</p>
         )}
+        
+        <UploadErrorHandler 
+          error={error} 
+          onDismiss={clearError}
+          className="mb-2"
+        />
 
         {files.length === 0 ? (
           // Upload area
@@ -210,8 +239,14 @@ export default function FileUploader({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <Upload className="h-8 w-8 text-gray-400 mb-2" />
-            <p className="text-sm text-gray-600">Drop your image here or click to browse</p>
+            {isProcessing ? (
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mb-2"></div>
+            ) : (
+              <Upload className="h-8 w-8 text-gray-400 mb-2" />
+            )}
+            <p className="text-sm text-gray-600">
+              {isProcessing ? 'Processing files...' : 'Drop your image here or click to browse'}
+            </p>
             <p className="text-xs text-gray-500 mt-1">
               {getAcceptedTypesText()} up to {maxSizeMB}MB
             </p>
@@ -276,6 +311,12 @@ export default function FileUploader({
       {description && (
         <p className="text-xs text-gray-500">{description}</p>
       )}
+      
+      <UploadErrorHandler 
+        error={error} 
+        onDismiss={clearError}
+        className="mb-2"
+      />
 
       {/* Initial upload area - only shown when no files are uploaded */}
       {files.length === 0 && (
@@ -291,8 +332,14 @@ export default function FileUploader({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <Camera className="h-8 w-8 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600">Drop your image here or click to browse</p>
+          {isProcessing ? (
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mb-2"></div>
+          ) : (
+            <Camera className="h-8 w-8 text-gray-400 mb-2" />
+          )}
+          <p className="text-sm text-gray-600">
+            {isProcessing ? 'Processing files...' : 'Drop your image here or click to browse'}
+          </p>
           <p className="text-xs text-gray-500 mt-1">
             {getAcceptedTypesText()} up to {maxSizeMB}MB
           </p>

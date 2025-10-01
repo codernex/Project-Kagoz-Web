@@ -5,10 +5,13 @@ interface IBusiness {
   owner: IUser;
   isOpen: boolean;
   city: string;
+  country: string;
+  tagLine:string;
   state: string;
   streetAddress: string;
   startingDate: string;
   logoUrl: string;
+  bannerUrl: string;
   email: string;
   mobile: string;
   postalCode: string;
@@ -158,4 +161,16 @@ interface ISeo {
   follow: boolean;
   createdAt: Date | string | number;
   updatedAt: Date | string | number;
+}
+
+interface LocationContactData {
+  streetAddress: string
+  houseRoad: string
+  localArea: string
+  city: string
+  postalCode: string
+  country: string
+  mobile: string
+  website: string
+  facebook: string
 }

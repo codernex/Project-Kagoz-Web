@@ -98,57 +98,33 @@ export function CompletionAndPublish({
 
   // API expects either { isOpen247: true } or { isOpen247: false, days: [...] }
   const buildOpeningHoursForApi = () => {
-    if (businessData.is24x7) {
-      return { isOpen247: true } as any
-    }
-
-    const toDisplayDay = (key: string) => {
-      const map: Record<string, string> = {
-        Mon: "Monday",
-        Tue: "Tuesday",
-        Wed: "Wednesday",
-        Thu: "Thursday",
-        Fri: "Friday",
-        Sat: "Saturday",
-        Sun: "Sunday",
+    // Use the new openingHours structure from stepHours
+    const openingHours = (businessData as any)?.openingHours
+    
+    console.log('🔍 Debug openingHours in completionAndPublish:', openingHours)
+    console.log('🔍 Debug businessData:', businessData)
+    
+    if (!openingHours) {
+      console.log('🔍 No openingHours found, using fallback')
+      // Fallback to old structure if openingHours doesn't exist
+      if (businessData.is24x7) {
+        return { isOpen247: true }
       }
-      return map[key] || key
+      return { isOpen247: false, days: [] }
     }
 
-    const parse = (t: string) => {
-      const m = (t || "").trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
-      if (!m) return { hours: "12", minutes: "00", period: "AM" }
-      const hours: string = m[1] || "12"
-      const minutes: string = m[2] || "00"
-      const period: string = (m[3] || "AM").toUpperCase()
-      return { hours, minutes, period }
+    // If 24/7 is enabled
+    if (openingHours.isOpen247) {
+      console.log('🔍 24/7 enabled, returning isOpen247: true')
+      return { isOpen247: true }
     }
 
-    const days = Object.entries(businessData.businessHours || {}).map(([dayKey, info]) => {
-      const open = (info as any)?.isOpen ?? false
-      const rangesStr: string = (info as any)?.openTime || ""
-      const ranges = open && rangesStr
-        ? rangesStr.split(',').map((r: string) => r.trim()).filter(Boolean)
-        : []
-
-      const timeRanges = ranges
-        .map((r: string) => {
-          const parts = r.split('-')
-          if (parts.length !== 2) return null
-          const from = parse(parts[0] || "")
-          const to = parse(parts[1] || "")
-          return { from, to }
-        })
-        .filter(Boolean) as any[]
-
-      return {
-        day: toDisplayDay(dayKey),
-        isOpen: open,
-        timeRanges,
-      }
-    })
-
-    return { isOpen247: false, days } as any
+    // If custom hours are set, use the days array from openingHours
+    console.log('🔍 Custom hours, returning days:', openingHours.days)
+    return {
+      isOpen247: false,
+      days: openingHours.days || []
+    }
   }
 
   const formatStartingDate = () => {
@@ -283,6 +259,10 @@ export function CompletionAndPublish({
       if (businessData.mediaBranding?.license && businessData.mediaBranding.license.length > 0) {
         for (const license of businessData.mediaBranding.license) {
           try {
+            if (!license.file) {
+              console.warn('License file is null, skipping upload')
+              continue
+            }
             const licenseFormData = new FormData()
             licenseFormData.append('image', license.file, license.file.name)
             
@@ -317,6 +297,10 @@ export function CompletionAndPublish({
 
           for (const gallery of photosToUpload) {
           try {
+            if (!gallery.file) {
+              console.warn('Gallery file is null, skipping upload')
+              continue
+            }
             const galleryFormData = new FormData()
             galleryFormData.append('image', gallery.file, gallery.file.name)
             await uploadPhoto({ slug, data: galleryFormData }).unwrap()
@@ -355,18 +339,33 @@ export function CompletionAndPublish({
   }
 
   const getBusinessHoursDisplay = () => {
-    if (businessData.is24x7) return ["Open 24/7"]
+    // Handle the new openingHours structure
+    const openingHours = (businessData as any)?.openingHours
     
-    const hasOpenDays = Object.values(businessData.businessHours).some(hours => hours.isOpen)
-    if (!hasOpenDays) return []
+    if (!openingHours) return []
     
-    return Object.entries(businessData.businessHours).map(([day, hours]) => {
-      const dayName = DAY_MAP[day as keyof typeof DAY_MAP]
-      if (hours.isOpen) {
-        return `${dayName}: ${hours.openTime} → ${hours.closeTime}`
-      }
-      return `${dayName}: Closed`
-    })
+    // If 24/7 is enabled
+    if (openingHours.isOpen247) {
+      return ["Open 24/7"]
+    }
+    
+    // If custom hours are set
+    if (openingHours.days && Array.isArray(openingHours.days)) {
+      return openingHours.days.map((dayData: any) => {
+        const dayName = dayData.day
+        if (dayData.isOpen && dayData.timeRanges && dayData.timeRanges.length > 0) {
+          const timeSlots = dayData.timeRanges.map((range: any) => {
+            const fromTime = `${range.from.hours}:${range.from.minutes} ${range.from.period}`
+            const toTime = `${range.to.hours}:${range.to.minutes} ${range.to.period}`
+            return `${fromTime} - ${toTime}`
+          }).join(', ')
+          return `${dayName}: ${timeSlots}`
+        }
+        return `${dayName}: Closed`
+      })
+    }
+    
+    return []
   }
 
   return (
@@ -376,7 +375,7 @@ export function CompletionAndPublish({
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Completion & Publish</h2>
-            <p className="text-gray-600">You're Almost Done! Review & Publish Your Listing.</p>
+            <p className="text-gray-600">You&apos;re Almost Done! Review & Publish Your Listing.</p>
           </div>
           
           {/* Progress Summary Card */}
@@ -423,9 +422,11 @@ export function CompletionAndPublish({
               {/* Banner Image */}
               <div className="h-48 bg-gradient-to-r from-blue-500 to-[#6F00FF] relative overflow-hidden">
                 {businessData.mediaBranding?.banner ? (
-                  <img 
+                  <Image 
                     src={businessData.mediaBranding.banner.preview} 
                     alt="Banner"
+                    width={800}
+                    height={192}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -442,9 +443,11 @@ export function CompletionAndPublish({
                 <div className="flex items-start space-x-4">
                   <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                     {businessData.mediaBranding?.logo ? (
-                      <img 
+                      <Image 
                         src={businessData.mediaBranding.logo.preview} 
                         alt="Logo"
+                        width={64}
+                        height={64}
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
@@ -540,9 +543,11 @@ export function CompletionAndPublish({
                     {businessData.mediaBranding?.license && businessData.mediaBranding.license.length > 0 ? (
                       businessData.mediaBranding.license.slice(0, 2).map((file, index) => (
                         <div key={file.id} className="aspect-video bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
-                          <img 
+                          <Image 
                             src={file.preview} 
                             alt={`License ${index + 1}`}
+                            width={200}
+                            height={112}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -567,9 +572,11 @@ export function CompletionAndPublish({
                     {businessData.mediaBranding?.gallery && businessData.mediaBranding.gallery.length > 0 ? (
                       businessData.mediaBranding.gallery.slice(0, 6).map((file, index) => (
                         <div key={file.id} className="aspect-square bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
-                          <img 
+                          <Image 
                             src={file.preview} 
                             alt={`Gallery ${index + 1}`}
+                            width={150}
+                            height={150}
                             className="w-full h-full object-cover"
                           />
                         </div>

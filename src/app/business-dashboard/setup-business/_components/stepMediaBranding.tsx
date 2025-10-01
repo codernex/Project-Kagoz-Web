@@ -11,7 +11,7 @@ import { useParams } from "next/navigation"
 
 interface UploadedFile {
   id: string
-  file: File
+  file: File | null
   preview: string
   name: string
   size: string

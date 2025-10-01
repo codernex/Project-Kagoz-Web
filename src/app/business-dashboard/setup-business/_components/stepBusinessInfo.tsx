@@ -73,9 +73,12 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
     reValidateMode: "onChange"
   })
 
+  // Watch form values for reactive validation
+  const watchedValues = form.watch()
+  
   // Add form validation rules
   const validateForm = () => {
-    const values = form.getValues()
+    const values = watchedValues
     const errors: any = {}
     
     if (!values.name || values.name.trim() === '') {
@@ -100,6 +103,10 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
       if (!dateObj.year || !dateObj.month || !dateObj.day) {
         errors.startingDate = 'Starting date is required'
       }
+    }
+    
+    if (!values.category || values.category.trim() === '') {
+      errors.category = 'Business category is required'
     }
     
     return Object.keys(errors).length === 0

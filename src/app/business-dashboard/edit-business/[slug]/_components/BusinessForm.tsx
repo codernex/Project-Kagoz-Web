@@ -50,7 +50,7 @@ interface BusinessHoursData {
 
 interface UploadedFile {
   id: string
-  file: File
+  file: File | null
   preview: string
   name: string
   size: string
@@ -270,7 +270,7 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
             console.log("🔍 BusinessForm - Parsing from API string:", dateStr)
             if (typeof dateStr === 'string' && dateStr.includes('-')) {
               const [year, month, day] = dateStr.split('-');
-              const monthNum = parseInt(month);
+              const monthNum = parseInt(month || '1');
               const monthNames = [
                 "January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"
@@ -279,7 +279,7 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
               const result = { 
                 year: year || "", 
                 month: monthName, 
-                day: String(parseInt(day) || day || "") // Normalize day - remove leading zeros
+                day: String(parseInt(day || '1') || day || "") // Normalize day - remove leading zeros
               };
               console.log("🔍 BusinessForm - Parsed result:", result)
               return result;
@@ -388,18 +388,25 @@ export default function BusinessForm({ businessId, mode, businessData, onSuccess
       submitData.append('businessInfo', JSON.stringify(formData.businessInfo))
       submitData.append('locationContact', JSON.stringify(formData.locationContact))
       submitData.append('businessHours', JSON.stringify(formData.businessHours))
+      submitData.append('mediaBranding', JSON.stringify(formData.mediaBranding))
       
-      // if (formData.mediaBranding.logo?.file.size > 0) {
-      //   submitData.append('logo', formData.mediaBranding.logo.file)
-      // }
-      // if (formData.mediaBranding.banner?.file.size > 0) {
-      //   submitData.append('banner', formData.mediaBranding.banner.file)
-      // }
-      // formData.mediaBranding.gallery.forEach((file, index) => {
-      //   if (file.file.size > 0) {
-      //     submitData.append(`gallery_${index}`, file.file)
-      //   }
-      // })
+      // Handle media files if they exist
+      if (formData.mediaBranding.logo?.file) {
+        submitData.append('logo', formData.mediaBranding.logo.file)
+      }
+      if (formData.mediaBranding.banner?.file) {
+        submitData.append('banner', formData.mediaBranding.banner.file)
+      }
+      if (formData.mediaBranding.tradeLicense?.file) {
+        submitData.append('tradeLicense', formData.mediaBranding.tradeLicense.file)
+      }
+      
+      // Handle gallery files
+      formData.mediaBranding.gallery.forEach((file, index) => {
+        if (file.file) {
+          submitData.append(`gallery_${index}`, file.file)
+        }
+      })
 
       const url = mode === 'edit' ? `/api/businesses/${businessId}` : '/api/businesses'
       const method = mode === 'edit' ? 'PUT' : 'POST'

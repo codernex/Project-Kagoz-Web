@@ -152,7 +152,30 @@ const business = baseApi.injectEndpoints({
       }),
       onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
         await queryFulfilled;
-        successMessage("new photo added to gallery");
+        successMessage("Photo added to gallery successfully");
+      },
+      invalidatesTags: ["Gallery"],
+    }),
+
+    // New mutation for uploading multiple gallery photos at once
+    uploadMultiplePhotos: builder.mutation<IPhoto[], { slug: string; files: File[] }>({
+      query: ({ slug, files }) => {
+        const formData = new FormData();
+        files.forEach((file, index) => {
+          formData.append(`images`, file);
+        });
+        return {
+          url: `/business/gallery/${slug}/multiple`,
+          data: formData,
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        };
+      },
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Gallery photos uploaded successfully");
       },
       invalidatesTags: ["Gallery"],
     }),
@@ -330,6 +353,7 @@ export const {
   useGetBusinessBySlugQuery,
   useGetPhotosQuery,
   useUploadPhotoMutation,
+  useUploadMultiplePhotosMutation,
   useAddBannerMutation,
   useAddLogoMutation,
   useAddFeaturedClientMutation,

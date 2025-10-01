@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,13 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Camera } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
 import { DateSelector } from "@/components/bizness/select-date"
-import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation, useUpdateBusinessMediaMutation } from "@/redux/api/business"
+import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation, useUpdateBusinessMediaMutation, useGetPhotosQuery, useUploadMultiplePhotosMutation } from "@/redux/api/business"
 import { useParams } from "next/navigation"
 // import FileUploader from "@/components/ui/file-upload"
 
 interface UploadedFile {
   id: string
-  file: File
+  file: File | null
   preview: string
   name: string
   size: string
@@ -134,8 +134,36 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
   const [addBanner] = useAddBannerMutation()
   const [uploadPhoto] = useUploadPhotoMutation()
+  const [uploadMultiplePhotos] = useUploadMultiplePhotosMutation()
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
+  
+  // Get existing gallery photos
+  const { data: existingPhotos = [] } = useGetPhotosQuery(slug)
+
+  // Convert existing photos to UploadedFile format
+  const convertPhotoToUploadedFile = (photo: IPhoto): UploadedFile => ({
+    id: `existing-${photo.id}`,
+    file: null, // No file object for existing photos
+    preview: photo.url,
+    name: `Photo ${photo.id}`,
+    size: 'Existing'
+  })
+
+  // Update formData when data prop changes (from API response)
+  React.useEffect(() => {
+    setFormData(data)
+  }, [data])
+
+  // Set existing photos in gallery when they are loaded
+  React.useEffect(() => {
+    if (existingPhotos.length > 0) {
+      const existingGalleryFiles = existingPhotos.map(convertPhotoToUploadedFile)
+      const newData = { ...formData, gallery: existingGalleryFiles }
+      setFormData(newData)
+      onUpdate(newData)
+    }
+  }, [existingPhotos])
 
   // Parse existing date for DateSelector
   const parseDate = (dateString: string) => {
@@ -227,14 +255,14 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
         await updateBusinessMedia({ slug, data: fd }).unwrap()
       }
       
-      // Upload gallery images separately
+      // Upload gallery images using multiple photos API
       if (formData.gallery && formData.gallery.length) {
-        for (const g of formData.gallery) {
-          if (g.file) {
-            const galleryFd = new FormData()
-            galleryFd.append('image', g.file)
-            await uploadPhoto({ slug, data: galleryFd }).unwrap()
-          }
+        const filesToUpload = formData.gallery
+          .filter(g => g.file)
+          .map(g => g.file!)
+        
+        if (filesToUpload.length > 0) {
+          await uploadMultiplePhotos({ slug, files: filesToUpload }).unwrap()
         }
       }
       onSubmit?.()
