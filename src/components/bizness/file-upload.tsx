@@ -54,8 +54,9 @@ export default function FileUploader({
     if (src.startsWith("data:") || src.startsWith("blob:")) return src
     // For HTTP URLs, use as-is
     if (src.startsWith("http")) return src
-    // For relative paths from API, add uploads prefix
-    return `http://localhost:9000/uploads/${src}`
+    // For relative paths from API, use backend URL or fallback to localhost
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000"
+    return `${backendUrl}/uploads/${src}`
   }
 
 

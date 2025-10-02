@@ -255,7 +255,7 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
                     </>
                   )
                 }
-                return hoursDisplay.map((hours, index) => (
+                return hoursDisplay.map((hours: string, index: number) => (
                   <div key={index} className="flex justify-between items-center py-1">
                     <span className="text-gray-700">{hours.split(':')[0]}:</span>
                     <span className={hours.includes('Closed') ? 'text-red-600 font-medium' : 'text-gray-600'}>
@@ -263,6 +263,7 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
                     </span>
                   </div>
                 ))
+                
               })()}
               {businessData.closedOnHolidays && (
                 <div className="mt-4 p-3 bg-orange-50 border border-red-200 rounded-lg">

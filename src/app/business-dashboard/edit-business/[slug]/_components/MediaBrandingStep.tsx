@@ -345,7 +345,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           <FileUploader
           label="Business Gallery"
           description="Add gallery images"
-          max={8}
+          max={5}
           maxSizeMB={10}
           value={formData.gallery}
           onChange={handleGalleryChange}

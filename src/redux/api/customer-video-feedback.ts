@@ -26,8 +26,38 @@ const feedback = baseApi.injectEndpoints({
       },
       invalidatesTags: ["VideoFeedback"],
     }),
+    updateVideoFeedback: builder.mutation<IVideo, { slug: string; feedbackId: string; data: FormData }>({
+      query: ({ slug, feedbackId, data }) => ({
+        url: `/business/video-feedback/${slug}/${feedbackId}`,
+        data,
+        method: "PATCH",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("video feedback updated successfully");
+      },
+      invalidatesTags: ["VideoFeedback"],
+    }),
+    deleteVideoFeedback: builder.mutation<IVideo, { slug: string; feedbackId: string }>({
+      query: ({ slug, feedbackId }) => ({
+        url: `/business/video-feedback/${slug}/${feedbackId}`,
+        method: "DELETE",
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("video feedback deleted successfully");
+      },
+      invalidatesTags: ["VideoFeedback"],
+    }),
   }),
 });
 
-export const { useGetVideoFeedbacksQuery, useAddVideoFeedbackMutation } =
-  feedback;
+export const { 
+  useGetVideoFeedbacksQuery, 
+  useAddVideoFeedbackMutation,
+  useUpdateVideoFeedbackMutation,
+  useDeleteVideoFeedbackMutation
+} = feedback;

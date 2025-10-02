@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import type { BusinessData } from "./businessSetup"
 import { Label } from "@/components/ui/label"
 import { Building2, Camera, ChevronLeft, Clock, Star } from "lucide-react"
@@ -202,7 +202,7 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
           name="licenseIssueDate"
           required
           value={businessData.issueDate}
-          onChange={(v) => setFormValue('issueDate', v)}
+          onChange={useCallback((v: any) => setFormValue('issueDate', v), [setFormValue])}
         />
             </div>
             {/* Business License */}

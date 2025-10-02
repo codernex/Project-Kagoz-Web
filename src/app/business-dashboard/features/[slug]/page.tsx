@@ -9,6 +9,7 @@ import { TextInput } from '@/components/shared/text-input'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useParams, useRouter } from 'next/navigation'
 import { useAddFeaturedClientMutation, useAddFeaturedOfferMutation, useAddVideoFeedbackMutation, useGetVideoFeedbacksQuery, useGetFeaturedOfferQuery, useGetFeauturedClientsQuery, useUpdateBusinessYouTubeVideoMutation, useGetBusinessBySlugQuery } from '@/redux/api'
+import VideoFeedbackDisplay from './_components/VideoFeedbackDisplay'
 import { useBusinessStore } from '@/hooks/selectedBusiness'
 import { toast } from 'sonner'
 import { appendApi } from '@/lib/utils'
@@ -384,20 +385,7 @@ export default function SpecialFeaturesPage() {
               </div>
             </div>
 
-            {/* Customer Image/Logo */}
-            <div>
-              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
-                Customer Image/Logo
-              </Label>
-              <FileUploader
-                max={1}
-                maxSizeMB={10}
-                recommendedSize="500x500 px"
-                value={[...formData.customerFeedback.customerImage, ...(videoFeedbacks && videoFeedbacks.length > 0 ? convertToUploadedFiles([videoFeedbacks[0]], 'image') : [])]}
-                onChange={handleCustomerImageChange}
-                onError={handleError}
-              />
-            </div>
+           
 
             {/* Company Name */}
             <div>
@@ -456,6 +444,20 @@ export default function SpecialFeaturesPage() {
           </div>
         </div>
 
+        {/* Existing Video Feedbacks Display */}
+        <VideoFeedbackDisplay 
+          feedbacks={(videoFeedbacks || []).map((video: any) => ({
+            id: video.id,
+            videoUrl: video.videoUrl,
+            logoUrl: video.logoUrl || '',
+            rating: video.rating || 1,
+            name: video.name || '',
+            companyName: video.companyName || '',
+            createdAt: video.createdAt || new Date().toISOString()
+          }))} 
+          businessSlug={targetSlug} 
+        />
+
         {/* Featured Offers Section */}
         <div className="bg-white rounded-[8px] shadow-sm p-6">
           <div className="flex items-start justify-between mb-4">
@@ -472,18 +474,7 @@ export default function SpecialFeaturesPage() {
           
           <div className="space-y-4">
             {/* CTA URL Field */}
-            <div>
-              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
-                Call to Action URL
-              </Label>
-              <TextInput
-                name="featuredOfferCtaUrl"
-                control={methods.control}
-                placeholder="https://example.com/offer"
-                width='100%'
-              />
-            </div>
-            
+           
             {/* File Upload */}
             <div>
               <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
