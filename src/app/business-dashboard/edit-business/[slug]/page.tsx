@@ -57,7 +57,7 @@ export default function EditBusiness() {
     <BusinessForm
       businessId={slug}
       mode="edit"
-      businessData={data}
+      businessData={data || null}
       onSuccess={(businessId) => {
         console.log('Business updated successfully:', businessId)
       }}

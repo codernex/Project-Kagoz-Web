@@ -14,7 +14,7 @@ import { FeatureType } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -46,7 +46,14 @@ export default function FeaturedOffer() {
   /**
    * Featured Offer Data
    */
-  const { data: featuredOffers } = useGetFeaturedOfferQuery(slug)
+  const { data: featuredOffers, isLoading: offersLoading } = useGetFeaturedOfferQuery(slug)
+
+  // Debug: Log when featured offers are loaded
+  React.useEffect(() => {
+    if (featuredOffers) {
+      console.log('Featured offers loaded:', featuredOffers)
+    }
+  }, [featuredOffers])
 
   /**
    * Activate Premium Feature Mutation
@@ -59,6 +66,7 @@ export default function FeaturedOffer() {
   const [addFeaturedOffer] = useAddFeaturedOfferMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof createFeatureSchema>> = (d) => {
+    console.log('Submitting featured offer:', { slug, data: d, file: file?.name })
 
     const formData = new FormData()
 
@@ -68,12 +76,29 @@ export default function FeaturedOffer() {
 
     if (file) {
       formData.append('image', file)
+      console.log('Added image file to FormData:', file.name, file.size)
     } else {
       toast.error("Please select a file")
+      return
     }
+
+    // Debug: Log all FormData entries
+    console.log('FormData contents:')
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value)
+    }
+
     addFeaturedOffer({ slug, data: formData })
-    setFile(undefined)
-    setOpen(false)
+      .unwrap()
+      .then(() => {
+        toast.success('Featured offer added successfully')
+        setFile(undefined)
+        setOpen(false)
+      })
+      .catch((error) => {
+        console.error('Error adding featured offer:', error)
+        toast.error('Error adding featured offer')
+      })
   }
 
   if (isLoading) {
@@ -103,8 +128,13 @@ export default function FeaturedOffer() {
         {
           featuredOffers?.map((offer) => {
             return (
-              <div key={offer.id} className="w-full relative h-[30rem] rounded-xs overflow-hidden">
-                <Image src={appendApi(offer.imageUrl)} fill alt="Test" />
+              <div key={offer.id} className="w-full relative h-[30rem] rounded-xs overflow-hidden border border-gray-200">
+                <Image src={appendApi(offer.imageUrl)} fill alt="Featured Offer" className="object-cover" />
+                {offer.ctaUrl && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white p-3">
+                    <p className="text-sm truncate">CTA: {offer.ctaUrl}</p>
+                  </div>
+                )}
               </div>
             )
           })

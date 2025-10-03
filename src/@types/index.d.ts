@@ -9,6 +9,8 @@ interface IBusiness {
   tagLine:string;
   state: string;
   streetAddress: string;
+  house: string;
+  localArea: string;
   startingDate: string;
   logoUrl: string;
   bannerUrl: string;
@@ -173,4 +175,20 @@ interface LocationContactData {
   mobile: string
   website: string
   facebook: string
+}
+
+interface UploadedFile {
+  id: string
+  file: File | null
+  preview: string
+  name: string
+  size: string
+}
+
+interface MediaBrandingData {
+  logo: UploadedFile | null
+  banner: UploadedFile | null
+  gallery: UploadedFile[]
+  tradeLicense: UploadedFile | null
+  tradeLicenseExpireDate: string
 }

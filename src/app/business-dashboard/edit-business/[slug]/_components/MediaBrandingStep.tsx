@@ -1,32 +1,19 @@
 "use client"
 
-import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import React, { useState, useCallback } from "react"
 import { Camera } from "lucide-react"
 import FileUploader from "@/components/bizness/file-upload"
 import { DateSelector } from "@/components/bizness/select-date"
-import { useAddBannerMutation, useUpdateBusinessMutation, useUploadPhotoMutation, useUpdateBusinessMediaMutation, useGetPhotosQuery, useUploadMultiplePhotosMutation } from "@/redux/api/business"
+import { 
+  useGetPhotosQuery, 
+  useUpdateBusinessMediaMutation,
+  useUploadMultiplePhotosMutation,
+  useUpdateLicenseMutation,
+  useUpdateBusinessMutation
+} from "@/redux/api/business"
 import { useParams } from "next/navigation"
-// import FileUploader from "@/components/ui/file-upload"
+import { toast } from "sonner"
 
-interface UploadedFile {
-  id: string
-  file: File | null
-  preview: string
-  name: string
-  size: string
-}
-
-interface MediaBrandingData {
-  logo: UploadedFile | null
-  banner: UploadedFile | null
-  gallery: UploadedFile[]
-  tradeLicense: UploadedFile | null
-  tradeLicenseExpireDate: string
-}
 
 interface MediaBrandingStepProps {
   data: MediaBrandingData
@@ -35,111 +22,27 @@ interface MediaBrandingStepProps {
   onSubmit?: () => void
 }
 
-// Custom DateSelector with initial values
-interface TradeLicenseDateSelectorProps {
-  label: string
-  name: string
-  required?: boolean
-  initialDate: { year: string; month: string; day: string }
-  onChange: (date: { year: string; month: string; day: string }) => void
-}
-
-function TradeLicenseDateSelector({ label, name, required, initialDate, onChange }: TradeLicenseDateSelectorProps) {
-  const [year, setYear] = useState(initialDate.year)
-  const [month, setMonth] = useState(initialDate.month)
-  const [day, setDay] = useState(initialDate.day)
-
-  // Debug logging
-  console.log("🔍 DateSelector Initial Values:", {
-    initialDate,
-    year,
-    month,
-    day
-  })
-
-  const years = Array.from({ length: 50 }, (_, i) => `${2000 + i}`)
-  const months = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December",
-  ]
-  const days = Array.from({ length: 31 }, (_, i) => `${i + 1}`)
-
-  const handleChange = (field: 'year' | 'month' | 'day', value: string) => {
-    if (field === 'year') setYear(value)
-    if (field === 'month') setMonth(value)
-    if (field === 'day') setDay(value)
-    
-    // Call onChange with updated values
-    const updatedDate = {
-      year: field === 'year' ? value : year,
-      month: field === 'month' ? value : month,
-      day: field === 'day' ? value : day
-    }
-    onChange(updatedDate)
-  }
-
-  return (
-    <div className="space-y-2">
-      <Label className="text-[#23272E] font-medium text-[16px]">
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label>
-      <div className="flex gap-4 mt-1">
-        <Select value={year} onValueChange={(value) => handleChange('year', value)}>
-          <SelectTrigger className="w-[120px] h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E] focus:ring-2 focus:ring-[#23272E]">
-            <SelectValue placeholder="Year" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((y) => (
-              <SelectItem key={y} value={y} className="text-[#23272E]">
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={month} onValueChange={(value) => handleChange('month', value)}>
-          <SelectTrigger className="w-[120px] h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E] focus:ring-2 focus:ring-[#23272E]">
-            <SelectValue placeholder="Month" />
-          </SelectTrigger>
-          <SelectContent>
-            {months.map((m, index) => (
-              <SelectItem key={m} value={(index + 1).toString().padStart(2, '0')} className="text-[#23272E]">
-                {m}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={day} onValueChange={(value) => handleChange('day', value)}>
-          <SelectTrigger className="w-[120px] h-[48px] border border-[#E5E7EB] rounded-[8px] bg-white text-[#23272E] px-4 focus:border-[#23272E] focus:ring-2 focus:ring-[#23272E]">
-            <SelectValue placeholder="Day" />
-          </SelectTrigger>
-          <SelectContent>
-            {days.map((d) => (
-              <SelectItem key={d} value={d} className="text-[#23272E]">
-                {d}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  )
-}
 
 export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: MediaBrandingStepProps) {
+  console.log("🚀 ~ MediaBrandingStep ~ 23421data:", data)
   const [formData, setFormData] = useState<MediaBrandingData>(data)
   const [errors, setErrors] = useState<{ logo?: string }>({})
-  const [updateBusiness] = useUpdateBusinessMutation()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // API mutations
   const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
-  const [addBanner] = useAddBannerMutation()
-  const [uploadPhoto] = useUploadPhotoMutation()
   const [uploadMultiplePhotos] = useUploadMultiplePhotosMutation()
+  const [updateLicense] = useUpdateLicenseMutation()
+  const [updateBusiness] = useUpdateBusinessMutation()
+  
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
   
-  // Get existing gallery photos
-  const { data: existingPhotos = [] } = useGetPhotosQuery(slug)
+  // Get existing gallery photos - only fetch if we don't have gallery data yet
+  const shouldFetchPhotos = !data.gallery || data.gallery.length === 0
+  const { data: existingPhotos = [] } = useGetPhotosQuery(slug, { 
+    skip: !shouldFetchPhotos || !slug 
+  })
 
   // Convert existing photos to UploadedFile format
   const convertPhotoToUploadedFile = (photo: IPhoto): UploadedFile => ({
@@ -155,19 +58,23 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     setFormData(data)
   }, [data])
 
-  // Set existing photos in gallery when they are loaded
+  // Set existing photos in gallery when they are loaded (only once)
   React.useEffect(() => {
-    if (existingPhotos.length > 0) {
+    if (existingPhotos.length > 0 && (!formData.gallery || formData.gallery.length === 0)) {
       const existingGalleryFiles = existingPhotos.map(convertPhotoToUploadedFile)
       const newData = { ...formData, gallery: existingGalleryFiles }
       setFormData(newData)
-      onUpdate(newData)
     }
-  }, [existingPhotos])
+  }, [existingPhotos, formData.gallery])
 
   // Parse existing date for DateSelector
   const parseDate = (dateString: string) => {
     if (!dateString) return { year: "", month: "", day: "" }
+    
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
+    ]
     
     // Handle both "YYYY-MM-DD" format and other date formats
     let date: Date
@@ -182,8 +89,8 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     
     return {
       year: date.getFullYear().toString(),
-      month: (date.getMonth() + 1).toString().padStart(2, '0'),
-      day: date.getDate().toString() // Remove padding for day to match SelectItem values
+      month: monthNames[date.getMonth()] || "", // Return month name instead of number
+      day: date.getDate().toString()
     }
   }
 
@@ -198,9 +105,9 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const handleLogoChange = (files: UploadedFile[]) => {
     const newData = { ...formData, logo: files[0] || null }
     setFormData(newData)
-    onUpdate(newData)
+    onUpdate(newData) // Sync with parent
     
-    // Clear error when file is uploaded
+    // Clear error when file is selected
     if (errors.logo) {
       setErrors({})
     }
@@ -209,13 +116,31 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const handleBannerChange = (files: UploadedFile[]) => {
     const newData = { ...formData, banner: files[0] || null }
     setFormData(newData)
-    onUpdate(newData)
+    onUpdate(newData) // Sync with parent
   }
 
   const handleGalleryChange = (files: UploadedFile[]) => {
     const newData = { ...formData, gallery: files }
     setFormData(newData)
-    onUpdate(newData)
+    onUpdate(newData) // Sync with parent
+  }
+
+  const handleTradeLicenseChange = (files: UploadedFile[]) => {
+    const newData = { ...formData, tradeLicense: files[0] || null }
+    setFormData(newData)
+    onUpdate(newData) // Sync with parent
+  }
+
+  const handleTradeLicenseDateChange = (date: any) => {
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
+    ]
+    const monthNumber = monthNames.indexOf(date.month) + 1
+    const dateString = `${date.year}-${monthNumber.toString().padStart(2, '0')}-${date.day.padStart(2, '0')}`
+    const newData = { ...formData, tradeLicenseExpireDate: dateString }
+    setFormData(newData)
+    onUpdate(newData) // Sync with parent
   }
 
   const handleError = (error: string) => {
@@ -236,38 +161,58 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
 
   const handleSubmit = async () => {
     if (!validateForm()) return
+    
+    setIsSubmitting(true)
+    
     try {
-      // Create a single FormData object for logo and banner
-      const fd = new FormData()
-      
-      // Add logo if present
-      if (formData.logo?.file) {
-        fd.append('logo', formData.logo.file)
-      }
-      
-      // Add banner if present
-      if (formData.banner?.file) {
-        fd.append('banner', formData.banner.file)
-      }
-      
-      // Send both logo and banner in a single request
-      if (formData.logo?.file || formData.banner?.file) {
-        await updateBusinessMedia({ slug, data: fd }).unwrap()
-      }
-      
-      // Upload gallery images using multiple photos API
-      if (formData.gallery && formData.gallery.length) {
-        const filesToUpload = formData.gallery
-          .filter(g => g.file)
-          .map(g => g.file!)
+      // 1. Update logo and banner if they are new files
+      if ((formData.logo?.file || formData.banner?.file) && slug) {
+        const mediaFormData = new FormData()
         
-        if (filesToUpload.length > 0) {
-          await uploadMultiplePhotos({ slug, files: filesToUpload }).unwrap()
+        if (formData.logo?.file) {
+          mediaFormData.append('logo', formData.logo.file)
+        }
+        if (formData.banner?.file) {
+          mediaFormData.append('banner', formData.banner.file)
+        }
+        
+        await updateBusinessMedia({ slug, data: mediaFormData }).unwrap()
+      }
+      
+      // 2. Upload gallery photos if there are new files
+      const newGalleryFiles = formData.gallery?.filter(item => item.file) || []
+      if (newGalleryFiles.length > 0 && slug) {
+        const galleryFiles = newGalleryFiles.map(item => item.file!).filter(Boolean)
+        if (galleryFiles.length > 0) {
+          await uploadMultiplePhotos({ slug, files: galleryFiles }).unwrap()
         }
       }
+      
+      // 3. Update trade license if it's a new file
+      if (formData.tradeLicense?.file && slug) {
+        const licenseFormData = new FormData()
+        licenseFormData.append('tradeLicense', formData.tradeLicense.file)
+        await updateLicense({ slug, data: licenseFormData }).unwrap()
+      }
+      
+      // 4. Update trade license expire date if it exists
+      if (formData.tradeLicenseExpireDate && slug) {
+        await updateBusiness({ 
+          slug, 
+          data: { tradeLicenseExpireDate: formData.tradeLicenseExpireDate }
+        }).unwrap()
+      }
+      
+      toast.success("Media and branding updated successfully!")
+      
+      // Call parent's submit callback if provided
       onSubmit?.()
-    } catch (e) {
-      console.error('Failed to upload media', e)
+      
+    } catch (error: any) {
+      console.error("Error updating media and branding:", error)
+      toast.error(error?.data?.message || "Failed to update media and branding")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -318,29 +263,17 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           maxSizeMB={10}
           recommendedSize="A4 document"
           value={formData.tradeLicense ? [formData.tradeLicense] : []}
-          onChange={(files) => {
-            const newData = { 
-              ...formData, 
-              tradeLicense: files[0] || null 
-            }
-            setFormData(newData)
-            onUpdate(newData)
-          }}
+          onChange={handleTradeLicenseChange}
           onError={handleError}
         />
 
         {/* Trade License Expire Date */}
-        <TradeLicenseDateSelector
+        <DateSelector
           label="Trade License Expire Date"
           name="tradeLicenseExpireDate"
           required
-          initialDate={initialDate}
-          onChange={(date) => {
-            const dateString = `${date.year}-${date.month.padStart(2, '0')}-${date.day.padStart(2, '0')}`
-            const newData = { ...formData, tradeLicenseExpireDate: dateString }
-            setFormData(newData)
-            onUpdate(newData)
-          }}
+          value={initialDate}
+          onChange={useCallback(handleTradeLicenseDateChange, [formData])}
         />
           <FileUploader
           label="Business Gallery"
@@ -363,9 +296,10 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
         </button>
         <button
           onClick={handleSubmit}
-          className="!px-20 !py-3 bg-[#6F00FF] cursor-pointer lg:whitespace-pre whitespace-normal text-white rounded-lg"
+          disabled={isSubmitting}
+          className="!px-20 !py-3 bg-[#6F00FF] cursor-pointer lg:whitespace-pre whitespace-normal text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save & Continue
+          {isSubmitting ? "Saving..." : "Save & Continue"}
         </button>
       </div>
     </div>

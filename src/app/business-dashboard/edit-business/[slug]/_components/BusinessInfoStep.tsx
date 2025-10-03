@@ -25,7 +25,11 @@ export default function BusinessInfoStep({ form, onNext, data, onUpdate }: Busin
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [updateBusiness] = useUpdateBusinessMutation()
   const [addCategoryToBusiness] = useAddCategoryToBusinessMutation()
-  const { data: categoriesData } = useGetCategoriesQuery()
+  const { data: categoriesData } = useGetCategoriesQuery(undefined, {
+    // Cache categories data to avoid refetching on every render
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false
+  })
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
   const route = useRouter()
@@ -156,7 +160,7 @@ export default function BusinessInfoStep({ form, onNext, data, onUpdate }: Busin
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleNext)} className="space-y-6">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="size-6 text-[#9333EA]" />
           <h3 className="auth-heading !font-medium text-[#111827]">Business Information</h3>

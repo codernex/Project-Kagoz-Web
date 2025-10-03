@@ -10,7 +10,7 @@ import { useParams } from "next/navigation"
 
 interface LocationContactData {
   streetAddress: string
-  houseRoad: string
+  house: string
   localArea: string
   city: string
   postalCode: string
@@ -38,6 +38,7 @@ export default function LocationContactStep({
 }: LocationContactStepProps) {
   const [formData, setFormData] = useState<LocationContactData>(data)
   const [errors, setErrors] = useState<Partial<LocationContactData>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [updateBusiness] = useUpdateBusinessMutation()
   const params = useParams() as { slug?: string }
@@ -51,7 +52,7 @@ export default function LocationContactStep({
     const subscription = form.watch((values: any) => {
       const next: LocationContactData = {
         streetAddress: values.streetAddress || "",
-        houseRoad: values.houseRoad || "",
+        house: values.house || "",
         localArea: values.localArea || "",
         city: values.city || "",
         postalCode: values.postalCode || "",
@@ -72,8 +73,8 @@ export default function LocationContactStep({
     if (!(form.getValues("streetAddress") || "").trim()) {
       newErrors.streetAddress = "Street address is required"
     }
-    if (!(form.getValues("houseRoad") || "").trim()) {
-      newErrors.houseRoad = "House/Road info is required"
+    if (!(form.getValues("house") || "").trim()) {
+      newErrors.house = "House/Road info is required"
     }
     if (!(form.getValues("localArea") || "").trim()) {
       newErrors.localArea = "Local area is required"
@@ -84,22 +85,33 @@ export default function LocationContactStep({
     if (!(form.getValues("postalCode") || "").trim()) {
       newErrors.postalCode = "Postal code is required"
     }
+    if (!(form.getValues("country") || "").trim()) {
+      newErrors.country = "Country is required"
+    }
     if (!(form.getValues("mobile") || "").trim()) {
       newErrors.mobile = "Mobile number is required"
     }
 
     setErrors(newErrors)
+    
+    // Show validation errors as toast
+    if (Object.keys(newErrors).length > 0) {
+      const firstError = Object.values(newErrors)[0]
+      toast.error(firstError || "Please fill in all required fields")
+    }
+    
     return Object.keys(newErrors).length === 0
   }
 
   const handleSaveAndBack = async () => {
     if (!validateForm()) return
 
+    setIsSubmitting(true)
     try {
       const currentValues = form.getValues()
       const jsonPayload = {
         streetAddress: currentValues.streetAddress || "",
-        houseRoad: currentValues.houseRoad || "",
+        house: currentValues.house || "",
         localArea: currentValues.localArea || "",
         city: currentValues.city || "",
         postalCode: currentValues.postalCode || "",
@@ -114,17 +126,20 @@ export default function LocationContactStep({
       onSaveAndBack()
     } catch (error) {
       toast.error("Failed to save location and contact information. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleNext = async () => {
     if (!validateForm()) return
 
+    setIsSubmitting(true)
     try {
       const currentValues = form.getValues()
       const jsonPayload = {
         streetAddress: currentValues.streetAddress || "",
-        house: currentValues.houseRoad || "",
+        house: currentValues.house || "",
         localArea: currentValues.localArea || "",
         city: currentValues.city || "",
         postalCode: currentValues.postalCode || "",
@@ -139,6 +154,8 @@ export default function LocationContactStep({
       onNext()
     } catch (error) {
       toast.error("Failed to save location and contact information. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -165,7 +182,7 @@ export default function LocationContactStep({
             width="100%"
           />
           <TextInput
-            name="houseRoad"
+            name="house"
             control={form.control}
             label="House / Road Info"
             required
@@ -196,7 +213,7 @@ export default function LocationContactStep({
             name="country"
             control={form.control}
             label="Country"
-            readOnly
+            required
             width="100%"
             className="mt-1"
           />
@@ -235,13 +252,15 @@ export default function LocationContactStep({
         <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
           <button
             onClick={handleSaveAndBack}
-            className="lg:px-20 px-4 !py-3 cursor-pointer border-blue-600 text-white bg-[#163987] rounded-lg"
+            disabled={isSubmitting}
+            className="lg:px-20 px-4 !py-3 cursor-pointer border-blue-600 text-white bg-[#163987] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save & Back to Businesses
           </button>
           <button
             onClick={handleNext}
-            className="lg:px-20 px-4 !py-3 cursor-pointer bg-[#6F00FF] text-white rounded-lg"
+            disabled={isSubmitting}
+            className="lg:px-20 px-4 !py-3 cursor-pointer bg-[#6F00FF] text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save & Continue
           </button>
