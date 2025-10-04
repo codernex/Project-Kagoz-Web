@@ -2,12 +2,13 @@
 
 import React, { useState, useCallback } from "react"
 import { Camera } from "lucide-react"
-import FileUploader from "@/components/bizness/file-upload"
+import { ImageUpload, type ImageUploadFile } from "@/components/bizness/image-uploader"
 import { DateSelector } from "@/components/bizness/select-date"
 import { 
   useGetPhotosQuery, 
-  useUpdateBusinessMediaMutation,
-  useUploadMultiplePhotosMutation,
+  useAddLogoMutation,
+  useAddBannerMutation,
+  useUploadPhotoMutation,
   useUpdateLicenseMutation,
   useUpdateBusinessMutation
 } from "@/redux/api/business"
@@ -25,13 +26,15 @@ interface MediaBrandingStepProps {
 
 export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: MediaBrandingStepProps) {
   console.log("🚀 ~ MediaBrandingStep ~ 23421data:", data)
+
   const [formData, setFormData] = useState<MediaBrandingData>(data)
   const [errors, setErrors] = useState<{ logo?: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   // API mutations
-  const [updateBusinessMedia] = useUpdateBusinessMediaMutation()
-  const [uploadMultiplePhotos] = useUploadMultiplePhotosMutation()
+  const [addLogo] = useAddLogoMutation()
+  const [addBanner] = useAddBannerMutation()
+  const [uploadPhoto] = useUploadPhotoMutation()
   const [updateLicense] = useUpdateLicenseMutation()
   const [updateBusiness] = useUpdateBusinessMutation()
   
@@ -48,10 +51,58 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const convertPhotoToUploadedFile = (photo: IPhoto): UploadedFile => ({
     id: `existing-${photo.id}`,
     file: null, // No file object for existing photos
-    preview: photo.url,
+    preview: photo.url.startsWith('http') 
+      ? photo.url 
+      : `http://localhost:9000/api/v1/uploads/${photo.url}`,
     name: `Photo ${photo.id}`,
     size: 'Existing'
   })
+
+  // Convert UploadedFile to ImageUploadFile
+  const convertToImageUploadFile = (uploadedFile: UploadedFile | null): ImageUploadFile[] => {
+    if (!uploadedFile) return []
+    
+    // For new files (with blob URLs), use the preview as-is
+    // For existing files (from API), construct the full URL
+    let previewUrl = uploadedFile.preview;
+    if (uploadedFile.preview && !uploadedFile.preview.startsWith('blob:') && !uploadedFile.preview.startsWith('http')) {
+      previewUrl = `http://localhost:9000/api/v1/uploads/${uploadedFile.preview}`;
+    }
+    
+    return [{
+      id: uploadedFile.id,
+      file: uploadedFile.file,
+      preview: previewUrl,
+      name: uploadedFile.name,
+      size: uploadedFile.size,
+      uploaded: !uploadedFile.file, // If no file object, it's already uploaded
+    }]
+  }
+
+  // Convert ImageUploadFile to UploadedFile
+  const convertFromImageUploadFile = (imageFiles: ImageUploadFile[]): UploadedFile | null => {
+    if (imageFiles.length === 0) return null
+    const imageFile = imageFiles[0]
+    if (!imageFile) return null
+    return {
+      id: imageFile.id,
+      file: imageFile.file,
+      preview: imageFile.preview,
+      name: imageFile.name,
+      size: imageFile.size,
+    }
+  }
+
+  // Convert array of ImageUploadFile to array of UploadedFile
+  const convertArrayFromImageUploadFile = (imageFiles: ImageUploadFile[]): UploadedFile[] => {
+    return imageFiles.map(imageFile => ({
+      id: imageFile.id,
+      file: imageFile.file,
+      preview: imageFile.preview,
+      name: imageFile.name,
+      size: imageFile.size,
+    }))
+  }
 
   // Update formData when data prop changes (from API response)
   React.useEffect(() => {
@@ -61,7 +112,9 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   // Set existing photos in gallery when they are loaded (only once)
   React.useEffect(() => {
     if (existingPhotos.length > 0 && (!formData.gallery || formData.gallery.length === 0)) {
+      console.log('🔍 Existing photos from API:', existingPhotos);
       const existingGalleryFiles = existingPhotos.map(convertPhotoToUploadedFile)
+      console.log('🔍 Converted gallery files:', existingGalleryFiles);
       const newData = { ...formData, gallery: existingGalleryFiles }
       setFormData(newData)
     }
@@ -102,8 +155,9 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     parsedDate: initialDate
   })
 
-  const handleLogoChange = (files: UploadedFile[]) => {
-    const newData = { ...formData, logo: files[0] || null }
+  const handleLogoChange = (files: ImageUploadFile[]) => {
+    const uploadedFile = convertFromImageUploadFile(files)
+    const newData = { ...formData, logo: uploadedFile }
     setFormData(newData)
     onUpdate(newData) // Sync with parent
     
@@ -113,20 +167,23 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     }
   }
 
-  const handleBannerChange = (files: UploadedFile[]) => {
-    const newData = { ...formData, banner: files[0] || null }
+  const handleBannerChange = (files: ImageUploadFile[]) => {
+    const uploadedFile = convertFromImageUploadFile(files)
+    const newData = { ...formData, banner: uploadedFile }
     setFormData(newData)
     onUpdate(newData) // Sync with parent
   }
 
-  const handleGalleryChange = (files: UploadedFile[]) => {
-    const newData = { ...formData, gallery: files }
+  const handleGalleryChange = (files: ImageUploadFile[]) => {
+    const uploadedFiles = convertArrayFromImageUploadFile(files)
+    const newData = { ...formData, gallery: uploadedFiles }
     setFormData(newData)
     onUpdate(newData) // Sync with parent
   }
 
-  const handleTradeLicenseChange = (files: UploadedFile[]) => {
-    const newData = { ...formData, tradeLicense: files[0] || null }
+  const handleTradeLicenseChange = (files: ImageUploadFile[]) => {
+    const uploadedFile = convertFromImageUploadFile(files)
+    const newData = { ...formData, tradeLicense: uploadedFile }
     setFormData(newData)
     onUpdate(newData) // Sync with parent
   }
@@ -165,37 +222,41 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     setIsSubmitting(true)
     
     try {
-      // 1. Update logo and banner if they are new files
-      if ((formData.logo?.file || formData.banner?.file) && slug) {
-        const mediaFormData = new FormData()
-        
-        if (formData.logo?.file) {
-          mediaFormData.append('logo', formData.logo.file)
-        }
-        if (formData.banner?.file) {
-          mediaFormData.append('banner', formData.banner.file)
-        }
-        
-        await updateBusinessMedia({ slug, data: mediaFormData }).unwrap()
+      // 1. Update logo if it's a new file
+      if (formData.logo?.file && slug) {
+        const logoFormData = new FormData()
+        logoFormData.append('logo', formData.logo.file)
+        await addLogo({ slug, data: logoFormData }).unwrap()
       }
       
-      // 2. Upload gallery photos if there are new files
+      // 2. Update banner if it's a new file
+      if (formData.banner?.file && slug) {
+        const bannerFormData = new FormData()
+        bannerFormData.append('banner', formData.banner.file)
+        await addBanner({ slug, data: bannerFormData }).unwrap()
+      }
+      
+      // 3. Upload gallery photos if there are new files
       const newGalleryFiles = formData.gallery?.filter(item => item.file) || []
       if (newGalleryFiles.length > 0 && slug) {
-        const galleryFiles = newGalleryFiles.map(item => item.file!).filter(Boolean)
-        if (galleryFiles.length > 0) {
-          await uploadMultiplePhotos({ slug, files: galleryFiles }).unwrap()
+        // Upload each photo individually using the single photo API
+        for (const galleryFile of newGalleryFiles) {
+          if (galleryFile.file) {
+            const formData = new FormData()
+            formData.append('image', galleryFile.file)
+            await uploadPhoto({ slug, data: formData }).unwrap()
+          }
         }
       }
       
-      // 3. Update trade license if it's a new file
+      // 4. Update trade license if it's a new file
       if (formData.tradeLicense?.file && slug) {
         const licenseFormData = new FormData()
         licenseFormData.append('tradeLicense', formData.tradeLicense.file)
         await updateLicense({ slug, data: licenseFormData }).unwrap()
       }
       
-      // 4. Update trade license expire date if it exists
+      // 5. Update trade license expire date if it exists
       if (formData.tradeLicenseExpireDate && slug) {
         await updateBusiness({ 
           slug, 
@@ -228,41 +289,73 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
 
       <div className="space-y-6">
         {/* Business Logo */}
-        <FileUploader
+        <ImageUpload
           label="Business Logo"
           description="Logo for your business profile"
           required={true}
           max={1}
           maxSizeMB={10}
-          recommendedSize="500x500 px"
-          value={formData.logo ? [formData.logo] : []}
+          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+          recommendedSize="500×500 px"
+          value={convertToImageUploadFile(formData.logo)}
           onChange={handleLogoChange}
           onError={handleError}
         />
 
         {/* Banner Image */}
-        <FileUploader
+        <ImageUpload
           label="Banner Image"
           description="Banner image for your business profile"
           max={1}
           maxSizeMB={10}
-          recommendedSize="1200x500 px"
-          value={formData.banner ? [formData.banner] : []}
+          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+          recommendedSize="1200×500 px"
+          value={convertToImageUploadFile(formData.banner)}
           onChange={handleBannerChange}
           onError={handleError}
         />
 
         {/* Business Gallery */}
-      
+        <ImageUpload
+          label="Business Gallery"
+          description="Add gallery images to showcase your business"
+          max={5}
+          maxSizeMB={10}
+          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+          recommendedSize="800×600 px"
+          value={formData.gallery.map(file => {
+            // For new files (with blob URLs), use the preview as-is
+            // For existing files (from API), construct the full URL
+            let previewUrl = file.preview;
+            if (file.preview && !file.preview.startsWith('blob:') && !file.preview.startsWith('http')) {
+              previewUrl = `http://localhost:9000/api/v1/uploads/${file.preview}`;
+            }
+            
+            const imageUploadFile = {
+              id: file.id,
+              file: file.file,
+              preview: previewUrl,
+              name: file.name,
+              size: file.size,
+              uploaded: !file.file, // If no file object, it's already uploaded
+            };
+            console.log('🔍 Gallery file mapping:', file, '->', imageUploadFile);
+            return imageUploadFile;
+          })}
+          onChange={handleGalleryChange}
+          onError={handleError}
+          disableRemove={true}
+        />
 
         {/* Trade License File */}
-        <FileUploader
+        <ImageUpload
           label="Trade License"
           description="Upload your trade license document"
           max={1}
           maxSizeMB={10}
+          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
           recommendedSize="A4 document"
-          value={formData.tradeLicense ? [formData.tradeLicense] : []}
+          value={convertToImageUploadFile(formData.tradeLicense)}
           onChange={handleTradeLicenseChange}
           onError={handleError}
         />
@@ -275,19 +368,9 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           value={initialDate}
           onChange={useCallback(handleTradeLicenseDateChange, [formData])}
         />
-          <FileUploader
-          label="Business Gallery"
-          description="Add gallery images"
-          max={5}
-          maxSizeMB={10}
-          value={formData.gallery}
-          onChange={handleGalleryChange}
-          onError={handleError}
-        />
       </div>
 
-     
-       <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
+      <div className="flex lg:flex-row flex-col gap-10 lg:w-1/2 w-full mx-auto">
         <button
           onClick={onBack}
           className="!px-20 !py-3 cursor-pointer border-blue-600 text-white lg:whitespace-pre whitespace-normal bg-[#163987]  rounded-lg"

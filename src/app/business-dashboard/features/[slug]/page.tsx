@@ -12,8 +12,7 @@ import { useAddFeaturedClientMutation, useAddFeaturedOfferMutation, useAddVideoF
 import VideoFeedbackDisplay from './_components/VideoFeedbackDisplay'
 import { useBusinessStore } from '@/hooks/selectedBusiness'
 import { toast } from 'sonner'
-import { appendApi } from '@/lib/utils'
-import Image from 'next/image'
+import VideoModal from '@/components/shared/video-modal'
 
 
 interface UploadedFile {
@@ -81,6 +80,10 @@ export default function SpecialFeaturesPage() {
   const { watch, setValue, handleSubmit: formHandleSubmit, reset } = methods;
   const formData = watch();
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Video modal state
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
+  const tutorialVideoUrl = "https://youtu.be/2cxz4HicFvs?si=ZwBorNGgIDG9WdED" // Your actual tutorial video
 
   // Show loading state while fetching data
   const isLoading = videoLoading || offersLoading || clientsLoading || businessLoading
@@ -363,7 +366,10 @@ export default function SpecialFeaturesPage() {
               <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Add Promo Video</h3>
               <p className="text-[14px] text-[#6F6D71]">Embed a YouTube video to promote your business</p>
             </div>
-            <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+            <button 
+              onClick={() => setIsVideoModalOpen(true)}
+              className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2"
+            >
               <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
             </button>
@@ -397,7 +403,7 @@ export default function SpecialFeaturesPage() {
           
           <FileUploader
             max={10}
-            maxSizeMB={10}
+            maxSizeMB={2}
             recommendedSize="500x500 px"
             value={formData.customerLogos}
             onChange={handleCustomerLogosChange}
@@ -500,7 +506,7 @@ export default function SpecialFeaturesPage() {
               </Label>
               <FileUploader
                 max={1}
-                maxSizeMB={10}
+                maxSizeMB={2}
                 recommendedSize="500x500 px"
                 value={formData.customerFeedback.customerImage}
                 onChange={handleCustomerImageChange}
@@ -559,7 +565,7 @@ export default function SpecialFeaturesPage() {
               </Label>
               <FileUploader
                 max={2}
-                maxSizeMB={10}
+                maxSizeMB={2}
                 recommendedSize="500x500 px"
                 value={formData.featuredOffers}
                 onChange={handleFeaturedOffersChange}
@@ -584,6 +590,14 @@ export default function SpecialFeaturesPage() {
         </div>
       </div>
     </div>
+    
+    {/* Video Modal */}
+    <VideoModal
+      isOpen={isVideoModalOpen}
+      onClose={() => setIsVideoModalOpen(false)}
+      videoUrl={tutorialVideoUrl}
+      // title="Tutorial: How to Add Promo Video"
+    />
     </FormProvider>
   )
 }

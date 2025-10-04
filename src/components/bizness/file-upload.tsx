@@ -34,7 +34,7 @@ export default function FileUploader({
   description,
   required = false,
   max = 1,
-  maxSizeMB = 10,
+  maxSizeMB = 2,
   acceptedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"],
   recommendedSize,
   value = [],
@@ -49,26 +49,32 @@ export default function FileUploader({
   const [error, setError] = React.useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
   const resolvePreviewSrc = (src?: string): string => {
+    console.log("🔍 resolvePreviewSrc called with:", { src, type: typeof src, length: src?.length })
+    
     if (!src) return ""
     // For data URLs or blob URLs, use as-is
     if (src.startsWith("data:") || src.startsWith("blob:")) return src
     // For HTTP URLs, use as-is
     if (src.startsWith("http")) return src
-    // For relative paths from API, use backend URL or fallback to localhost
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000"
-    return `${backendUrl}/uploads/${src}`
+    
+    // Direct fallback to localhost:9000/uploads/ for API images
+    const directUrl = `http://localhost:9000/api/v1/uploads/${src}`
+    console.log("🔍 Direct URL construction:", { src, directUrl })
+    return directUrl
   }
 
 
   // Handle image load errors
   const handleImageError = (fileId: string | undefined) => {
     if (!fileId) return;
+    console.log("❌ Image load error for file:", fileId);
     setImageErrors(prev => new Set(prev).add(fileId));
   }
 
   // Handle successful image loads
   const handleImageLoad = (fileId: string | undefined) => {
     if (!fileId) return;
+    console.log("✅ Image loaded successfully for file:", fileId);
     setImageErrors(prev => {
       const newSet = new Set(prev);
       newSet.delete(fileId);
@@ -77,6 +83,7 @@ export default function FileUploader({
   }
 
   React.useEffect(() => {
+    console.log("🔍 FileUploader received value:", value)
     setFiles(value)
   }, [value])
 
@@ -98,8 +105,14 @@ export default function FileUploader({
 
   const validateFile = (file: File): string | null => {
     // Check file size
-    if (file.size > maxSizeMB * 1024 * 1024) {
-      return `File size must be less than ${maxSizeMB}MB`
+    const maxSizeBytes = maxSizeMB * 1024 * 1024
+    console.log(`Validating file: ${file.name}, size: ${(file.size / (1024 * 1024)).toFixed(2)}MB, max allowed: ${maxSizeMB}MB`)
+    
+    if (file.size > maxSizeBytes) {
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2)
+      const errorMsg = `File "${file.name}" is too large (${fileSizeMB}MB). Maximum allowed size is ${maxSizeMB}MB`
+      console.log('File size validation failed:', errorMsg)
+      return errorMsg
     }
 
     // Check file type
@@ -107,9 +120,12 @@ export default function FileUploader({
       const readableTypes = acceptedTypes
         .map(t => (t.startsWith('image/') ? t.split('/')[1]?.toUpperCase() || t : t))
         .join(', ')
-      return `No supported file type. Allowed: ${readableTypes}`
+      const errorMsg = `File "${file.name}" has unsupported format. Allowed formats: ${readableTypes}`
+      console.log('File type validation failed:', errorMsg)
+      return errorMsg
     }
 
+    console.log('File validation passed:', file.name)
     return null
   }
 
@@ -120,10 +136,15 @@ export default function FileUploader({
     const errors: string[] = []
     const validFiles: File[] = []
 
+    console.log('Processing files:', fileArray.length, 'files, maxSizeMB:', maxSizeMB)
+
+    // Clear any previous errors
+    setError(null)
+
     for (const file of fileArray) {
       const error = validateFile(file)
       if (error) {
-        errors.push(`${file.name}: ${error}`)
+        errors.push(error)
       } else {
         validFiles.push(file)
       }
@@ -131,6 +152,7 @@ export default function FileUploader({
 
     if (errors.length > 0) {
       const errorMessage = errors.join('\n')
+      console.log('File validation errors:', errorMessage)
       setError(errorMessage)
       onError?.(errorMessage)
       return
@@ -138,7 +160,7 @@ export default function FileUploader({
 
     // Check if adding these files would exceed the max limit
     if (files.length + validFiles.length > max) {
-      const errorMessage = `Maximum ${max} file${max > 1 ? 's' : ''} allowed`
+      const errorMessage = `You can only upload ${max} file${max > 1 ? 's' : ''} at a time. Currently you have ${files.length} file${files.length > 1 ? 's' : ''} uploaded.`
       setError(errorMessage)
       onError?.(errorMessage)
       return
@@ -164,7 +186,8 @@ export default function FileUploader({
       setFiles(updatedFiles)
       onChange?.(updatedFiles)
     } catch (error) {
-      const errorMessage = 'Failed to process files. Please try again.'
+      console.error('File processing error:', error)
+      const errorMessage = 'Failed to process files. Please check your files and try again.'
       setError(errorMessage)
       onError?.(errorMessage)
     } finally {
@@ -279,6 +302,7 @@ export default function FileUploader({
                   className="w-12 h-12 sm:h-[80px] sm:w-[80px] object-cover rounded"
                   onError={() => handleImageError(files[0]?.id)}
                   onLoad={() => handleImageLoad(files[0]?.id)}
+                  unoptimized={true}
                 />
               ) : null}
               <div className="flex-1 min-w-0">
@@ -365,6 +389,7 @@ export default function FileUploader({
                   className="w-20 h-20 sm:h-[80px] sm:w-[150px] object-cover rounded-[8px]"
                   onError={() => handleImageError(file.id)}
                   onLoad={() => handleImageLoad(file.id)}
+                  unoptimized={true}
                 />
               )}
               <button
