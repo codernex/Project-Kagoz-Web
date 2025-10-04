@@ -176,7 +176,7 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
 
             <Textarea
               placeholderIcon={Tag}
-              label="tagLine"
+              label="Tagline"
               required
               name="tagLine"
               control={form.control}

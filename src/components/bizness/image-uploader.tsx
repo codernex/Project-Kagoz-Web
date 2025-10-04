@@ -206,20 +206,20 @@ export function ImageUpload({
           onDrop={handleDrop}
           onClick={handleBrowseClick}
           className={cn(
-            "relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors cursor-pointer",
-            "min-h-[160px] px-6 py-8 sm:min-h-[180px]",
+            "relative flex flex-col items-center justify-center rounded-[8px] border border-gray-200 border-dashed transition-colors cursor-pointer",
+            "min-h-[100px] px-6 py-8 sm:min-h-[140px]",
             isDragging
-              ? "border-primary bg-primary/5"
-              : "border-border bg-background hover:border-primary/50 hover:bg-accent/50",
+              ? "border border-gray-200"
+              : "border border-gray-200",
           )}
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <div className="rounded-full bg-muted p-3">
+          <div className="flex flex-col items-center gap-2 !text-[#111827] text-center">
+            <div className="rounded-full  p-3">
               <Upload className="h-5 w-5 text-muted-foreground text-[#111827]" />
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-foreground">
-                Drop your image here or <span className="text-primary font-medium">click to browse</span>
+              <p className="text-sm ">
+                Drop your image here or <span className=" font-medium">click to browse</span>
               </p>
               <p className="text-xs text-muted-foreground">
                 {acceptedTypes.map((type) => type.split("/")[1]?.toUpperCase() ?? type).join(", ")} up to {maxSizeMB}MB

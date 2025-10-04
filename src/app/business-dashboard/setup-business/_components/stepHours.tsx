@@ -335,10 +335,7 @@ export function StepHours({ businessData, setFormValue, onPrev, onNext, isNextDi
               <Label className="ml-[12px] text-[14px] text-[#353535] font-normal">Closed on Public Holidays</Label>
             </div>
 
-            <div className="bg-[#F3F4F6] p-[8px] text-[#2D3643] text-[14px] rounded-[8px] gap-3 flex items-center w-fit">
-              <Copy className="w-[16px] h-[16px]" />
-              <span>Copy Mon-Fri hours to all weekdays</span>
-            </div>
+            
           </div>
         </div>
 

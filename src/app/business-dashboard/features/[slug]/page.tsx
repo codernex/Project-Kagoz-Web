@@ -9,10 +9,10 @@ import { TextInput } from '@/components/shared/text-input'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useParams, useRouter } from 'next/navigation'
 import { useAddFeaturedClientMutation, useAddFeaturedOfferMutation, useAddVideoFeedbackMutation, useGetVideoFeedbacksQuery, useGetFeaturedOfferQuery, useGetFeauturedClientsQuery, useUpdateBusinessYouTubeVideoMutation, useGetBusinessBySlugQuery } from '@/redux/api'
-import VideoFeedbackDisplay from './_components/VideoFeedbackDisplay'
 import { useBusinessStore } from '@/hooks/selectedBusiness'
 import { toast } from 'sonner'
 import VideoModal from '@/components/shared/video-modal'
+import { ImageUpload } from '@/components/bizness/image-uploader'
 
 
 interface UploadedFile {
@@ -106,10 +106,20 @@ export default function SpecialFeaturesPage() {
         setValue('customerLogos', convertedLogos);
       }
 
-      // Set featured offers
+      // Set featured offers with images
       if (featuredOffers && featuredOffers.length > 0) {
-        const convertedOffers = convertToUploadedFiles(featuredOffers, 'image');
-        setValue('featuredOffers', convertedOffers);
+        // Convert featured offer images to ImageUpload format
+        const offerImages = featuredOffers.map((offer: any, index: number) => ({
+          id: `existing-offer-${offer.id || index}`,
+          file: null,
+          preview: offer.imageUrl?.startsWith('http') 
+            ? offer.imageUrl 
+            : `http://localhost:9000/api/v1/uploads/${offer.imageUrl}`,
+          name: `Featured Offer ${index + 1}`,
+          size: '0 KB',
+          uploaded: true
+        }));
+        setValue('featuredOffers', offerImages);
         
         // Set CTA URL from first offer
         const firstOffer = featuredOffers[0];
@@ -118,17 +128,21 @@ export default function SpecialFeaturesPage() {
         }
       }
 
-      // Set customer feedback
+      // Set customer feedback with logo images
       if (videoFeedbacks && videoFeedbacks.length > 0) {
-        const feedback = videoFeedbacks[0];
-        setValue('customerFeedback.name', (feedback as any).name || '');
-        setValue('customerFeedback.company', (feedback as any).company || '');
-        setValue('customerFeedback.youtubeUrl', (feedback as any).url || (feedback as any).videoUrl || '');
-        setValue('customerFeedback.rating', (feedback as any).rating || 1);
-        
-        if ((feedback as any).logo || (feedback as any).image) {
-          const customerImage = convertToUploadedFiles([feedback], 'image');
-          setValue('customerFeedback.customerImage', customerImage);
+        // Convert logo URLs to ImageUpload format
+        if (videoFeedbacks.length > 0) {
+          const logoImages = videoFeedbacks.map((feedback: any, index: number) => ({
+            id: `existing-logo-${feedback.id || index}`,
+            file: null,
+            preview: feedback.logoUrl?.startsWith('http') 
+              ? feedback.logoUrl 
+              : `http://localhost:9000/api/v1/uploads/${feedback.logoUrl}`,
+            name: `${feedback.name || 'Customer'} Logo`,
+            size: '0 KB',
+            uploaded: true
+          }));
+          setValue('customerFeedback.customerImage', logoImages);
         }
       }
     };
@@ -151,7 +165,7 @@ export default function SpecialFeaturesPage() {
         const imageUrl = item?.url || item?.imageUrl;
         const fullImageUrl = imageUrl.startsWith('http') 
           ? imageUrl 
-          : `http://localhost:9000/uploads/${imageUrl}`;
+          : `http://localhost:9000/uploads/api/v1/${imageUrl}`;
         
         return {
           id: `existing-${type}-${index}-${Date.now()}`,
@@ -191,9 +205,6 @@ export default function SpecialFeaturesPage() {
 
   // Check if all required fields are filled (including existing data)
   const isFormValid = () => {
-    // Check if at least one customer logo is uploaded (new or existing)
-    const hasCustomerLogos = formData.customerLogos.length > 0 || (featuredClients && featuredClients.length > 0)
-    
     // Check if customer feedback fields are filled (all or none)
     const hasCustomerName = formData.customerFeedback.name.trim() !== ''
     const hasCompanyName = formData.customerFeedback.company.trim() !== ''
@@ -204,20 +215,13 @@ export default function SpecialFeaturesPage() {
     const customerFeedbackComplete = (hasCustomerName && hasCompanyName && hasYoutubeUrl && hasCustomerImage) || 
                                    (!hasCustomerName && !hasCompanyName && !hasYoutubeUrl && !hasCustomerImage)
     
-    // Check if at least one featured offer is uploaded (new or existing) and CTA URL is provided
-    const hasFeaturedOffers = formData.featuredOffers.length > 0 || (featuredOffers && featuredOffers.length > 0)
-    const hasCtaUrl = formData.featuredOfferCtaUrl.trim() !== ''
-    
     // Debug logging
     console.log('Form validation debug:', {
-      hasCustomerLogos,
       hasCustomerName,
       hasCompanyName,
       hasYoutubeUrl,
       hasCustomerImage,
       customerFeedbackComplete,
-      hasFeaturedOffers,
-      hasCtaUrl,
       formData: {
         customerLogos: formData.customerLogos.length,
         featuredOffers: formData.featuredOffers.length,
@@ -226,11 +230,11 @@ export default function SpecialFeaturesPage() {
       }
     })
     
-    // Make customer feedback completely optional - only require customer logos and featured offers with CTA URL
-    // But if customer feedback is provided, it should be complete
+    // Make customer feedback completely optional - only require that if customer feedback is provided, it should be complete
     const customerFeedbackValid = !hasCustomerName || (hasCustomerName && hasCompanyName && hasYoutubeUrl)
     
-    return hasCustomerLogos && hasFeaturedOffers && hasCtaUrl && customerFeedbackValid
+    // Form is valid if customer feedback is valid (all other fields are optional)
+    return customerFeedbackValid
   }
 
   const onSubmit = async (data: SpecialFeaturesData) => {
@@ -258,7 +262,7 @@ export default function SpecialFeaturesPage() {
         toast.success('Promo video updated successfully')
       }
 
-      // 1) Upload customer logos (featured clients)
+      // 1) Upload customer logos (featured clients) - optional
       if (data.customerLogos?.length) {
         for (const logo of data.customerLogos) {
           if (logo.file) {
@@ -274,13 +278,15 @@ export default function SpecialFeaturesPage() {
       if (data.customerFeedback?.youtubeUrl && data.customerFeedback?.name && data.customerFeedback?.company) {
         const fd = new FormData()
         
-        // Add logo file if provided
-        if (data.customerFeedback?.customerImage?.[0] && data.customerFeedback.customerImage[0].file) {
-          const logoFile = data.customerFeedback.customerImage[0].file
-          fd.append('logo', logoFile)
-          console.log('Adding logo file to FormData:', logoFile.name, logoFile.size)
+        // Add logo file if provided - check for new files (with file property)
+        const customerImages = data.customerFeedback?.customerImage || []
+        const newLogoFile = customerImages.find(img => img.file) // Find image with file property
+        
+        if (newLogoFile && newLogoFile.file) {
+          fd.append('logo', newLogoFile.file)
+          console.log('Adding logo file to FormData:', newLogoFile.file.name, newLogoFile.file.size)
         } else {
-          console.log('No logo file provided for video feedback')
+          console.log('No new logo file provided for video feedback')
         }
         
         // Add other fields (always required)
@@ -300,24 +306,27 @@ export default function SpecialFeaturesPage() {
           rating: data.customerFeedback.rating,
           name: data.customerFeedback.name,
           company: data.customerFeedback.company,
-          hasLogo: !!(data.customerFeedback?.customerImage?.[0] && data.customerFeedback.customerImage[0].file)
+          hasLogo: !!(newLogoFile && newLogoFile.file)
         })
         
         await addVideoFeedback({ slug: targetSlug, data: fd }).unwrap()
         toast.success('Customer video feedback uploaded successfully')
       }
 
-      // 3) Upload featured offers
+      // 3) Upload featured offers - optional
       if (data.featuredOffers?.length) {
         for (const offer of data.featuredOffers) {
           if (offer.file) {
             const fd = new FormData()
             fd.append('image', offer.file)
-            fd.append('ctaUrl', data.featuredOfferCtaUrl)
+            // Only add CTA URL if provided
+            if (data.featuredOfferCtaUrl?.trim()) {
+              fd.append('ctaUrl', data.featuredOfferCtaUrl)
+            }
             
             console.log('Submitting featured offer:', {
               image: offer.file.name,
-              ctaUrl: data.featuredOfferCtaUrl
+              ctaUrl: data.featuredOfferCtaUrl || 'No CTA URL provided'
             })
             
             await addFeaturedOffer({ slug: targetSlug, data: fd }).unwrap()
@@ -387,29 +396,6 @@ export default function SpecialFeaturesPage() {
           </div>
         </div>
 
-        {/* Add Customer Brand Logo Section */}
-        <div className="bg-white rounded-[8px] shadow-sm p-6">
-          <div className="flex items-start justify-between gap-2 mb-4">
-            <div className="flex-1">
-              <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Add Customer Brand Logo</h3>
-              <p className="text-[14px] text-[#6F6D71]">Upload and showcase customer brand logos to highlight trusted collaborations</p>
-            </div>
-           <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
-              <CirclePlay className="h-[16px] w-[16px]" />
-              See Tutorial
-            </button>
-          </div>
-          
-          
-          <FileUploader
-            max={10}
-            maxSizeMB={2}
-            recommendedSize="500x500 px"
-            value={formData.customerLogos}
-            onChange={handleCustomerLogosChange}
-            onError={handleError}
-          />
-        </div>
 
         {/* Customer Video Feedback Section */}
         <div className="bg-white rounded-[8px] shadow-sm p-6">
@@ -442,7 +428,21 @@ export default function SpecialFeaturesPage() {
               </div>
             </div>
 
-           
+            <div>
+              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
+                Customer Logos
+              </Label>
+              <ImageUpload
+                acceptedTypes={["image/png"]}
+                max={5}
+                maxSizeMB={1}
+                recommendedSize="500x500 px"
+                disableRemove={true}
+                value={formData.customerFeedback.customerImage}
+                onChange={handleCustomerImageChange}
+                onError={handleError}
+              />
+            </div>
 
             {/* Company Name */}
             <div>
@@ -499,36 +499,53 @@ export default function SpecialFeaturesPage() {
               </div>
             </div>
 
-            {/* Customer Image Upload */}
-            <div>
-              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
-                Customer Image/Logo
-              </Label>
-              <FileUploader
-                max={1}
-                maxSizeMB={2}
-                recommendedSize="500x500 px"
-                value={formData.customerFeedback.customerImage}
-                onChange={handleCustomerImageChange}
-                onError={handleError}
-              />
+            <div className="flex">
+            {videoFeedbacks && videoFeedbacks.length > 0 && (
+           <div className="bg-white rounded-[8px] w-full p-6">
+            <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              {videoFeedbacks.map((feedback: any, index: number) => {
+                const getVideoId = (url: string) => {
+                  if (!url) return null;
+                  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+                  return match ? match[1] : null;
+                };
+                
+                const videoId = getVideoId(feedback.videoUrl || feedback.url);
+                
+                return (
+                <div key={feedback.id || index} className="flex-shrink-0">
+                   
+                  {/* Video Thumbnails */}
+                  {videoId && (
+                    <div 
+                      className="relative w-[190px] h-[120px] bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+                      onClick={() => window.open(feedback.videoUrl || feedback.url, '_blank')}
+                    >
+                      <img 
+                        src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                        alt={`${feedback.name || 'Customer'} video thumbnail`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                          <div className="w-0 h-0 border-l-[6px] border-l-gray-600 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
+                        </div>
+                      </div>
+                      <button className="absolute top-1 right-1 w-[16px] h-[16px] bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+                        <span className="text-white text-xs">×</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+                );
+              })}
             </div>
           </div>
-        </div>
+        )}
+            </div>
+           </div>
+         </div>
 
-        {/* Existing Video Feedbacks Display */}
-        <VideoFeedbackDisplay 
-          feedbacks={(videoFeedbacks || []).map((video: any) => ({
-            id: video.id,
-            videoUrl: video.videoUrl,
-            logoUrl: video.logoUrl || '',
-            rating: video.rating || 1,
-            name: video.name || '',
-            companyName: video.companyName || '',
-            createdAt: video.createdAt || new Date().toISOString()
-          }))} 
-          businessSlug={targetSlug} 
-        />
 
         {/* Featured Offers Section */}
         <div className="bg-white rounded-[8px] shadow-sm p-6">
@@ -544,29 +561,20 @@ export default function SpecialFeaturesPage() {
           </div>
           
           
-          <div className="space-y-4">
-            {/* CTA URL Field */}
-            <div>
-              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
-                CTA URL
-              </Label>
-              <TextInput
-                name="featuredOfferCtaUrl"
-                control={methods.control}
-                placeholder="https://example.com/offer-details"
-                width='100%'
-              />
-            </div>
+          <div className="space-y-4 flex">
+          
             
             {/* File Upload */}
             <div>
               <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
                 Upload Files
               </Label>
-              <FileUploader
+              <ImageUpload
+                acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
                 max={2}
                 maxSizeMB={2}
                 recommendedSize="500x500 px"
+                disableRemove={true}
                 value={formData.featuredOffers}
                 onChange={handleFeaturedOffersChange}
                 onError={handleError}

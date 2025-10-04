@@ -183,7 +183,7 @@ export default function BusinessHoursStep({ data, businessData, onUpdate, onNext
           <div className="flex gap-[11.5px]"><Switch id="holidays" checked={formData.closedOnHolidays} onCheckedChange={c => !formData.is24Hours && updateFormData({ closedOnHolidays: c })} disabled={formData.is24Hours} /><h2 className={`text-sm font-normal ${formData.is24Hours ? 'text-gray-400' : ''}`}>Closed on Public Holidays</h2></div>
         </div>
 
-        {!formData.is24Hours && <button onClick={copyMonFri} className="flex items-center gap-2 bg-[#F3F4F6] p-2 text-[#2D3643] border-purple-200 rounded-[8px]"><Copy className="w-3 h-3"/>Copy Mon-Fri hours</button>}
+
 
         {!formData.is24Hours && days.map(day => formData.businessHours[day]?.isOpen && (
           <div key={day} className="border-gray-200 border rounded-[8px] p-4 space-y-3">
