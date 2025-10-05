@@ -162,7 +162,7 @@ export default function BusinessInfoStep({ form, onNext, data, onUpdate }: Busin
     <Form {...form}>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         <div className="flex items-center gap-2 mb-4">
-          <Building2 className="size-6 text-[#9333EA]" />
+          <Building2 className="w-[24px] h-[24px] text-[#9333EA]" />
           <h3 className="auth-heading !font-medium text-[#111827]">Business Information</h3>
         </div>
         <p className="text-[#2D3643] Subheading !text-start mb-6">Tell us about your business</p>

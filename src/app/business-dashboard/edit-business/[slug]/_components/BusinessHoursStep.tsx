@@ -69,6 +69,7 @@ interface BusinessHoursData { is24Hours: boolean; closedOnHolidays: boolean; bus
 interface BusinessHoursStepProps { data: BusinessHoursData; businessData?: any; onUpdate: (data: BusinessHoursData) => void; onNext: () => void; onBack: () => void }
 
 export default function BusinessHoursStep({ data, businessData, onUpdate, onNext, onBack }: BusinessHoursStepProps) {
+  console.log("🚀 ~ BusinessHoursStep ~ data:", data)
   const [formData, setFormData] = useState<BusinessHoursData>(data)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [setOpeningHours] = useSetOpeningHoursMutation()
@@ -146,19 +147,13 @@ export default function BusinessHoursStep({ data, businessData, onUpdate, onNext
     updateFormData({ businessHours: { ...formData.businessHours, [day]: { ...curr, slots: curr.slots.filter((_, i) => i !== idx) } } })
   }
 
-  const copyMonFri = () => {
-    const mon = formData.businessHours.Monday; if (!mon?.isOpen) return alert("Set Monday first")
-    const updated = { ...formData.businessHours }
-    for (const d of ["Tuesday","Wednesday","Thursday","Friday"]) updated[d] = { ...mon }
-    updateFormData({ businessHours: updated })
-  }
 
   const handleNext = async () => { if (!validateForm()) return; await setOpeningHours({ slug, ...transformToApiFormat(formData) }).unwrap(); onNext() }
   const handleBack = async () => { if (!validateForm()) return; await setOpeningHours({ slug, ...transformToApiFormat(formData) }).unwrap(); onBack() }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-4"><Clock className="size-6 text-[#9333EA]" /><h3 className="auth-heading !font-medium text-[#111827]">Business Hours & Availability</h3></div>
+      <div className="flex items-center gap-2 mb-4"><Clock className="w-[24px] h-[24px] text-[#9333EA]" /><h3 className="auth-heading !font-medium text-[#111827]">Business Hours & Availability</h3></div>
       <p className="text-[#2D3643] Subheading !text-start mb-6">When are you open?</p>
 
       <div className="space-y-6">

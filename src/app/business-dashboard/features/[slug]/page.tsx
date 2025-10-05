@@ -128,22 +128,28 @@ export default function SpecialFeaturesPage() {
         }
       }
 
-      // Set customer feedback with logo images
       if (videoFeedbacks && videoFeedbacks.length > 0) {
-        // Convert logo URLs to ImageUpload format
-        if (videoFeedbacks.length > 0) {
-          const logoImages = videoFeedbacks.map((feedback: any, index: number) => ({
-            id: `existing-logo-${feedback.id || index}`,
-            file: null,
-            preview: feedback.logoUrl?.startsWith('http') 
-              ? feedback.logoUrl 
-              : `http://localhost:9000/api/v1/uploads/${feedback.logoUrl}`,
-            name: `${feedback.name || 'Customer'} Logo`,
-            size: '0 KB',
-            uploaded: true
-          }));
-          setValue('customerFeedback.customerImage', logoImages);
+        // Use the first feedback for form population
+        const firstFeedback = videoFeedbacks[0] as any;
+        if (firstFeedback) {
+          setValue('customerFeedback.name', firstFeedback?.name || '');
+          setValue('customerFeedback.company', firstFeedback?.companyName || '');
+          setValue('customerFeedback.youtubeUrl', firstFeedback?.videoUrl || '');
+          setValue('customerFeedback.rating', firstFeedback?.rating || 1);
         }
+        
+        // Convert logo URLs to ImageUpload format
+        const logoImages = videoFeedbacks.map((feedback: any, index: number) => ({
+          id: `existing-logo-${feedback.id || index}`,
+          file: null,
+          preview: feedback.logoUrl?.startsWith('http') 
+            ? feedback.logoUrl 
+            : `http://localhost:9000/api/v1/uploads/${feedback.logoUrl}`,
+          name: `${feedback.name || 'Customer'} Logo`,
+          size: '0 KB',
+          uploaded: true
+        }));
+        setValue('customerFeedback.customerImage', logoImages);
       }
     };
 
@@ -488,7 +494,7 @@ export default function SpecialFeaturesPage() {
                     className="p-1"
                   >
                     <Star
-                      className={`h-5 w-5 ${
+                      className={`h-[16px] w-[16px] ${
                         star <= formData.customerFeedback.rating
                           ? 'fill-yellow-400 text-yellow-400'
                           : 'text-gray-300'
@@ -561,18 +567,13 @@ export default function SpecialFeaturesPage() {
           </div>
           
           
-          <div className="space-y-4 flex">
-          
-            
-            {/* File Upload */}
+      
             <div>
-              <Label className="text-[14px] font-medium text-gray-700 mb-2 block">
-                Upload Files
-              </Label>
+              
               <ImageUpload
-                acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+                acceptedTypes={["image/png"]}
                 max={2}
-                maxSizeMB={2}
+                maxSizeMB={1}
                 recommendedSize="500x500 px"
                 disableRemove={true}
                 value={formData.featuredOffers}
@@ -580,7 +581,6 @@ export default function SpecialFeaturesPage() {
                 onError={handleError}
               />
             </div>
-          </div>
         </div>
 
       

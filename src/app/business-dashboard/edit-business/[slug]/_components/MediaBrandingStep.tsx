@@ -25,7 +25,6 @@ interface MediaBrandingStepProps {
 
 
 export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: MediaBrandingStepProps) {
-  console.log("🚀 ~ MediaBrandingStep ~ 23421data:", data)
 
   const [formData, setFormData] = useState<MediaBrandingData>(data)
   const [errors, setErrors] = useState<{ logo?: string }>({})
@@ -41,7 +40,6 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   const params = useParams() as { slug?: string }
   const slug = decodeURIComponent((params?.slug as string) || "").trim().toLowerCase().replace(/\s+/g, "-")
   
-  // Get existing gallery photos - only fetch if we don't have gallery data yet
   const shouldFetchPhotos = !data.gallery || data.gallery.length === 0
   const { data: existingPhotos = [] } = useGetPhotosQuery(slug, { 
     skip: !shouldFetchPhotos || !slug 
@@ -61,9 +59,6 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   // Convert UploadedFile to ImageUploadFile
   const convertToImageUploadFile = (uploadedFile: UploadedFile | null): ImageUploadFile[] => {
     if (!uploadedFile) return []
-    
-    // For new files (with blob URLs), use the preview as-is
-    // For existing files (from API), construct the full URL
     let previewUrl = uploadedFile.preview;
     if (uploadedFile.preview && !uploadedFile.preview.startsWith('blob:') && !uploadedFile.preview.startsWith('http')) {
       previewUrl = `http://localhost:9000/api/v1/uploads/${uploadedFile.preview}`;
@@ -112,9 +107,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   // Set existing photos in gallery when they are loaded (only once)
   React.useEffect(() => {
     if (existingPhotos.length > 0 && (!formData.gallery || formData.gallery.length === 0)) {
-      console.log('🔍 Existing photos from API:', existingPhotos);
       const existingGalleryFiles = existingPhotos.map(convertPhotoToUploadedFile)
-      console.log('🔍 Converted gallery files:', existingGalleryFiles);
       const newData = { ...formData, gallery: existingGalleryFiles }
       setFormData(newData)
     }
@@ -148,12 +141,6 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
   }
 
   const initialDate = parseDate(formData.tradeLicenseExpireDate)
-  
-  // Debug logging
-  console.log("🔍 Trade License Date Debug:", {
-    originalDate: formData.tradeLicenseExpireDate,
-    parsedDate: initialDate
-  })
 
   const handleLogoChange = (files: ImageUploadFile[]) => {
     const uploadedFile = convertFromImageUploadFile(files)
@@ -281,7 +268,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-4">
         
-          <Camera className="size-6 text-[#9333EA]" />
+          <Camera className="w-[24px] h-[24px] text-[#9333EA]" />
       
         <h3 className="auth-heading !font-medium text-[#111827]">Media & Business Branding</h3>
       </div>
@@ -315,37 +302,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           onError={handleError}
         />
 
-        {/* Business Gallery */}
-        <ImageUpload
-          label="Business Gallery"
-          description="Add gallery images to showcase your business"
-          max={5}
-          maxSizeMB={10}
-          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
-          recommendedSize="800×600 px"
-          value={formData.gallery.map(file => {
-            // For new files (with blob URLs), use the preview as-is
-            // For existing files (from API), construct the full URL
-            let previewUrl = file.preview;
-            if (file.preview && !file.preview.startsWith('blob:') && !file.preview.startsWith('http')) {
-              previewUrl = `http://localhost:9000/api/v1/uploads/${file.preview}`;
-            }
-            
-            const imageUploadFile = {
-              id: file.id,
-              file: file.file,
-              preview: previewUrl,
-              name: file.name,
-              size: file.size,
-              uploaded: !file.file, // If no file object, it's already uploaded
-            };
-            console.log('🔍 Gallery file mapping:', file, '->', imageUploadFile);
-            return imageUploadFile;
-          })}
-          onChange={handleGalleryChange}
-          onError={handleError}
-          disableRemove={true}
-        />
+     
 
         {/* Trade License File */}
         <ImageUpload
@@ -367,6 +324,34 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           required
           value={initialDate}
           onChange={useCallback(handleTradeLicenseDateChange, [formData])}
+        />
+           <ImageUpload
+          label="Business Gallery"
+          description="Add gallery images to showcase your business"
+          max={5}
+          maxSizeMB={10}
+          acceptedTypes={["image/png"]}
+          recommendedSize="800×600 px"
+          value={formData.gallery.map(file => {
+            console.log("🚀 ~ MediaBrandingStep ~ file:", file)
+            let previewUrl = file.preview;
+            if (file.preview && !file.preview.startsWith('blob:') && !file.preview.startsWith('http')) {
+              previewUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${file.preview}`;
+            }
+            
+            const imageUploadFile = {
+              id: file.id,
+              file: file.file,
+              preview: previewUrl,
+              name: file?.name,
+              size: file.size,
+              uploaded: !file.file, // If no file object, it's already uploaded
+            };
+            return imageUploadFile;
+          })}
+          onChange={handleGalleryChange}
+          onError={handleError}
+          disableRemove={true}
         />
       </div>
 

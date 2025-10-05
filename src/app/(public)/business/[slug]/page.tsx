@@ -44,14 +44,14 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       title: data.name,
       description: data.about,
       alternates: {
-        canonical: process.env.NEXT_PUBLIC_BASE_URL + `/business/${slug}`
+        canonical: (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000') + `/business/${slug}`
       },
       openGraph: {
         title: data.name,
         description: data.about,
         images: appendApi(data.logoUrl),
         type: "website",
-        url: `${process.env.NEXT_PUBLIC_BASE_URL}/business/${data.slug}`
+        url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/business/${data.slug}`
       },
       twitter: {
         card: 'summary_large_image',
