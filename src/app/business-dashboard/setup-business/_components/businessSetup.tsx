@@ -121,12 +121,70 @@ export function BusinessSetupWizard() {
   }
 
   const [businessData, setBusinessData] = useState<BusinessData>(defaultValues)
+  const [publishFunction, setPublishFunction] = useState<(() => Promise<void>) | null>(null)
 
   const setFormValue = (field: string, value: any) => {
     setBusinessData((prev) => ({
       ...prev,
       [field]: value,
     }))
+  }
+
+  // Calculate completion percentage based on actual filled fields
+  const calculateCompletionPercentage = () => {
+    let completedFields = 0
+    let totalFields = 0
+
+    // Business Information (Step 0)
+    const businessInfoFields = ['name', 'tagLine', 'about']
+    businessInfoFields.forEach(field => {
+      totalFields++
+      if (businessData[field as keyof BusinessData] && businessData[field as keyof BusinessData] !== '') {
+        completedFields++
+      }
+    })
+
+    // Location & Contact (Step 1)
+    const locationFields = ['streetAddress', 'city', 'mobile']
+    locationFields.forEach(field => {
+      totalFields++
+      if (businessData[field as keyof BusinessData] && businessData[field as keyof BusinessData] !== '') {
+        completedFields++
+      }
+    })
+
+    // Business Hours (Step 2) - Check if any hours are configured
+    totalFields++
+    const hasHoursConfigured = businessData.is24x7 || 
+      Object.values(businessData.businessHours || {}).some(hour => hour.isOpen) ||
+      (businessData.openingHours && businessData.openingHours.days && businessData.openingHours.days.length > 0)
+    if (hasHoursConfigured) {
+      completedFields++
+    }
+
+    // Media & Branding (Step 3)
+    totalFields += 3 // logo, license, gallery
+    if (businessData.mediaBranding?.logo) completedFields++
+    if (businessData.mediaBranding?.license && businessData.mediaBranding.license.length > 0) completedFields++
+    if (businessData.mediaBranding?.gallery && businessData.mediaBranding.gallery.length > 0) completedFields++
+
+    // Optional fields that improve completion
+    const optionalFields = ['website', 'facebook', 'email', 'startingDate']
+    optionalFields.forEach(field => {
+      if (field === 'startingDate') {
+        totalFields++
+        if (businessData.startingDate?.year && businessData.startingDate?.month && businessData.startingDate?.day) {
+          completedFields++
+        }
+      } else {
+        totalFields++
+        if (businessData[field as keyof BusinessData] && businessData[field as keyof BusinessData] !== '') {
+          completedFields++
+        }
+      }
+    })
+
+    return Math.round((completedFields / totalFields) * 100)
   }
 
   const nextStep = async (data?: any) => {
@@ -275,6 +333,14 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
             <FullPagePreview
               businessData={businessData}
               onBack={() => setShowFullPreview(false)}
+              onPublish={async () => {
+                if (publishFunction) {
+                  await publishFunction();
+                } else {
+                  // Fallback: go back to completion page
+                  setShowFullPreview(false);
+                }
+              }}
             />
           );
         } else {
@@ -282,7 +348,7 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
           return (
             <CompletionAndPublish
               businessData={businessData}
-              completionPercentage={Math.round(((currentStep + 1) / STEPS.length) * 100)}
+              completionPercentage={calculateCompletionPercentage()}
               onPreviewClick={() => setShowFullPreview(true)}
               onPrevious={prevStep}
               onPublish={async (businessResult?: any) => {
@@ -292,6 +358,7 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
                 }
                 setIsPublished(true);
               }}
+              onPublishFunctionReady={(publishFn) => setPublishFunction(() => publishFn)}
             />
           );
         }

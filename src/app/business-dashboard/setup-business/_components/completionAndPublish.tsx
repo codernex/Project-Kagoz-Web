@@ -1,11 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import Image from "next/image"
-import { ArrowLeft, CircleCheckBig, SquareArrowOutUpRight } from "lucide-react"
+import { Calendar, CalendarCheck, Camera, ChevronLeft, CircleCheckBig, Facebook, FileText, Globe, MapPin, Phone, SquareArrowOutUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   useRegisterBusinessMutation,
   useUpdateBusinessMutation,
@@ -15,6 +13,7 @@ import {
   useAddLogoMutation,
   useSetOpeningHoursMutation
 } from "@/redux/api"
+import { useGetCategoriesQuery } from "@/redux/api/category"
 import type { BusinessData } from "./businessSetup"
 import { axiosInstance } from "@/redux/api/base"
 
@@ -24,6 +23,7 @@ interface CompletionAndPublishProps {
   onPreviewClick: () => void
   onPublish?: (businessResult?: any) => void
   onPrevious?: () => void
+  onPublishFunctionReady?: (publishFn: () => Promise<void>) => void
 }
 
 const DAY_MAP: Record<string, string> = {
@@ -46,10 +46,14 @@ export function CompletionAndPublish({
   completionPercentage,
   onPreviewClick,
   onPublish,
-  onPrevious
+  onPrevious,
+  onPublishFunctionReady
 }: CompletionAndPublishProps) {
   const [isPublishing, setIsPublishing] = useState(false)
   const [isSubmittingMedia, setIsSubmittingMedia] = useState(false)
+  
+  // Fetch categories to get category name
+  const { data: categoriesData } = useGetCategoriesQuery()
   const [registerBusiness, { isLoading }] = useRegisterBusinessMutation()
   const [updateBusiness] = useUpdateBusinessMutation()
   const [addBanner] = useAddBannerMutation()
@@ -58,6 +62,13 @@ export function CompletionAndPublish({
   const [uploadPhoto] = useUploadPhotoMutation()
   const [setOpeningHours] = useSetOpeningHoursMutation()
   const [addCategoryToBusiness] = (require("@/redux/api") as any).useAddCategoryToBusinessMutation()
+
+  // Expose the publish function to parent component
+  React.useEffect(() => {
+    if (onPublishFunctionReady) {
+      onPublishFunctionReady(handlePublish)
+    }
+  }, [onPublishFunctionReady])
 
   const buildOpeningHoursPayload = () => {
     if (businessData.is24x7) {
@@ -96,13 +107,10 @@ export function CompletionAndPublish({
     }
   }
 
-  // API expects either { isOpen247: true } or { isOpen247: false, days: [...] }
   const buildOpeningHoursForApi = () => {
     // Use the new openingHours structure from stepHours
     const openingHours = (businessData as any)?.openingHours
     
-    console.log('🔍 Debug openingHours in completionAndPublish:', openingHours)
-    console.log('🔍 Debug businessData:', businessData)
     
     if (!openingHours) {
       console.log('🔍 No openingHours found, using fallback')
@@ -179,9 +187,6 @@ export function CompletionAndPublish({
       
       if (businessSlug) {
         await submitAllMediaFiles(businessSlug)
-
-        // Some fields (about, facebook, startingDate) are not persisted on create.
-        // Patch them immediately after creation to ensure they are saved.
         try {
           await updateBusiness({
             slug: businessSlug,
@@ -334,8 +339,19 @@ export function CompletionAndPublish({
   }
 
   const formatDate = (date: { year: string; month: string; day: string }) => {
+    if (!date.month || !date.day || !date.year) return "Not specified"
     const monthIndex = parseInt(date.month) - 1
+    if (monthIndex < 0 || monthIndex > 11) return "Not specified"
     return `${MONTHS[monthIndex]} ${date.day}, ${date.year}`
+  }
+
+  // Get category name from ID
+  const getCategoryName = (categoryId: string) => {
+    if (!categoriesData || !categoryId) return "Not specified"
+    const category = categoriesData.find((cat: any) => 
+      String(cat.id || cat._id) === String(categoryId)
+    )
+    return category?.name || "Not specified"
   }
 
   const getBusinessHoursDisplay = () => {
@@ -374,53 +390,54 @@ export function CompletionAndPublish({
         {/* Left Section: Completion & Publish */}
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Completion & Publish</h2>
+            <h2 className="text-2xl font-medium flex items-center gap-2 text-[#111827] mb-2"><CircleCheckBig className="text-[#9333EA]" /> Completion & Publish</h2>
             <p className="text-gray-600">You&apos;re Almost Done! Review & Publish Your Listing.</p>
           </div>
           
           {/* Progress Summary Card */}
-          <Card className="border-2 border-gray-100">
-            <CardContent className="p-6">
-              <h3 className="common-text text-[#111827] mb-4">Progress Summary</h3>
+          <div className="border border-gray-100 rounded-[8px] shadow-lg">
+            <div className="p-6">
+              <h3 className="common-text text-[#111827] mb-10">Progress Summary</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700">📊 Your listing is {completionPercentage}% complete</span>
+                  <span className="text-[#353535]">📊 Your listing is {completionPercentage}% complete</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 relative rounded-full">
                   <div 
-                    className="h-2 bg-[#6F00FF] rounded-full transition-all duration-300" 
+                    className="h-2 bg-[#6F00FF] rounded-full  transition-all duration-300" 
                     style={{ width: `${completionPercentage}%` }}
                   />
-                  <span className="absolute right-0 -top-5 text-xs font-semibold text-[#2D3643] pr-1">
+                  <span className="absolute right-0  mb-12 -top-9 text-[14px] font-semibold text-[#2D3643] pr-1">
                     {completionPercentage}%
                   </span>
                 </div>
-                <div className="flex items-center space-x-2 text-[#15803D]">
+                <div className="flex items-center space-x-2 text-[#2D3643]">
                   <span className="font-medium">
                     <Image 
                       width={1000} 
                       height={1000} 
-                      src="/icons/checkmark.png" 
+                      src="/checkmark.png" 
                       alt="Verified Badge" 
-                      className="w-4 h-4 inline-block mr-1" 
+                      className="w-[16px] h-[16px] inline-block mr-1" 
                     />
                     {completionPercentage === 100 
-                      ? "Great job! You've completed your business profile." 
+                      ? " Great job! You've completed your business profile." 
                       : "Keep going! Add more details to improve your listing."}
                   </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
         
         {/* Right Section: Complete Business Preview */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">Complete Business Preview</h2>
-          <Card className="border border-gray-200">
-            <CardContent className="p-0">
-              {/* Banner Image */}
-              <div className="h-48 bg-gradient-to-r from-blue-500 to-[#6F00FF] relative overflow-hidden">
+        <div className="space-y-6 border border-gray-200 rounded-[8px] p-[12px] sm:p-[24px]">
+          <h2 className="sm:text-[20px] text-[16px] font-medium text-[#111827] flex items-center gap-2">
+            <span className="bg-[#6F00FF] rounded-full h-3 w-3"></span>
+            Complete Business Preview</h2>
+
+            <div className="space-y-4 rounded-[8px] bg-gradient-to-r from-[#F0FDFA] to-[#FAF5FF] border border-[#CCFBF1]">
+            <div className="h-48 relative overflow-hidden rounded-t-[8px]">
                 {businessData.mediaBranding?.banner ? (
                   <Image 
                     src={businessData.mediaBranding.banner.preview} 
@@ -432,30 +449,24 @@ export function CompletionAndPublish({
                 ) : (
                   <div className="absolute inset-0 bg-black bg-opacity-20" />
                 )}
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-bold">{businessData.name}</h3>
-                </div>
+               
               </div>
-              
-              {/* Business Info */}
-              <div className="p-6 space-y-6">
-                {/* Logo and Basic Info */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden">
+              <div className="flex items-start space-x-4 p-8">
+                  <div className="w-16 sm:w-[64px] h-16 sm:h-[64px] bg-red-500 rounded-[8px] flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                     {businessData.mediaBranding?.logo ? (
                       <Image 
                         src={businessData.mediaBranding.logo.preview} 
                         alt="Logo"
                         width={64}
                         height={64}
-                        className="w-full h-full object-cover rounded-full"
+                        className="w-full h-full object-cover "
                       />
                     ) : (
                       <span>{businessData.name ? businessData.name.charAt(0).toUpperCase() : "B"}</span>
                     )}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-[20px] font-medium text-[#111827]">
                       {businessData.name || "Business Name"}
                     </h3>
                     <p className="text-gray-600 mt-1">
@@ -463,54 +474,59 @@ export function CompletionAndPublish({
                     </p>
                   </div>
                 </div>
-                
+            </div>
+          <div className="">
+            <div className="space-y-6 ">
+              
+              
                 {/* About Section */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">About</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {businessData.about || "Business description will appear here"}
-                  </p>
+                  <h4 className="font-medium text-[#353535] mb-2 flex items-center gap-2"> <span><FileText className="w-[16px] h-[16px] text-gray-600" /></span> About</h4>
+                  <p 
+                    dangerouslySetInnerHTML={{
+                      __html: businessData.about || "Business description will appear here"
+                    }} 
+                    className="text-gray-600 text-sm leading-relaxed"
+                  />
                 </div>
-                
-                {/* Business Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700">Starting Date:</span>
+                <div>
+                    <span className="font-medium text-[#353535] flex gap-2 items-center"><Calendar className="w-[16px] h-[16px] text-gray-600" />Starting Date</span>
                     <p className="text-gray-600">
-                      {businessData.startingDate.year && businessData.startingDate.month && businessData.startingDate.day 
+                      {businessData.startingDate?.year && businessData.startingDate?.month && businessData.startingDate?.day 
                         ? formatDate(businessData.startingDate) 
                         : "Not specified"}
                     </p>
                   </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Category:</span>
-                    <p className="text-gray-600">{businessData.category || "Not specified"}</p>
+                <div>
+                    <span className="font-medium text-[#353535] flex gap-2 items-center"><CalendarCheck className="w-[16px] h-[16px] text-gray-600" />Category</span>
+                    <p className="text-gray-600">{getCategoryName(businessData.category) || "Not specified"}</p>
                   </div>
-                  <div className="md:col-span-2">
-                    <span className="font-medium text-gray-700">Address:</span>
+                <div>
+                    <span className="font-medium text-[#353535] flex gap-2 items-center"><MapPin className="w-[16px] h-[16px] text-gray-600" />Address</span>
                     <p className="text-gray-600">{getFullAddress() || "Address not provided"}</p>
                   </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Phone:</span>
+                <div>
+                    <span className="font-medium text-[#353535] flex gap-2 items-center"><Phone className="w-[16px] h-[16px] text-gray-600" />Phone</span>
                     <p className="text-gray-600">{businessData.mobile || "Not provided"}</p>
                   </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Website:</span>
-                    <p className="text-blue-600 hover:underline cursor-pointer">
-                      {businessData.website || "Not provided"}
-                    </p>
+                <div>
+                    <span className="font-medium text-[#353535] flex gap-2 items-center"><Globe className="w-[16px] h-[16px] text-gray-600" />Website</span>
+                    <p className="text-gray-600">{businessData.website || "Not provided"}</p>
                   </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Facebook:</span>
-                    <p className="text-blue-600 hover:underline cursor-pointer">
-                      {businessData.facebook || "Not provided"}
-                    </p>
+                <div>
+                    <span className="font-medium text-[#353535] flex gap-2 items-center"><Facebook className="w-[16px] h-[16px] text-gray-600" />Facebook</span>
+                    <p className="text-gray-600">{businessData.facebook || "Not provided"}</p>
                   </div>
-                </div>
+                        
+                      
+              
                 
                 {/* Business Hours */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">Business Hours</h4>
+                  <h4 className="font-medium text-[#353535] mb-3 flex items-center gap-2">
+                    <div className=""><Calendar className="w-[16px] h-[16px] text-gray-600" /></div>
+                    Business Hours
+                  </h4>
                   <div className="space-y-2">
                     {(() => {
                       const hoursDisplay = getBusinessHoursDisplay()
@@ -528,9 +544,10 @@ export function CompletionAndPublish({
                     })()}
                     {businessData.closedOnHolidays && (
                       <div className="mt-3">
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-800 border border-red-200">
-                          Closed on public holidays.
-                        </Badge>
+                        <div className="bg-orange-100 text-orange-800 border border-orange-200 rounded px-3 py-2 text-sm flex items-center gap-2">
+                          <div className="w-4 h-4 bg-orange-300 rounded"></div>
+                          Closed on public holidays
+                        </div>
                       </div>
                     )}
                   </div>
@@ -567,10 +584,13 @@ export function CompletionAndPublish({
                 
                 {/* Business Gallery */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">Business Gallery</h4>
+                  <h4 className="font-medium text-[#353535] mb-3 flex items-center gap-2">
+                  <Camera className="w-[16px] h-[16px] text-gray-600" />
+                    Business Gallery
+                  </h4>
                   <div className="grid grid-cols-3 gap-2">
                     {businessData.mediaBranding?.gallery && businessData.mediaBranding.gallery.length > 0 ? (
-                      businessData.mediaBranding.gallery.slice(0, 6).map((file, index) => (
+                      businessData.mediaBranding.gallery.slice(0, 5).map((file, index) => (
                         <div key={file.id} className="aspect-square bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
                           <Image 
                             src={file.preview} 
@@ -582,7 +602,7 @@ export function CompletionAndPublish({
                         </div>
                       ))
                     ) : (
-                      Array.from({ length: 6 }, (_, i) => (
+                      Array.from({ length: 5 }, (_, i) => (
                         <div key={i} className="aspect-square bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
                           <span className="text-gray-400 text-xs">Gallery {i + 1}</span>
                         </div>
@@ -591,38 +611,37 @@ export function CompletionAndPublish({
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            
+          </div>
           
           {/* Progress and Preview Button */}
-          <div className="space-y-4">
-            <span className="common-text text-center flex justify-center !font-medium text-[#15803D]">
-              <CircleCheckBig className="size-4" />
-              {completionPercentage}% Complete
-            </span>
-            <div className="flex items-center justify-between">
-              <div className="flex-1 mr-4">
-                <div className="w-full h-2 bg-green-500 rounded-full">
-                  <div 
-                    className="h-2 bg-green-500 rounded-full transition-all duration-300" 
-                    style={{ width: `${completionPercentage}%` }}
-                  />
-                </div>
+          {/* Completion Status Card */}
+          <div className="bg-green-50 border border-green-200 rounded-[8px] p-6 space-y-6 flex flex-col items-center justify-center mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-[30px] h-[30px] bg-green-500 rounded-full flex items-center justify-center">
+                <CircleCheckBig className="w-[20px] h-[20px] text-white" />
               </div>
+              <span className="font-medium text-[#15803D]">{completionPercentage}% Complete</span>
             </div>
-            <p className="text-sm text-[#15803D] text-center">
-              {completionPercentage === 100 
-                ? "Perfect! Your listing is complete and ready to publish." 
-                : "🎯 Almost there! Add more details to improve visibility."}
+            <div className="w-full bg-[#15803D] rounded-full h-4 mb-3">
+              <div 
+                className="bg-green-500 h-4 rounded-full transition-all duration-300" 
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+            <p className="text-sm text-[#15803D] flex items-center gap-1">
+              🎯 Almost there! Add more details to improve visibility.
             </p>
-            <button 
-              onClick={onPreviewClick}
-              className="w-full text-[#6F00FF] bg-[#F1EBFF] flex items-center justify-center rounded-[8px] py-3 border !border-[#6F00FF]"
-            >
-              <SquareArrowOutUpRight className="w-4 h-4 mr-2" />
-              See Full Page Preview
-            </button>
           </div>
+          
+          {/* Preview Button */}
+          <button 
+            onClick={onPreviewClick}
+            className="w-full text-[#6F00FF] bg-[#F1EBFF] flex items-center justify-center rounded-[8px] py-3 border border-[#6F00FF] hover:bg-[#6F00FF] hover:text-white transition-colors"
+          >
+            <SquareArrowOutUpRight className="w-[20px] h-[20px] mr-2" />
+            See Full Page Preview
+          </button>
         </div>
         
         {/* Upload Progress */}
@@ -645,28 +664,29 @@ export function CompletionAndPublish({
         )}
 
         {/* Bottom Navigation */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+        <div className="flex justify-between gap-6 mt-8 pt-6 border-t border-gray-200">
           <Button 
             variant="outline" 
-            className="flex items-center space-x-2"
+            className="flex items-center w-[50%] space-x-2"
             onClick={onPrevious}
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ChevronLeft className="w-[16px] h-[16px]" />
             <span>Previous</span>
           </Button>
           <Button 
+          variant="submit"  
             onClick={handlePublish}
             disabled={isPublishing || isLoading || isSubmittingMedia}
             className="bg-[#6F00FF] hover:bg-purple-700 text-white px-8"
           >
             {isPublishing ? (
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-[8px] animate-spin" />
                 <span>Creating Business...</span>
               </div>
             ) : isSubmittingMedia ? (
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-[8px] animate-spin" />
                 <span>Uploading Media...</span>
               </div>
             ) : (

@@ -1,8 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Clock,
   MapPin,
@@ -10,282 +8,232 @@ import {
   Globe,
   Facebook,
   Calendar,
-  Building2,
-  Star,
-  ArrowLeft,
-  Share2,
-  Eye,
   FileText,
   Tag,
   Camera,
   CheckCircle,
-  User,
-  ChevronDown,
+  ChevronLeft,
 } from "lucide-react"
 import type { BusinessData } from "./businessSetup"
+import Link from "next/link"
+import { useGetCategoriesQuery } from "@/redux/api/category"
 
 interface FullPagePreviewProps {
   businessData: BusinessData
   onBack: () => void
+  onPublish?: () => void
 }
 
-export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) {
+export function FullPagePreview({ businessData, onBack, onPublish }: FullPagePreviewProps) {
+  // Fetch categories to get category name
+  const { data: categoriesData } = useGetCategoriesQuery()
+  
   const getFullAddress = () => {
     const parts = [businessData.streetAddress, businessData.houseInfo, businessData.localArea, businessData.city, businessData.postalCode, businessData.country].filter(Boolean)
     return parts.join(", ")
   }
 
+  // Get category name from ID
+  const getCategoryName = (categoryId: string) => {
+    if (!categoriesData || !categoryId) return "Business Platform"
+    const category = categoriesData.find((cat: any) => 
+      String(cat.id || cat._id) === String(categoryId)
+    )
+    return category?.name || "Business Platform"
+  }
+
   const formatDate = (date: { year: string; month: string; day: string }) => {
+    // Check if any field is empty, undefined, or invalid
+    if (!date.month || !date.day || !date.year || 
+        date.month.trim() === '' || date.day.trim() === '' || date.year.trim() === '') {
+      return "Not specified"
+    }
+    
     const months = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ]
-    return `${months[parseInt(date.month) - 1]} ${date.day}, ${date.year}`
-  }
-
-  const getBusinessHoursDisplay = () => {
-    // Handle the new openingHours structure
-    const openingHours = (businessData as any)?.openingHours
     
-    if (!openingHours) return []
+    const monthIndex = parseInt(date.month) - 1
+    if (monthIndex < 0 || monthIndex > 11 || isNaN(monthIndex)) return "Not specified"
     
-    // If 24/7 is enabled
-    if (openingHours.isOpen247) {
-      return ["Open 24/7"]
-    }
-    
-    // If custom hours are set
-    if (openingHours.days && Array.isArray(openingHours.days)) {
-      return openingHours.days.map((dayData: any) => {
-        const dayName = dayData.day
-        if (dayData.isOpen && dayData.timeRanges && dayData.timeRanges.length > 0) {
-          const timeSlots = dayData.timeRanges.map((range: any) => {
-            const fromTime = `${range.from.hours}:${range.from.minutes} ${range.from.period}`
-            const toTime = `${range.to.hours}:${range.to.minutes} ${range.to.period}`
-            return `${fromTime} - ${toTime}`
-          }).join(', ')
-          return `${dayName}: ${timeSlots}`
-        }
-        return `${dayName}: Closed`
-      })
-    }
-    
-    return []
+    return `${months[monthIndex]} ${date.day}, ${date.year}`
   }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-        {/* <div className="border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-[#6F00FF] rounded-full"></div>
-              <h1 className="text-xl font-bold text-gray-900">Complete Business Preview</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
-              </div>
-              <ChevronDown className="w-4 h-4 text-gray-700" />
-            </div>
-          </div>
-        </div> */}
-
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Banner Image */}
-        <div className="relative h-64 bg-gradient-to-r from-blue-600 to-purple-700 rounded-lg overflow-hidden mb-6">
-          {businessData.mediaBranding?.banner ? (
-            <img 
-              src={businessData.mediaBranding.banner.preview} 
-              alt="Banner"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-          )}
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-[16px] h-[16px] bg-[#6F00FF] rounded-full"></div>
+          <h1 className="text-[40px] font-medium text-[#111827]">Complete Business Preview</h1>
         </div>
 
-        {/* Business Info Card */}
-        <Card className="border border-gray-200 shadow-sm mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-4">
-              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl overflow-hidden flex-shrink-0">
-                {businessData.mediaBranding?.logo ? (
-                  <img 
-                    src={businessData.mediaBranding.logo.preview} 
-                    alt="Logo"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <span>{businessData.name ? businessData.name.charAt(0).toUpperCase() : "K"}</span>
-                )}
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{businessData.name || "Kagoz.com"}</h2>
-                <p className="text-gray-600 mb-4">
-                  {businessData.about || "Kagoz stands out by offering both free and premium listing options to cater to the diverse needs of businesses."}
-                </p>
-                <div className="flex items-center space-x-6 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{businessData.city || "Dhaka"}, {businessData.country || "Bangladesh"}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Phone className="w-4 h-4" />
-                    <span>{businessData.mobile || "+880 1712345678"}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Globe className="w-4 h-4" />
-                    <span>Open</span>
-                  </div>
-                </div>
-              </div>
+        {/* Business Preview Card */}
+        <div className="bg-gray-50 border border-[#CCFBF1] rounded-[8px] mb-8">
+          {/* Banner Image */}
+          <div className="h-32 sm:h-[260px] bg-gradient-to-r from-blue-500 to-[#6F00FF] relative overflow-hidden rounded-t-[8px] mb-4">
+            {businessData.mediaBranding?.banner ? (
+              <img 
+                src={businessData.mediaBranding.banner.preview} 
+                alt="Banner"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-[#6F00FF]" />
+            )}
+            <div className="absolute bottom-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+              523 × 128
             </div>
-          </CardContent>
-        </Card>
-
+          </div>
+          
+          {/* Logo and Basic Info */}
+          <div className="flex items-start space-x-4 p-8">
+            <div className="w-12 h-12  sm:h-[130px] sm:w-[130px] rounded-[8px] flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+              {businessData.mediaBranding?.logo ? (
+                <img 
+                  src={businessData.mediaBranding.logo.preview} 
+                  alt="Logo"
+                  className="w-full h-full object-cover rounded-[8px]"
+                />
+              ) : (
+                <span>K</span>
+              )}
+            </div>
+            <div className="flex-1">
+              <h2 className="sm:text-[32px] text-[24px] font-medium text-[#111827]">
+                {businessData.name || "Kagoz.com"}
+              </h2>
+              <p className="text-gray-600 text-sm mt-1">
+                {businessData.tagLine || "Kagoz.com stands out by offering well-designed premium hosting spaces to cater to the diverse needs of businesses."}
+              </p>
+            
+            </div>
+          </div>
+        </div>
         {/* Business Details */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* About Section */}
           <div>
-            <div className="flex items-center space-x-2 mb-3">
-              <FileText className="w-5 h-5 text-gray-600" />
-              <h3 className="text-lg font-semibold text-gray-900">About</h3>
-            </div>
-            <p className="text-gray-600 leading-relaxed">
-              {businessData.about || "Kagoz stands out by offering both free and premium listing options to cater to the diverse needs of businesses. Whether you're a start-up or an established enterprise, our platform provides a comprehensive solution to streamline your services and reach potential customers. From a Basic Listing, it already straightforward process to get businesses listed at no cost. Verified and Trusted Information Each business listing undergoes verification to ensure accuracy and reliability. User-Friendly Search Experience. Advanced search features allow users to find businesses by category, name, or location."}
+            <h3 className="font-medium text-[#353535] mb-2 flex items-center gap-2">
+            <FileText className="w-[16px] h-[16px]" />
+              About
+            </h3>
+            <p dangerouslySetInnerHTML={{ __html: businessData.about || "Kagoz.com is a leading web hosting and domain registration service provider in Bangladesh. We offer a wide range of hosting solutions, including shared hosting, VPS hosting, dedicated servers, and cloud hosting, to meet the needs of businesses of all sizes. Our services are backed by a team of experienced professionals and 24/7 customer support." }} className="text-gray-600 text-sm leading-relaxed">
             </p>
           </div>
-
-          {/* Business Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-5 h-5 text-gray-600" />
-              <div>
-                <span className="font-medium text-gray-700">Starting Date:</span>
-                <p className="text-gray-600">
-                  {businessData.startingDate.year && businessData.startingDate.month && businessData.startingDate.day 
-                    ? formatDate(businessData.startingDate) 
-                    : "July 12, 2025"}
-                </p>
-              </div>
+          
+          {/* Starting Date & Category */}
+          <div>
+              <span className="font-medium text-[#353535] flex items-center gap-2">
+                <Calendar className="w-[16px] h-[16px] text-gray-600" />
+                Starting Date
+              </span>
+              <p className="text-gray-600 text-sm">
+                {formatDate(businessData.startingDate)}
+              </p>
+            </div>
+            <div>
+              <span className="font-medium text-[#353535] flex items-center gap-2">
+                <Tag className="w-[16px] h-[16px] text-gray-600" />
+                Category
+              </span>
+              <p className="text-gray-600 text-sm">{getCategoryName(businessData.category)}</p>
+            </div>
+          {/* Address */}
+          <div>
+            <span className="font-medium text-[#353535] flex items-center gap-2">
+              <MapPin className="w-[16px] h-[16px] text-gray-600" />
+              Address
+            </span>
+            <p className="text-gray-600 text-sm">{getFullAddress() || "25/A, Mohammandia, Lalmatia, Block D, House 24, Mohammadpur, Dhaka, 1207, Bangladesh"}</p>
+          </div>
+          
+          {/* Phone & Website */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <span className="font-medium text-[#353535] flex items-center gap-2">
+                <Phone className="w-[16px] h-[16px] text-gray-600" />
+                Phone
+              </span>
+              <p className="text-gray-600 text-sm">{businessData.mobile || "+88017*****"}</p>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Tag className="w-5 h-5 text-gray-600" />
-              <div>
-                <span className="font-medium text-gray-700">Category:</span>
-                <p className="text-gray-600">{businessData.category || "Business Media/IT"}</p>
-              </div>
+          </div>
+          <div>
+              <span className="font-medium text-[#353535] flex items-center gap-2">
+                <Globe className="w-[16px] h-[16px] text-gray-600" />
+                Website
+              </span>
+              <Link href={businessData.website} className="text-blue-600 hover:underline cursor-pointer text-sm">
+                {businessData.website}
+              </Link>
             </div>
-            
-            <div className="flex items-start space-x-2 md:col-span-2">
-              <MapPin className="w-5 h-5 text-gray-600 mt-0.5" />
-              <div>
-                <span className="font-medium text-gray-700">Address:</span>
-                <p className="text-gray-600">{getFullAddress() || "23/A, Mohammadpur 1st, Road 7 House 12, Mohammadpur, Dhaka, 1207, Bangladesh"}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Phone className="w-5 h-5 text-gray-600" />
-              <div>
-                <span className="font-medium text-gray-700">Phone:</span>
-                <p className="text-gray-600">{businessData.mobile || "+880 1712345678"}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Globe className="w-5 h-5 text-gray-600" />
-              <div>
-                <span className="font-medium text-gray-700">Website:</span>
-                <p className="text-blue-600 hover:underline cursor-pointer">{businessData.website || "https://www.kagoz.com"}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Facebook className="w-5 h-5 text-gray-600" />
-              <div>
-                <span className="font-medium text-gray-700">Facebook:</span>
-                <p className="text-blue-600 hover:underline cursor-pointer">{businessData.facebook || "https://facebook.com/kagoz.com"}</p>
-              </div>
-            </div>
+          {/* Facebook */}
+          <div>
+            <span className="font-medium text-[#353535] flex items-center gap-2">
+              <Facebook className="w-[16px] h-[16px] text-gray-600" />
+              Facebook
+            </span>
+            <Link href={businessData.facebook} className="text-blue-600 hover:underline cursor-pointer text-sm">
+              {businessData.facebook }
+            </Link>
           </div>
 
           {/* Business Hours */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Clock className="w-5 h-5 text-gray-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Business Hours</h3>
-            </div>
+            <h3 className="font-medium text-[#353535] mb-3 flex items-center gap-2">
+              <Clock className="w-[16px] h-[16px] text-gray-600" />
+              Business Hours
+            </h3>
             <div className="space-y-2">
-              {(() => {
-                const hoursDisplay = getBusinessHoursDisplay()
-                if (hoursDisplay.length === 0 || (hoursDisplay.length === 1 && hoursDisplay[0] === "Open 24/7")) {
-                  return (
-                    <>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Monday:</span>
-                        <span className="text-gray-600">9:00 AM - 1:00 PM, 2:00 PM - 6:00 PM</span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Tuesday:</span>
-                        <span className="text-gray-600">9:00 AM - 6:00 PM</span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Wednesday:</span>
-                        <span className="text-gray-600">9:00 AM - 6:00 PM</span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Thursday:</span>
-                        <span className="text-gray-600">9:00 AM - 6:00 PM</span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Friday:</span>
-                        <span className="text-red-600 font-medium">Closed</span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Saturday:</span>
-                        <span className="text-gray-600">9:00 AM - 6:00 PM</span>
-                      </div>
-                      <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-700">Sunday:</span>
-                        <span className="text-gray-600">9:00 AM - 6:00 PM</span>
-                      </div>
-                    </>
-                  )
-                }
-                return hoursDisplay.map((hours: string, index: number) => (
-                  <div key={index} className="flex justify-between items-center py-1">
-                    <span className="text-gray-700">{hours.split(':')[0]}:</span>
-                    <span className={hours.includes('Closed') ? 'text-red-600 font-medium' : 'text-gray-600'}>
-                      {hours.split(':')[1]}
-                    </span>
-                  </div>
-                ))
-                
-              })()}
-              {businessData.closedOnHolidays && (
-                <div className="mt-4 p-3 bg-orange-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-red-600" />
-                    <span className="text-orange-800 text-sm">Closed on public holidays</span>
-                  </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Monday:</span>
+                <span className="text-gray-600">9:00 AM → 1:00 PM, 2:00 PM → 6:00 PM</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Tuesday:</span>
+                <span className="text-gray-600">9:00 AM → 6:00 PM</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Wednesday:</span>
+                <span className="text-gray-600">9:00 AM → 6:00 PM</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Thursday:</span>
+                <span className="text-gray-600">9:00 AM → 6:00 PM</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Friday:</span>
+                <span className="text-red-600">Closed</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Saturday:</span>
+                <span className="text-gray-600">9:00 AM → 6:00 PM</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">Sunday:</span>
+                <span className="text-gray-600">9:00 AM → 6:00 PM</span>
+              </div>
+              <div className="mt-3">
+                <div className="bg-orange-100 text-orange-800 border border-orange-200 rounded px-3 py-2 text-sm flex items-center gap-2">
+                  <div className="w-[16px] h-[16px] bg-orange-300 rounded"></div>
+                  Closed on public holidays
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
           {/* Verified License */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <FileText className="w-5 h-5 text-gray-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Verified License</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+            <h3 className="font-medium text-[#353535] mb-3 flex items-center gap-2">
+              <FileText className="w-[16px] h-[16px] text-gray-600" />
+              Verified License
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
               {businessData.mediaBranding?.license && businessData.mediaBranding.license.length > 0 ? (
                 businessData.mediaBranding.license.slice(0, 2).map((file, index) => (
-                  <div key={file.id} className="aspect-video bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
+                  <div key={file.id} className="sm:w-[227px] sm:h-[154px] w-[100px] h-[80px] bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
                     <img 
                       src={file.preview} 
                       alt={`License ${index + 1}`}
@@ -295,11 +243,11 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
                 ))
               ) : (
                 <>
-                  <div className="aspect-video bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">ID Card/Certificate</span>
+                  <div className="sm:w-[227px] sm:h-[154px] w-[100px] h-[80px] bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">License Image 1</span>
                   </div>
-                  <div className="aspect-video bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">Business License</span>
+                  <div className="sm:w-[227px] sm:h-[154px] w-[100px] h-[80px] bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">License Image 2</span>
                   </div>
                 </>
               )}
@@ -308,14 +256,14 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
 
           {/* Business Gallery */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Camera className="w-5 h-5 text-gray-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Business Gallery</h3>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
+            <h3 className="font-medium text-[#353535] mb-3 flex items-center gap-2">
+              <Camera className="w-[16px] h-[16px] text-gray-600" />
+              Business Gallery
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
               {businessData.mediaBranding?.gallery && businessData.mediaBranding.gallery.length > 0 ? (
-                businessData.mediaBranding.gallery.slice(0, 6).map((file, index) => (
-                  <div key={file.id} className="aspect-square bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
+                businessData.mediaBranding.gallery.slice(0, 5).map((file, index) => (
+                  <div key={file.id} className="sm:w-[227px] sm:h-[154px] w-[100px] h-[80px] bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
                     <img 
                       src={file.preview} 
                       alt={`Gallery ${index + 1}`}
@@ -324,8 +272,8 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
                   </div>
                 ))
               ) : (
-                Array.from({ length: 6 }, (_, i) => (
-                  <div key={i} className="aspect-square bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                Array.from({ length: 5 }, (_, i) => (
+                  <div key={i} className="sm:w-[227px] sm:h-[154px] w-[100px] h-[80px] bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 text-xs">Gallery {i + 1}</span>
                   </div>
                 ))
@@ -334,23 +282,41 @@ export function FullPagePreview({ businessData, onBack }: FullPagePreviewProps) 
           </div>
         </div>
 
-        {/* Progress and Action Section */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="flex items-center space-x-3 mb-3">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <span className="text-lg font-semibold text-gray-900">95% Complete</span>
+        {/* Completion Status */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6 my-6 sm:my-10">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-white" />
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-            <div className="bg-green-600 h-2 rounded-full" style={{ width: "95%" }}></div>
+          <div className="text-center mb-4">
+            <span className="text-2xl font-bold text-[#15803D]">95% Complete</span>
           </div>
-          <p className="text-gray-600 mb-8">Almost there! Add more details to improve visibility.</p>
-          
-          <div className="flex flex-col items-center space-y-4">
-            <Button className="bg-[#6F00FF] hover:bg-purple-700 text-white px-8 py-3 rounded-lg">
-              Publish My Business Listing
-            </Button>
-            <p className="text-sm text-gray-500">7 views today</p>
+          <div className="w-full bg-green-200 rounded-full h-4 mb-4">
+            <div className="bg-green-500 h-4 rounded-full" style={{ width: "95%" }}></div>
           </div>
+          <p className="text-sm text-[#15803D] text-center flex items-center justify-center gap-1">
+            🎯 Almost there! Add more details to improve visibility.
+          </p>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center">
+          <Button 
+            onClick={onBack}
+            variant="outline" 
+            className="flex items-center gap-2 border border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 rounded-[8px]  font-medium"
+          >
+            <ChevronLeft className="w-[16px] h-[16px]" />
+            Continue Editing
+          </Button>
+          <Button 
+            variant={"submit"} 
+            className="bg-[#6F00FF] hover:bg-purple-700 text-white px-8 py-3 rounded-lg text-lg font-medium"
+            onClick={onPublish}
+          >
+            Publish Business Listing
+          </Button>
         </div>
       </div>
     </div>

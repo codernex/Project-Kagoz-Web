@@ -101,7 +101,19 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
 
   // Update formData when data prop changes (from API response)
   React.useEffect(() => {
-    setFormData(data)
+    const updatedData = { ...data }
+    
+    // Ensure trade license expiry date is always set
+    if (!updatedData.tradeLicenseExpireDate) {
+      const nextYear = new Date()
+      nextYear.setFullYear(nextYear.getFullYear() + 1)
+      const defaultDate = nextYear.toISOString().split('T')[0]
+      if (defaultDate) {
+        updatedData.tradeLicenseExpireDate = defaultDate
+      }
+    }
+    
+    setFormData(updatedData)
   }, [data])
 
   // Set existing photos in gallery when they are loaded (only once)
@@ -187,6 +199,18 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     onUpdate(newData) // Sync with parent
   }
 
+  // Ensure trade license expiry date is always set with a default if not provided
+  const getTradeLicenseExpireDate = (): string => {
+    if (formData.tradeLicenseExpireDate) {
+      return formData.tradeLicenseExpireDate
+    }
+    // Set a default date if none is provided (1 year from now)
+    const nextYear = new Date()
+    nextYear.setFullYear(nextYear.getFullYear() + 1)
+    const defaultDate = nextYear.toISOString().split('T')[0]
+    return defaultDate || '2025-12-31' // Fallback date if toISOString fails
+  }
+
   const handleError = (error: string) => {
     // You can show a toast notification here instead of alert
     alert(error)
@@ -236,19 +260,20 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
         }
       }
       
-      // 4. Update trade license if it's a new file
-      if (formData.tradeLicense?.file && slug) {
+      // 4. Update trade license - always include date in the payload
+      if (slug) {
         const licenseFormData = new FormData()
-        licenseFormData.append('tradeLicense', formData.tradeLicense.file)
+        
+        // Add trade license file if it's a new file (API expects 'image' field)
+        if (formData.tradeLicense?.file) {
+          licenseFormData.append('image', formData.tradeLicense.file)
+        }
+        
+        // Always include the trade license expiry date in the payload
+        const expireDate = getTradeLicenseExpireDate()
+        licenseFormData.append('date', expireDate)
+        
         await updateLicense({ slug, data: licenseFormData }).unwrap()
-      }
-      
-      // 5. Update trade license expire date if it exists
-      if (formData.tradeLicenseExpireDate && slug) {
-        await updateBusiness({ 
-          slug, 
-          data: { tradeLicenseExpireDate: formData.tradeLicenseExpireDate }
-        }).unwrap()
       }
       
       toast.success("Media and branding updated successfully!")
