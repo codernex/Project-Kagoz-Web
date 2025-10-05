@@ -63,13 +63,6 @@ export function CompletionAndPublish({
   const [setOpeningHours] = useSetOpeningHoursMutation()
   const [addCategoryToBusiness] = (require("@/redux/api") as any).useAddCategoryToBusinessMutation()
 
-  // Expose the publish function to parent component
-  React.useEffect(() => {
-    if (onPublishFunctionReady) {
-      onPublishFunctionReady(handlePublish)
-    }
-  }, [onPublishFunctionReady])
-
   const buildOpeningHoursPayload = () => {
     if (businessData.is24x7) {
       return {
@@ -147,7 +140,7 @@ export function CompletionAndPublish({
     return `${year}-${month}-${day}`
   }
 
-  const handlePublish = async () => {
+  const handlePublish = React.useCallback(async () => {
     setIsPublishing(true)
     
     try {
@@ -166,7 +159,6 @@ export function CompletionAndPublish({
         house: businessData.houseInfo || "",
         localArea: businessData.localArea || "",
         city: businessData.city || "",
-        state: businessData.state || "",
         postalCode: businessData.postalCode || "",
         country: businessData.country || "",
         mobile: businessData.mobile || "",
@@ -227,7 +219,14 @@ export function CompletionAndPublish({
     } finally {
       setIsPublishing(false)
     }
-  }
+  }, [businessData, onPublish, registerBusiness, updateBusiness, addCategoryToBusiness, setOpeningHours, addBanner, addLogo, updateLicense, uploadPhoto])
+
+  // Expose the publish function to parent component
+  React.useEffect(() => {
+    if (onPublishFunctionReady) {
+      onPublishFunctionReady(handlePublish)
+    }
+  }, [onPublishFunctionReady, handlePublish])
 
   const submitAllMediaFiles = async (slug: string) => {
     setIsSubmittingMedia(true)

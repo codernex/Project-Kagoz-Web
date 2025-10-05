@@ -42,7 +42,6 @@ export interface BusinessData {
   houseInfo: string
   localArea: string
   city: string
-  state: string
   postalCode: string
   country: string
   mobile: string
@@ -96,7 +95,6 @@ export function BusinessSetupWizard() {
     houseInfo: "",
     localArea: "",
     city: "",
-    state: "",
     postalCode: "",
     country: "",
     mobile: "",
@@ -378,7 +376,7 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <h1 className="learge-headeing ">Business Setup</h1>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 text-end">
               Step 4 of 5 - 90% Complete
             </div>
           </div>
@@ -413,7 +411,7 @@ const renderProgressBar = (opts?: { published?: boolean }) => {
     progressBar = renderProgressBar();
   }
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white px-1 sm:px-5">
       {progressBar}
       <div className="max-w-[1184px] mx-auto mt-8">{renderStep()}</div>
     </div>

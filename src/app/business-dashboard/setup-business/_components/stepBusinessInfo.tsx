@@ -158,7 +158,7 @@ export function StepBusinessInfo({ businessData, onPrev, onNext, setFormValue }:
         {/* Left side form fields */}
         <div className="lg:col-span-2">
           <div className="flex items-center space-x-2 mb-4">
-            <Building2 className="w-6 h-6 text-[#6F00FF]" />
+            <Building2 className="sm:w-6 h-[24px] sm:h-6 w-[24px] text-[#6F00FF]" />
             <h2 className="auth-heading !font-medium text-[#111827]">Business Information</h2>
           </div>
           <p className="text-[#2D3643] mb-6">Tell us about your business</p>

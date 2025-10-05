@@ -59,11 +59,11 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         <div className="flex items-center justify-between sm:p-[26.5px] p-4 border-b border-[#E4E4E4]">
           <div className="flex items-center space-x-2">
             
-            <Image src="/images/logo.png" alt="KAGOZ" width={1000} height={1000} className="w-[179px] object-cover h-[30px]" />
+            <Image src="/images/logo.png" alt="KAGOZ" width={1000} height={500} className="w-[179px] object-fill h-[30px]" />
            
           </div>
-          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
-            <X className="h-[16px] w-[16px]" />
+          <Button variant="ghost" size="sm" className="lg:hidden w-fit h-fit" onClick={() => setSidebarOpen(false)}>
+            <X className="h-[20px] w-[20px]" />
           </Button>
         </div>
 

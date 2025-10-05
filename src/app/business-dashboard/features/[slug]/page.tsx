@@ -80,6 +80,8 @@ export default function SpecialFeaturesPage() {
   const { watch, setValue, handleSubmit: formHandleSubmit, reset } = methods;
   const formData = watch();
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [changedModules, setChangedModules] = useState<Set<string>>(new Set())
+  const [youtubeUrlError, setYoutubeUrlError] = useState<string>('')
 
   // Video modal state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
@@ -129,14 +131,14 @@ export default function SpecialFeaturesPage() {
       }
 
       if (videoFeedbacks && videoFeedbacks.length > 0) {
-        // Use the first feedback for form population
-        const firstFeedback = videoFeedbacks[0] as any;
-        if (firstFeedback) {
-          setValue('customerFeedback.name', firstFeedback?.name || '');
-          setValue('customerFeedback.company', firstFeedback?.companyName || '');
-          setValue('customerFeedback.youtubeUrl', firstFeedback?.videoUrl || '');
-          setValue('customerFeedback.rating', firstFeedback?.rating || 1);
-        }
+        // Don't auto-populate customer feedback fields - let user enter fresh data
+        // const firstFeedback = videoFeedbacks[0] as any;
+        // if (firstFeedback) {
+        //   setValue('customerFeedback.name', firstFeedback?.name || '');
+        //   setValue('customerFeedback.company', firstFeedback?.companyName || '');
+        //   setValue('customerFeedback.youtubeUrl', firstFeedback?.videoUrl || '');
+        //   setValue('customerFeedback.rating', firstFeedback?.rating || 1);
+        // }
         
         // Convert logo URLs to ImageUpload format
         const logoImages = videoFeedbacks.map((feedback: any, index: number) => ({
@@ -194,20 +196,80 @@ export default function SpecialFeaturesPage() {
 
   const handleCustomerLogosChange = (files: UploadedFile[]) => {
     setValue('customerLogos', files)
+    setChangedModules(prev => new Set([...prev, 'customerLogos']))
   }
 
   const handleCustomerImageChange = (files: UploadedFile[]) => {
     console.log('Customer image changed:', files)
     setValue('customerFeedback.customerImage', files)
+    setChangedModules(prev => new Set([...prev, 'customerFeedback']))
   }
 
   const handleFeaturedOffersChange = (files: UploadedFile[]) => {
     setValue('featuredOffers', files)
+    setChangedModules(prev => new Set([...prev, 'featuredOffers']))
   }
 
   const handleRatingChange = (rating: number) => {
     setValue('customerFeedback.rating', rating)
+    setChangedModules(prev => new Set([...prev, 'customerFeedback']))
   }
+
+  const handlePromoVideoChange = (url: string) => {
+    setValue('promoVideoUrl', url)
+    setChangedModules(prev => new Set([...prev, 'promoVideo']))
+  }
+
+  const handleCustomerFeedbackFieldChange = (field: string, value: any) => {
+    if (field === 'name') {
+      setValue('customerFeedback.name', value)
+    } else if (field === 'company') {
+      setValue('customerFeedback.company', value)
+    } else if (field === 'youtubeUrl') {
+      setValue('customerFeedback.youtubeUrl', value)
+      // Real-time validation for YouTube URL
+      const validation = validateYouTubeUrl(value)
+      setYoutubeUrlError(validation.isValid ? '' : validation.message)
+    } else if (field === 'rating') {
+      setValue('customerFeedback.rating', value)
+    }
+    setChangedModules(prev => new Set([...prev, 'customerFeedback']))
+  }
+
+  // YouTube URL validation
+  const validateYouTubeUrl = (url: string): { isValid: boolean; message: string } => {
+    if (!url.trim()) {
+      return { isValid: true, message: '' } // Empty is valid (optional field)
+    }
+    
+    // Check if URL contains 'watch' (required for YouTube video URLs)
+    if (!url.includes('watch')) {
+      return { 
+        isValid: false, 
+        message: 'Please enter a valid YouTube video URL (must contain "watch")' 
+      }
+    }
+    
+    // Check if it's a YouTube URL
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+      return { 
+        isValid: false, 
+        message: 'Please enter a valid YouTube URL' 
+      }
+    }
+    
+    // Check for video ID pattern
+    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
+    if (!videoIdMatch) {
+      return { 
+        isValid: false, 
+        message: 'Please enter a valid YouTube video URL format' 
+      }
+    }
+    
+    return { isValid: true, message: 'Valid YouTube URL' }
+  }
+
 
   // Check if all required fields are filled (including existing data)
   const isFormValid = () => {
@@ -217,8 +279,11 @@ export default function SpecialFeaturesPage() {
     const hasYoutubeUrl = formData.customerFeedback.youtubeUrl.trim() !== ''
     const hasCustomerImage = formData.customerFeedback.customerImage.length > 0 || (videoFeedbacks && videoFeedbacks.length > 0)
     
+    // Validate YouTube URL if provided
+    const youtubeUrlValid = !hasYoutubeUrl || validateYouTubeUrl(formData.customerFeedback.youtubeUrl).isValid
+    
     // Customer feedback is optional - either all fields are filled or none
-    const customerFeedbackComplete = (hasCustomerName && hasCompanyName && hasYoutubeUrl && hasCustomerImage) || 
+    const customerFeedbackComplete = (hasCustomerName && hasCompanyName && hasYoutubeUrl && hasCustomerImage && youtubeUrlValid) || 
                                    (!hasCustomerName && !hasCompanyName && !hasYoutubeUrl && !hasCustomerImage)
     
     // Debug logging
@@ -253,8 +318,10 @@ export default function SpecialFeaturesPage() {
         return
       }
 
-      // 0) Update promo video if provided
-      if (data.promoVideoUrl?.trim()) {
+      console.log('Changed modules:', Array.from(changedModules))
+
+      // 0) Update promo video if provided AND changed
+      if (changedModules.has('promoVideo') && data.promoVideoUrl?.trim()) {
         console.log('Submitting promo video:', {
           slug: targetSlug,
           youtubeVideo: data.promoVideoUrl
@@ -268,8 +335,8 @@ export default function SpecialFeaturesPage() {
         toast.success('Promo video updated successfully')
       }
 
-      // 1) Upload customer logos (featured clients) - optional
-      if (data.customerLogos?.length) {
+      // 1) Upload customer logos (featured clients) - optional AND changed
+      if (changedModules.has('customerLogos') && data.customerLogos?.length) {
         for (const logo of data.customerLogos) {
           if (logo.file) {
             const fd = new FormData()
@@ -280,8 +347,8 @@ export default function SpecialFeaturesPage() {
         }
       }
 
-      // 2) Upload customer video feedback (multipart fields: logo, url, rating, name, companyName)
-      if (data.customerFeedback?.youtubeUrl && data.customerFeedback?.name && data.customerFeedback?.company) {
+      // 2) Upload customer video feedback (multipart fields: logo, url, rating, name, companyName) - only if changed
+      if (changedModules.has('customerFeedback') && data.customerFeedback?.youtubeUrl && data.customerFeedback?.name && data.customerFeedback?.company) {
         const fd = new FormData()
         
         // Add logo file if provided - check for new files (with file property)
@@ -319,8 +386,8 @@ export default function SpecialFeaturesPage() {
         toast.success('Customer video feedback uploaded successfully')
       }
 
-      // 3) Upload featured offers - optional
-      if (data.featuredOffers?.length) {
+      // 3) Upload featured offers - optional AND changed
+      if (changedModules.has('featuredOffers') && data.featuredOffers?.length) {
         for (const offer of data.featuredOffers) {
           if (offer.file) {
             const fd = new FormData()
@@ -343,6 +410,9 @@ export default function SpecialFeaturesPage() {
       
       console.log('All special features submitted successfully!')
       toast.success('All special features saved successfully!')
+      
+      // Clear changed modules after successful submission
+      setChangedModules(new Set())
       
     } catch (error) {
       console.error('Error saving special features:', error)
@@ -398,6 +468,7 @@ export default function SpecialFeaturesPage() {
               placeholder="Paste Youtube link"
               placeholderIcon={Youtube}
               width='100%'
+              onChange={(e) => handlePromoVideoChange(e.target.value)}
             />
           </div>
         </div>
@@ -430,6 +501,7 @@ export default function SpecialFeaturesPage() {
                   placeholderIcon={User}
                   placeholder="Customer Name"
                   width='100%'
+                  onChange={(e) => handleCustomerFeedbackFieldChange('name', e.target.value)}
                 />
               </div>
             </div>
@@ -461,6 +533,7 @@ export default function SpecialFeaturesPage() {
                   placeholderIcon={Building}
                   placeholder="Company Name"
                   width='100%'
+                  onChange={(e) => handleCustomerFeedbackFieldChange('company', e.target.value)}
                 />
               </div>
             </div>
@@ -475,8 +548,12 @@ export default function SpecialFeaturesPage() {
                   control={methods.control}
                   placeholderIcon={Youtube}
                   placeholder="Paste Youtube link"
+                  onChange={(e) => handleCustomerFeedbackFieldChange('youtubeUrl', e.target.value)}
                   width='100%'
                 />
+                {youtubeUrlError && (
+                  <p className="text-red-500 text-sm mt-1">{youtubeUrlError}</p>
+                )}
               </div>
             </div>
 
@@ -524,7 +601,7 @@ export default function SpecialFeaturesPage() {
                   {/* Video Thumbnails */}
                   {videoId && (
                     <div 
-                      className="relative w-[190px] h-[120px] bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+                      className="relative w-[190px] h-[120px] bg-gray-200 rounded-[8px] overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
                       onClick={() => window.open(feedback.videoUrl || feedback.url, '_blank')}
                     >
                       <img 
@@ -537,9 +614,7 @@ export default function SpecialFeaturesPage() {
                           <div className="w-0 h-0 border-l-[6px] border-l-gray-600 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
                         </div>
                       </div>
-                      <button className="absolute top-1 right-1 w-[16px] h-[16px] bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
-                        <span className="text-white text-xs">×</span>
-                      </button>
+                      
                     </div>
                   )}
                 </div>
@@ -586,7 +661,7 @@ export default function SpecialFeaturesPage() {
       
 
         {/* Save Button */}
-        <div className="flex justify-center pt-6">
+        <div className="flex justify-center p-6">
           <Button
             variant={'submit'}
             onClick={formHandleSubmit(onSubmit)}

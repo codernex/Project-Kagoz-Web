@@ -284,7 +284,7 @@ export function StepHours({ businessData, setFormValue, onPrev, onNext, isNextDi
       {/* Left Panel - Form Input */}
       <div className="lg:col-span-2">
         <div className="flex items-center space-x-2 mb-4">
-          <Clock className="w-6 h-6 text-[#6F00FF]" />
+          <Clock className="sm:w-6 h-[24px] sm:h-6 w-[24px] text-[#6F00FF]" />
           <h2 className="auth-heading !font-medium text-[#111827]">Business Hours & Availability</h2>
         </div>
         <p className="text-[#2D3643] mb-6">When are you open?</p>

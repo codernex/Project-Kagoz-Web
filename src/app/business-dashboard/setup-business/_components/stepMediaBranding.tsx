@@ -151,7 +151,7 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
       <div className="lg:col-span-2">
         <div>
           <div className="flex items-center space-x-2 mb-6">
-            <Camera className="w-[16px] h-[16px] text-[#6F00FF]" />
+            <Camera className="sm:w-6 h-[24px] sm:h-6 w-[24px] text-[#6F00FF]" />
             <h2 className="auth-heading !font-medium text-[#111827]">Media & Business Branding</h2>
           </div>
           <p className="text-[#2D3643] mb-6">Add Visuals to Represent Your Business</p>

@@ -33,7 +33,6 @@ export function StepLocationContact({
     houseInfo: string
     localArea: string
     city: string
-    state: string
     postalCode: string
     country: string
     mobile: string
@@ -53,7 +52,6 @@ export function StepLocationContact({
     postalCode: api.postalCode || businessData.postalCode || "",
     streetAddress: api.streetAddress || businessData.streetAddress || "",
     website: api.website || businessData.website || "",
-    state: api.state || businessData.state || "",
   }
 
   const form = useForm<LocationContactInput>({
@@ -83,7 +81,7 @@ export function StepLocationContact({
   return (
     <div>
       <div className="flex items-center space-x-2 mb-6">
-        <MapPin className="w-6 h-6 text-[#6F00FF]" />
+        <MapPin className="sm:w-6 h-[24px] sm:h-6 w-[24px] text-[#6F00FF]" />
         <h2 className="auth-heading !font-medium text-[#111827]">Location & Contact</h2>
       </div>
       <p className="text-gray-600 mb-6">Where is your business located?</p>
@@ -124,13 +122,6 @@ export function StepLocationContact({
               label="City"
               width="100%"
               placeholder="Enter city"
-            />
-            <TextInput
-              name="state"
-              control={form.control}
-              label="State/Province"
-              width="100%"
-              placeholder="Enter state or province"
             />
             <TextInput
               name="postalCode"
@@ -227,13 +218,12 @@ export function StepLocationContact({
                 <div className="space-y-4 text-xs">
                   {/* Address */}
                   <div className="flex items-start space-x-2">
-                    <MapPin className="w-3 h-3 text-gray-400 mt-0.5" />
+                    <MapPin className="w-[16px] h-[16px] text-gray-400 mt-0.5" />
                     <div>
                       <p className="font-medium">Address</p>
                       <p className="text-gray-600">
                         {businessData.streetAddress}, {businessData.houseInfo},{" "}
                         {businessData.localArea}, {businessData.city},{" "}
-                        {businessData.state && `${businessData.state}, `}
                         {businessData.postalCode}, {businessData.country}
                       </p>
                     </div>
@@ -241,7 +231,7 @@ export function StepLocationContact({
 
                   {/* Phone */}
                   <div className="flex items-center space-x-2">
-                    <Phone className="w-3 h-3 text-gray-400" />
+                    <Phone className="w-[16px] h-[16px] text-gray-400" />
                     <div>
                       <p className="font-medium">Phone</p>
                       <p className="text-gray-600">{businessData.mobile}</p>
@@ -250,7 +240,7 @@ export function StepLocationContact({
 
                   {/* Website */}
                   <div className="flex items-center space-x-2">
-                    <Globe className="w-3 h-3 text-gray-400" />
+                    <Globe className="w-[16px] h-[16px] text-gray-400" />
                     <div>
                       <p className="font-medium">Website</p>
                       <p className="text-blue-600">{businessData.website}</p>
@@ -259,7 +249,7 @@ export function StepLocationContact({
 
                   {/* Facebook */}
                   <div className="flex items-center space-x-2">
-                    <Facebook className="w-3 h-3 text-gray-400" />
+                    <Facebook className="w-[16px] h-[16px] text-gray-400" />
                     <div>
                       <p className="font-medium">Facebook</p>
                       <p className="text-blue-600">{businessData.facebook}</p>
