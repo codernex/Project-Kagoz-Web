@@ -116,7 +116,7 @@ export default function SpecialFeaturesPage() {
           file: null,
           preview: offer.imageUrl?.startsWith('http') 
             ? offer.imageUrl 
-            : `http://localhost:9000/api/v1/uploads/${offer.imageUrl}`,
+            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${offer.imageUrl}`,
           name: `Featured Offer ${index + 1}`,
           size: '0 KB',
           uploaded: true
@@ -146,7 +146,7 @@ export default function SpecialFeaturesPage() {
           file: null,
           preview: feedback.logoUrl?.startsWith('http') 
             ? feedback.logoUrl 
-            : `http://localhost:9000/api/v1/uploads/${feedback.logoUrl}`,
+            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${feedback.logoUrl}`,
           name: `${feedback.name || 'Customer'} Logo`,
           size: '0 KB',
           uploaded: true
@@ -173,7 +173,7 @@ export default function SpecialFeaturesPage() {
         const imageUrl = item?.url || item?.imageUrl;
         const fullImageUrl = imageUrl.startsWith('http') 
           ? imageUrl 
-          : `http://localhost:9000/uploads/api/v1/${imageUrl}`;
+          : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${imageUrl}`;
         
         return {
           id: `existing-${type}-${index}-${Date.now()}`,

@@ -51,7 +51,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     file: null, // No file object for existing photos
     preview: photo.url.startsWith('http') 
       ? photo.url 
-      : `http://localhost:9000/api/v1/uploads/${photo.url}`,
+      : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${photo.url}`,
     name: `Photo ${photo.id}`,
     size: 'Existing'
   })
@@ -61,7 +61,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     if (!uploadedFile) return []
     let previewUrl = uploadedFile.preview;
     if (uploadedFile.preview && !uploadedFile.preview.startsWith('blob:') && !uploadedFile.preview.startsWith('http')) {
-      previewUrl = `http://localhost:9000/api/v1/uploads/${uploadedFile.preview}`;
+      previewUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${uploadedFile.preview}`;
     }
     
     return [{
@@ -307,7 +307,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           required={true}
           max={1}
           maxSizeMB={10}
-          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+          acceptedTypes={["image/png"]}
           recommendedSize="500×500 px"
           value={convertToImageUploadFile(formData.logo)}
           onChange={handleLogoChange}
@@ -320,7 +320,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           description="Banner image for your business profile"
           max={1}
           maxSizeMB={10}
-          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+          acceptedTypes={["image/png"]}
           recommendedSize="1200×500 px"
           value={convertToImageUploadFile(formData.banner)}
           onChange={handleBannerChange}
@@ -335,7 +335,7 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
           description="Upload your trade license document"
           max={1}
           maxSizeMB={10}
-          acceptedTypes={["image/png", "image/jpeg", "image/jpg", "image/webp"]}
+          acceptedTypes={["image/png"]}
           recommendedSize="A4 document"
           value={convertToImageUploadFile(formData.tradeLicense)}
           onChange={handleTradeLicenseChange}
