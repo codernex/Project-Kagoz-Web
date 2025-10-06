@@ -12,6 +12,15 @@ const category = baseApi.injectEndpoints({
         url: `/categories/${id}`,
       }),
     }),
+    getDescription: builder.query<
+      { description: string },
+      { category: string; location: string | undefined }
+    >({
+      query: (params) => ({
+        url: "/categories/locations/description",
+        params,
+      }),
+    }),
   }),
 });
 
@@ -19,4 +28,5 @@ export const {
   useGetCategoriesQuery,
   useGetSubcategoriesQuery,
   useLazyGetCategoriesQuery,
+  useGetDescriptionQuery,
 } = category;

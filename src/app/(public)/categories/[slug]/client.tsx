@@ -2,9 +2,7 @@
 import { BlogWidget } from "@/components/shared/blog-widget";
 import { Loader } from "@/components/shared/loader";
 import { Pagination } from "@/components/shared/pagination";
-import {
-  useGetBusinessByQueryQuery
-} from "@/redux/api";
+import { useGetBusinessByQueryQuery } from "@/redux/api";
 import Dompurify from "dompurify";
 import { ChevronRight } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -15,15 +13,16 @@ import { MobileFilter } from "./_components/mobile-filter";
 import { OtherFilter } from "./_components/other-filter";
 import { SearchItem } from "./_components/search-item";
 import { SponsoredBusiness } from "./_components/sponsored-business";
+import { useGetDescriptionQuery } from "@/redux/api/category";
 const Categories = dynamic(
   () => import("./_components/categories").then((m) => m.Categories),
-  { ssr: false },
+  { ssr: false }
 );
 
 export default function CategoriesSearchPage({
   slug,
   category,
-  searchLocation
+  searchLocation,
 }: {
   slug: string;
   category: ICategory;
@@ -35,12 +34,17 @@ export default function CategoriesSearchPage({
     longitude: null | number;
   }>({ latitude: null, longitude: null });
 
+  const { data: categoryData } = useGetDescriptionQuery({
+    location: searchLocation,
+    category: slug,
+  });
+
   /**
    * Filtering DOM Content
    */
   const sanitizedConent = useMemo(() => {
-    return Dompurify.sanitize(category.details || "");
-  }, [category]);
+    return Dompurify.sanitize(categoryData?.description || "");
+  }, [categoryData?.description]);
 
   const searchParams = useSearchParams();
   /**
@@ -99,10 +103,18 @@ export default function CategoriesSearchPage({
           </div>
           <h1 className="text-md font-bold text-muted lg:text-lg">
             Top {data?.items.length}{" "}
-            <span className="capitalize text-black">{`${slug.replace(`-in-${searchLocation}`, "").split("-").join(" ")}`}</span>{" "}
-            {
-              searchLocation ? <><span>in</span> <span className="text-black capitalize">{searchLocation?.split('-').join(' ')}</span></> : null
-            }
+            <span className="capitalize text-black">{`${slug
+              .replace(`-in-${searchLocation}`, "")
+              .split("-")
+              .join(" ")}`}</span>{" "}
+            {searchLocation ? (
+              <>
+                <span>in</span>{" "}
+                <span className="text-black capitalize">
+                  {searchLocation?.split("-").join(" ")}
+                </span>
+              </>
+            ) : null}
           </h1>
         </div>
       </section>
@@ -131,17 +143,19 @@ export default function CategoriesSearchPage({
       <section className="container grid grid-cols-6 gap-x-[6rem] gap-y-[4rem] py-[6rem]">
         <div className="col-span-6 w-full space-y-[3rem] md:col-span-4">
           {data?.items.length ? (
-            data?.items?.filter(b => b.name.length && b.slug.length)?.map((b, index) => {
-              return (
-                <SearchItem
-                  key={index}
-                  index={index}
-                  {...b}
-                  id={index}
-                  isOpen={avalibility === "Now Open"}
-                />
-              );
-            })
+            data?.items
+              ?.filter((b) => b.name.length && b.slug.length)
+              ?.map((b, index) => {
+                return (
+                  <SearchItem
+                    key={index}
+                    index={index}
+                    {...b}
+                    id={index}
+                    isOpen={avalibility === "Now Open"}
+                  />
+                );
+              })
           ) : (
             <h2 className="text-xl font-medium">No Result Found</h2>
           )}
