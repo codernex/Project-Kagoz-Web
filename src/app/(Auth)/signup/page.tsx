@@ -57,9 +57,13 @@ const Signup: React.FC = () => {
 
         {/* Right side */}
         <div className="p-8 rounded-[16px] w-full bg-white authform-shadow">
-         <Link href="/" className="common-text !text-[16px] !font-normal text-[#111827] flex items-center mb-[23px]">
+         <div
+         onClick={() => {
+          window.location.href = '/';
+         }}
+         className="common-text !text-[16px] cursor-pointer !font-normal text-[#111827] flex items-center mb-[23px]">
             <ArrowLeft className="w-[16px] h-[16px] mr-1" /> Back to Search
-          </Link>
+          </div>
 
           <h2 className="auth-heading !font-semibold text-[#111827]  mb-2">Create Account</h2>
           <p className="common-text !font-normal text-[#2D3643] mb-8">

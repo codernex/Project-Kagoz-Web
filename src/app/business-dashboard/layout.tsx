@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import BusinessDashboardLayout from "./_components/layout/dashboard-layout";
+import DashboardErrorBoundary from "@/components/dashboard-error-boundary";
 
 
 export const metadata: Metadata = {
@@ -9,10 +10,10 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: React.PropsWithChildren) {
   return (
-    <div>
+    <DashboardErrorBoundary>
       <BusinessDashboardLayout>
         {children}
       </BusinessDashboardLayout>
-    </div>
+    </DashboardErrorBoundary>
   )
 }

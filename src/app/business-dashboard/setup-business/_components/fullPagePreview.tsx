@@ -43,8 +43,8 @@ export function FullPagePreview({ businessData, onBack, onPublish }: FullPagePre
   }
 
   const formatDate = (date: { year: string; month: string; day: string }) => {
-    // Check if any field is empty, undefined, or invalid
-    if (!date.month || !date.day || !date.year || 
+    // Check if date object exists and has valid fields
+    if (!date || !date.month || !date.day || !date.year || 
         date.month.trim() === '' || date.day.trim() === '' || date.year.trim() === '') {
       return "Not specified"
     }
@@ -54,6 +54,12 @@ export function FullPagePreview({ businessData, onBack, onPublish }: FullPagePre
       "July", "August", "September", "October", "November", "December"
     ]
     
+    // Check if month is already a month name (like "January", "February", etc.)
+    if (months.includes(date.month)) {
+      return `${date.month} ${date.day}, ${date.year}`
+    }
+    
+    // If month is numeric, convert to month name
     const monthIndex = parseInt(date.month) - 1
     if (monthIndex < 0 || monthIndex > 11 || isNaN(monthIndex)) return "Not specified"
     
@@ -130,7 +136,10 @@ export function FullPagePreview({ businessData, onBack, onPublish }: FullPagePre
                 Starting Date
               </span>
               <p className="text-gray-600 text-sm">
-                {formatDate(businessData.startingDate)}
+                {(() => {
+                  console.log("Starting date data:", businessData.startingDate);
+                  return formatDate(businessData.startingDate);
+                })()}
               </p>
             </div>
             <div>

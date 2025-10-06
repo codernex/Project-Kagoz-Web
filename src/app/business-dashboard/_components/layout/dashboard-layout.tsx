@@ -1,30 +1,57 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { UserProfile } from "../user-profile"
 import { useAuth } from "@/context/AuthContext"
-import { usePathname, useRouter } from "next/navigation"
-import { axiosInstance } from "@/redux/api"
-
+import {  useRouter } from "next/navigation"
 export default function BusinessDashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [userInfo, setUserInfo] = useState<any>(null)
-  const [shouldRedirect, setShouldRedirect] = useState(false)
-  const { user,isAuth } = useAuth()
+  const { isAuth } = useAuth()
   const router = useRouter()
-
+  const isMountedRef = useRef(true)
 
   useEffect(() => {
-      if (isAuth === false && !loading) {
-          router.push("/"); // Redirect to home or login page
-      } else {
-          setLoading(false); // Once auth status is verified, stop loading
+      if (isAuth === false && !loading && isMountedRef.current) {
+          // Use requestAnimationFrame to ensure DOM is stable before navigation
+          requestAnimationFrame(() => {
+              if (isMountedRef.current) {
+                  try {
+                      router.push("/"); // Redirect to home or login page
+                  } catch (error) {
+                      console.warn('Navigation error handled:', error)
+                      window.location.href = '/'
+                  }
+              }
+          });
+      } else if (isAuth === true) {
+          if (isMountedRef.current) {
+              setLoading(false); // Once auth status is verified, stop loading
+          }
       }
   }, [isAuth, router, loading]);
+
+  // Cleanup function to prevent state updates after unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FCFCFD] font-inter flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6F00FF] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FCFCFD] font-inter">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

@@ -24,7 +24,12 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
     e.preventDefault()
     
     if (businessSlug) {
-      router.push(`/business-dashboard/features/${businessSlug}`)
+      try {
+        router.push(`/business-dashboard/features/${businessSlug}`)
+      } catch (error) {
+        console.warn('Navigation error handled:', error)
+        window.location.href = `/business-dashboard/features/${businessSlug}`
+      }
     }
   }
 
