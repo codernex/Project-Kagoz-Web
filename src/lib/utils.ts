@@ -15,6 +15,11 @@ export function appendApi(file: string) {
   return `${process.env.NEXT_PUBLIC_API_URL}/uploads/${file}`;
 }
 
+export function removeHtmlTags(input: string | undefined | null): string {
+  if (!input) return "";
+  return input.replace(/<[^>]*>/g, "").trim();
+}
+
 export function extractYouTubeVideoId(url: string): string {
   const patterns = [
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/.*[?&]v=([^&]+)/, // For URLs like https://www.youtube.com/watch?v=4Z9mUjtFJYY
