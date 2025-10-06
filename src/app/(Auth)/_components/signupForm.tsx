@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import Image from 'next/image';
@@ -14,6 +14,7 @@ import GoogleContinueButton from '@/components/shared/google-continue';
 const SignupForm = () => {
   const router = useRouter();
   const { signUp } = useAuth();
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const methods = useForm({
     defaultValues: {
       name: '',
@@ -37,19 +38,9 @@ const SignupForm = () => {
         password: data.password,
       };
       
-      // Call the AuthContext signUp method
       await signUp(payload);
       
-      // Add some logging logic here
-      console.log('Signup successful for:', data.email);
-      console.log('User data:', payload);
-      console.log('Redirecting to OTP verification...');
-      
-      // The AuthContext will handle the OTP modal and navigation
-      // No need to manually push to router as the context handles it
-      
     } catch (error: any) {
-      // Error handling is already done in the AuthContext
       console.error('Signup error:', error);
     }
   };
@@ -108,7 +99,12 @@ const SignupForm = () => {
 
         {/* Checkbox */}
         <div className="flex items-center  space-x-2">
-          <Checkbox variant='remember' id="terms" />
+          <Checkbox 
+            variant='remember' 
+            id="terms" 
+            checked={isTermsAccepted}
+            onCheckedChange={(checked) => setIsTermsAccepted(checked === true)}
+          />
           <label
             htmlFor="terms"
             className="text-[14px] !text-[#353535] leading-5 font-normal "
@@ -118,7 +114,12 @@ const SignupForm = () => {
         </div>
 
         {/* Sign up button */}
-        <Button variant="submit" className="w-full cursor-pointer" type="submit">
+        <Button 
+          variant="submit" 
+          className="w-full cursor-pointer" 
+          type="submit"
+          disabled={!isTermsAccepted}
+        >
           Sign Up
         </Button>
         <div className="flex items-center">
@@ -126,19 +127,6 @@ const SignupForm = () => {
           <p className="text-center text-gray-500 whitespace-pre mx-1.5">Or sign up with</p>
           <div className="h-px bg-[#E4E4E4] w-full"></div>
         </div>
-        {/* <Button
-          variant="outline"
-          className="w-full flex cursor-pointer text-[#111827] items-center justify-center gap-2"
-        >
-          <Image
-            width={20}
-            height={20}
-            src="https://www.svgrepo.com/show/355037/google.svg"
-            alt="Google"
-            className="w-[16px] h-[16px]"
-          />
-          Continue with Google
-        </Button> */}
         <GoogleContinueButton />
 
         <p className="text-center common-text text-[#2D3643] ">
