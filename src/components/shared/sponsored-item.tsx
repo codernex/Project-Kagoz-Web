@@ -112,8 +112,10 @@ export const SponsoredBusinessItem: React.FC<SponsoredBusinessItemProps> = ({
           </div>
         </div>
       </div>
-      <p className="text-xsm lg:text-sm text-muted">
-        {trimToWordCount(business.about, 10)}
+      <p dangerouslySetInnerHTML={
+        {__html: trimToWordCount(business.about, 10)}
+      } className="text-xsm lg:text-sm text-muted">
+        
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:grid-cols-4">

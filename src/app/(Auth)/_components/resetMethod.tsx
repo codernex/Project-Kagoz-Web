@@ -10,10 +10,10 @@ const ResetMethodSelector = () => {
     const { method, setMethod } = useReset();
 
     const handleMethodSelect = (selectedMethod: "email" | "phone") => {
-        if (selectedMethod === "phone") {
-            toast.error("This module is under development");
-            return;
-        }
+        // if (selectedMethod === "phone") {
+        //     // toast.error("This module is under development");
+        //     return;
+        // }
         setMethod(selectedMethod);
     };
 
@@ -65,7 +65,10 @@ const ResetMethodSelector = () => {
         </Link>
 
         {/* Phone Option */}
-        <div
+        <Link
+        href={
+          '/forgot-method/forgot-password'
+        }
           onClick={() => handleMethodSelect("phone")}
           className={`w-full flex items-center justify-between sm:px-5 px-3 sm:py-[18px] py-2.5 rounded-[0.75rem] border transition cursor-pointer ${
             method === "phone"
@@ -91,7 +94,7 @@ const ResetMethodSelector = () => {
                 <Check className="text-white sm:w-[12px] sm:h-[12px] w-[8px] h-[8px]" />
             </div>
           )}
-        </div>
+        </Link>
       </div>
 
       {/* Back Link */}

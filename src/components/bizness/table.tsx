@@ -1,7 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PenLine, SquareArrowOutUpRight } from "lucide-react";
+import { PenLine } from "lucide-react";
 import { Pagination } from "@/components/shared/pagination";
+import LivePreviewButton from "@/components/shared/live-preview-button";
 
 const statusColors: Record<"Pending" | "Active", string> = {
   Pending: "bg-yellow-100 text-yellow-700",
@@ -101,15 +102,10 @@ export default function Table({
                       >
                         <PenLine className="w-[16px] h-[16px]" /> Edit
                       </button>
-                      {row.status === "Pending" ? (
-                        <button className="bg-[#6F00FF] text-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2  transition">
-                          <SquareArrowOutUpRight className="w-[16px] h-[16px]" /> Preview
-                        </button>
-                      ) : (
-                        <button className="bg-[#6F00FF] text-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2  transition">
-                          <SquareArrowOutUpRight className="w-[16px] h-[16px]" /> Live Preview
-                        </button>
-                      )}
+                      <LivePreviewButton 
+                        slug={row.slug} 
+                        status={row.status} 
+                      />
                     </div>
                   </td>
                 </tr>

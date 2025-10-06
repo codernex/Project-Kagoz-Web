@@ -13,7 +13,8 @@ import { useRouter } from 'next/navigation'
 import { useCookies } from 'next-client-cookies'
 import { jwtDecode } from 'jwt-decode'
 
-const OtpPage = ({ email }: { email: string }) => {
+const OtpPage = ({ handle }: { handle: string }) => {
+    console.log("🚀 ~ OtpPage ~ handle:", handle)
     const { endpoint = '/auth/verify', resendEndpoint = '/auth/resend-otp', type = 'login' } = useOtpVerificationModal()
     const router = useRouter()
     const cookies = useCookies()
@@ -29,13 +30,13 @@ const OtpPage = ({ email }: { email: string }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
+    if (!handle) {
       toast.error('Missing email in URL');
       return;
     }
     try {
       setSubmitting(true)
-      const response = await axiosInstance.post(endpoint, { otp, email });
+      const response = await axiosInstance.post(endpoint, { otp, handle });
       
       if (isLoginFlow) {
         // For login flow, set the token and redirect to dashboard
@@ -75,11 +76,11 @@ const OtpPage = ({ email }: { email: string }) => {
   }, [timer])
 
   const handleResend = async () => {
-    if (!canResend || !email || resending) return
+    if (!canResend || !handle || resending) return
     
     try {
       setResending(true)
-      await axiosInstance.post(resendEndpoint, { email, type })
+      await axiosInstance.post(resendEndpoint, { handle, type })
       toast.success('OTP resent successfully!')
       setTimer(120)
       setCanResend(false)

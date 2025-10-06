@@ -1,7 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
-import { Mail, Send } from 'lucide-react'
+import { Mail, Phone, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useReset } from './methodContext'
 import { axiosInstance } from '@/redux/api'
@@ -17,27 +17,27 @@ const ResetTypeForm = () => {
 
   const methods = useForm({
     defaultValues: {
-      email: '',
-      phone: ''
+      handle: '',
+     
     }
   });
 
   const onSubmit = async (data: any) => {
-    if (method === "phone") {
-      toast.error("This module is under development");
-      return;
-    }
+    // if (method === "phone") {
+    //   toast.error("This module is under development");
+    //   return;
+    // }
 
-    if (!data.email) {
-      toast.error("Please enter your email");
-      return;
-    }
+    // if (!data.email) {
+    //   toast.error("Please enter your email");
+    //   return;
+    // }
 
     setIsLoading(true);
     try {
-      await axiosInstance.post('/auth/forget-password', { email: data.email });
+      await axiosInstance.post('/auth/forget-password', { handle: data.handle });
       toast.success("OTP sent to your email");
-      router.push(`/forgot-method/forgot-password/${data.email}`);
+      router.push(`/forgot-method/forgot-password/${data.handle}`);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to send OTP");
     } finally {
@@ -49,28 +49,21 @@ const ResetTypeForm = () => {
     <FormProvider {...methods}>
       <form className="space-y-5 w-full" onSubmit={methods.handleSubmit(onSubmit)}>
             {/* Email */}
-             {method === "email" && (
+             {/* {method === "email" && ( */}
               <TextInput
-                name="email"
-                placeholderIcon={Mail}
-                type="email"
-                label="Email Address"
-                placeholder="Enter your email"
+                name="handle"
+                placeholderIcon={
+                  method === "email" ? Mail : Phone
+                }
+                type={
+                  method === "email" ? "email" : "tel"
+                }
+                label={method === "email" ? "Email Address" : "Phone Number"}
+                placeholder={method === "email" ? "Enter your email" : "Enter your phone number"}
                 required
                 control={methods.control}
               />
-             )}
-              {method === "phone" && (
-              <TextInput
-                name="phone"
-                placeholderIcon={Mail}
-                type="tel"
-                label="Phone Number"
-                placeholder="Enter your phone number"
-                disabled
-                control={methods.control}
-              />
-             )}
+          
 
             {/* Instructions */}
             {/* Sign up button */}

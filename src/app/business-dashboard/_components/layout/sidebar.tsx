@@ -5,8 +5,6 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import Image from "next/image"
 import { useAuth } from "@/context/AuthContext"
-import { useBusinessStore } from "@/hooks/selectedBusiness"
-import { toast } from "sonner"
 
 interface SidebarProps {
   sidebarOpen: boolean
@@ -57,7 +55,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between sm:p-[26.5px] p-4 border-b border-[#E4E4E4]">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 w-fit h-fit cursor-pointer" onClick={() => router.push('/')}>
             
             <Image src="/images/logo.png" alt="KAGOZ" width={1000} height={500} className="w-[179px] object-fill h-[30px]" />
            

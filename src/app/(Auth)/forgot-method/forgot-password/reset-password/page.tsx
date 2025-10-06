@@ -15,7 +15,7 @@ const ResetPassword = () => {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const email = searchParams.get('email');
+    const handle = searchParams.get('email');
 
     const methods = useForm({
         defaultValues: {
@@ -30,13 +30,13 @@ const ResetPassword = () => {
             return;
         }
 
-        if (data.password.length < 8) {
+        if (data.password.length < 6) {
             toast.error("Password must be at least 8 characters long");
             return;
         }
 
-        if (!email) {
-            toast.error("Email is required");
+        if (!handle) {
+            toast.error("Email or phone is required");
             return;
         }
 
@@ -45,7 +45,7 @@ const ResetPassword = () => {
             await axiosInstance.post('/auth/reset-password', { 
                 password: data.password,
                 confirmPassword: data.confirmPassword,
-                email: email
+                handle: handle
             });
             setShowSuccess(true);
         } catch (err: any) {

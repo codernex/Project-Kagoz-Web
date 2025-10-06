@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 const Page = () => {
     const params = useParams();
     const router = useRouter();
-    const email = decodeURIComponent(params.slug as string);
+    const handle = decodeURIComponent(params.slug as string);
     const [otp, setOtp] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [timer, setTimer] = useState(120) // 2 minutes like auth.tsx
@@ -40,11 +40,11 @@ const Page = () => {
         setIsLoading(true);
         try {
             await axiosInstance.post('/auth/forget-password/verify', { 
-                email, 
+              handle, 
                 otp 
             });
             toast.success("OTP verified successfully");
-            router.push(`/forgot-method/forgot-password/reset-password?email=${encodeURIComponent(email)}`);
+            router.push(`/forgot-method/forgot-password/reset-password?email=${encodeURIComponent(handle)}`);
         } catch (error: any) {
             const message = error?.response?.data?.message;
             if (Array.isArray(message)) {
@@ -60,12 +60,12 @@ const Page = () => {
     };
 
     const handleResendOTP = async () => {
-        if (!canResend || !email || resending) return;
+        if (!canResend || !handle || resending) return;
         
         try {
             setResending(true);
             // Use the same endpoint as auth.tsx for forgot password
-            await axiosInstance.post('/auth/forget-password', { email });
+            await axiosInstance.post('/auth/forget-password', { handle });
             toast.success('OTP resent successfully!');
             setTimer(120); // Reset to 2 minutes
             setCanResend(false);

@@ -116,8 +116,9 @@ export const SearchItem: React.FC<ISearchItemProps> = ({ index, ...business }) =
             </div>
           </div>
         </div>
-        <p className="text-xsm lg:text-sm text-muted">
-          {business.about}
+        <p dangerouslySetInnerHTML={
+          {__html: business.about}
+        } className="text-xsm lg:text-sm text-muted">
         </p>
       </div>
       <div className="w-full md:w-[40%] flex justify-center md:justify-end">
