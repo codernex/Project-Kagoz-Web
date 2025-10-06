@@ -65,15 +65,27 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                 setIsAuth(true)
                 setUser(decodedUser); // Set the user
                 
-                // Use requestAnimationFrame to ensure DOM is stable before navigation
-                requestAnimationFrame(() => {
+                // Use multiple strategies to ensure safe navigation
+                const navigateToDashboard = () => {
                     try {
                         router.push(`/business-dashboard`)
                     } catch (error) {
-                        console.warn('Navigation error handled:', error);
-                        // Fallback to window.location if router fails
+                        console.warn('Router navigation failed, using window.location:', error);
                         window.location.href = '/business-dashboard';
                     }
+                }
+
+                // Use requestAnimationFrame with multiple fallbacks
+                requestAnimationFrame(() => {
+                    // Add a small delay to ensure all DOM operations are complete
+                    setTimeout(() => {
+                        try {
+                            navigateToDashboard()
+                        } catch (error) {
+                            console.warn('Navigation failed, using direct window.location:', error);
+                            window.location.href = '/business-dashboard';
+                        }
+                    }, 100);
                 });
             }
 

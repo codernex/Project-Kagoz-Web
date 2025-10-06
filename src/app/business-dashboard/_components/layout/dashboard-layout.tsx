@@ -7,7 +7,6 @@ import { Header } from "./header"
 import { UserProfile } from "../user-profile"
 import { useAuth } from "@/context/AuthContext"
 import {  useRouter } from "next/navigation"
-
 export default function BusinessDashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -29,7 +28,9 @@ export default function BusinessDashboardLayout({ children }: { children: React.
               }
           });
       } else if (isAuth === true) {
-          setLoading(false); // Once auth status is verified, stop loading
+          if (isMountedRef.current) {
+              setLoading(false); // Once auth status is verified, stop loading
+          }
       }
   }, [isAuth, router, loading]);
 
@@ -39,6 +40,7 @@ export default function BusinessDashboardLayout({ children }: { children: React.
       isMountedRef.current = false
     }
   }, [])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FCFCFD] font-inter flex items-center justify-center">

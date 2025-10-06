@@ -10,6 +10,11 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 import GlobalErrorHandler from "@/components/global-error-handler";
 import DOMManipulationFix from "@/components/dom-manipulation-fix";
+import ReactReconciliationFix from "@/components/react-reconciliation-fix";
+import NextJSDOMFix from "@/components/nextjs-dom-fix";
+import AggressiveDOMFix from "@/components/aggressive-dom-fix";
+import ReactDOMPatch from "@/components/react-dom-patch";
+import NextJS15Fix from "@/components/nextjs-15-fix";
 
 export const metadata: Metadata = {
   title: "KAGOZ",
@@ -44,6 +49,11 @@ export default function RootLayout({
             <AuthProvider>
               <GlobalErrorHandler />
               <DOMManipulationFix />
+              <ReactReconciliationFix />
+              <NextJSDOMFix />
+              <AggressiveDOMFix />
+              <ReactDOMPatch />
+              <NextJS15Fix />
               <Toaster toastOptions={{
                 className:"text-[18px]"
               }} richColors position="bottom-right" duration={4000} />
