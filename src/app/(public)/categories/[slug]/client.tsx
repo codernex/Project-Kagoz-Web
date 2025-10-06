@@ -36,7 +36,7 @@ export default function CategoriesSearchPage({
 
   const { data: categoryData } = useGetDescriptionQuery({
     location: searchLocation,
-    category: slug,
+    category: category.slug,
   });
 
   /**
