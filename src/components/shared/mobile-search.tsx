@@ -88,7 +88,7 @@ const MobileSearch: React.FC = React.memo(() => {
     } else {
       businessAction({ name: searchTerm, location });
     }
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm, selectedTab, categoryAction, businessAction, searchTerm, location])
 
   return (
     <div

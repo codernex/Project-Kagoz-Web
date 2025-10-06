@@ -15,7 +15,7 @@ export function useUnmountSafety() {
     }
   }, [])
 
-  const safeSetState = <T>(setState: (value: T) => void, value: T) => {
+  const safeSetState = <T,>(setState: (value: T) => void, value: T) => {
     if (isMountedRef.current) {
       setState(value)
     }

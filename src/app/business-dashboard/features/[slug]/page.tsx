@@ -481,7 +481,10 @@ export default function SpecialFeaturesPage() {
               <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Customer Video Feedback</h3>
               <p className="text-[14px] text-[#6F6D71]">Upload video testimonials from satisfied customers to build trust and engagement</p>
             </div>
-           <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+           <button 
+             onClick={() => setIsVideoModalOpen(true)}
+             className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2"
+           >
               <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
             </button>
@@ -635,7 +638,10 @@ export default function SpecialFeaturesPage() {
               <h3 className="text-[1.5rem] font-semibold text-[#111827] mb-1">Featured Offers</h3>
               <p className="text-[14px] text-[#6F6D71]">Display special offers that add value for your customers</p>
             </div>
-            <button className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2">
+            <button 
+              onClick={() => setIsVideoModalOpen(true)}
+              className="bg-[#6F00FF] rounded-[8px] p-[8px] w-fit hover:bg-purple-700 text-white flex items-center gap-2"
+            >
               <CirclePlay className="h-[16px] w-[16px]" />
               See Tutorial
             </button>
@@ -679,7 +685,6 @@ export default function SpecialFeaturesPage() {
       isOpen={isVideoModalOpen}
       onClose={() => setIsVideoModalOpen(false)}
       videoUrl={tutorialVideoUrl}
-      // title="Tutorial: How to Add Promo Video"
     />
     </FormProvider>
   )
