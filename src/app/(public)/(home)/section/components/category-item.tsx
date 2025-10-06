@@ -2,17 +2,18 @@ import { appendApi } from "@/lib/utils";
 import { axiosInstance } from "@/redux/api";
 import Dompurify from "dompurify";
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 
 const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
   const [data, setData] = useState<string>("");
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
     if (category.iconUrl) {
       axiosInstance
         .get(appendApi(category.iconUrl))
         .then((res) => {
-          if (res.data) {
+          if (res.data && isMountedRef.current) {
             setData(res.data); // Correctly update state with the fetched data
           }
         })
@@ -20,9 +21,22 @@ const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
           console.error("Error fetching data:", error); // Handle errors gracefully
         });
     }
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [category.iconUrl]);
 
-  const sanitizedData = useMemo(() => Dompurify.sanitize(data), [data]);
+  const sanitizedData = useMemo(() => {
+    if (!data) return "";
+    try {
+      return Dompurify.sanitize(data);
+    } catch (error) {
+      console.error("Error sanitizing data:", error);
+      return "";
+    }
+  }, [data]);
 
   return (
     <Link
@@ -31,7 +45,7 @@ const CategoryItem: React.FC<ICategory> = ({ ...category }) => {
     >
       <div
         dangerouslySetInnerHTML={{
-          __html: sanitizedData,
+          __html: sanitizedData || "",
         }}
         className="flex h-[6rem] w-[6rem] items-center justify-center rounded-full border-[1px] border-[#6F00FF33] bg-[#6F00FF0D] p-6 transition-colors delay-300 ease-linear hover:stroke-primary lg:h-[8rem] lg:w-[8rem]"
         role="presentation"

@@ -8,6 +8,8 @@ import { CookiesProvider } from 'next-client-cookies/server';
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Toaster } from "sonner";
+import GlobalErrorHandler from "@/components/global-error-handler";
+import DOMManipulationFix from "@/components/dom-manipulation-fix";
 
 export const metadata: Metadata = {
   title: "KAGOZ",
@@ -40,6 +42,8 @@ export default function RootLayout({
         <ReduxWrapper>
           <CookiesProvider>
             <AuthProvider>
+              <GlobalErrorHandler />
+              <DOMManipulationFix />
               <Toaster toastOptions={{
                 className:"text-[18px]"
               }} richColors position="bottom-right" duration={4000} />

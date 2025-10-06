@@ -152,6 +152,7 @@ export function CompletionAndPublish({
       const payload = {
         name: businessData.name,
         tagLine: businessData.tagLine,
+        tagline: businessData.tagLine, // Add lowercase version for API compatibility
         about: businessData.about || "Business description not provided",
         categoryId: businessData.category && businessData.category !== "" ? parseInt(businessData.category) : null,
         subCategories: [],
@@ -173,6 +174,9 @@ export function CompletionAndPublish({
         openingHours: buildOpeningHoursPayload()
       }
       
+      // Debug log to see what values are being sent
+      console.log("Business data being sent to API:", payload)
+      
       // Submit to API and get the business slug
       const result = await registerBusiness(payload).unwrap()
       const businessSlug = result?.slug || result?.data?.slug
@@ -183,6 +187,7 @@ export function CompletionAndPublish({
           await updateBusiness({
             slug: businessSlug,
             data: {
+              tagLine: businessData.tagLine || "",
               about: businessData.about || "",
               facebook: businessData.facebook || "",
               startingDate: formatStartingDate(),
@@ -219,14 +224,14 @@ export function CompletionAndPublish({
     } finally {
       setIsPublishing(false)
     }
-  }, [businessData, onPublish, registerBusiness, updateBusiness, addCategoryToBusiness, setOpeningHours, addBanner, addLogo, updateLicense, uploadPhoto])
+  }, [registerBusiness, updateBusiness, addCategoryToBusiness, setOpeningHours])
 
   // Expose the publish function to parent component
   React.useEffect(() => {
     if (onPublishFunctionReady) {
       onPublishFunctionReady(handlePublish)
     }
-  }, [onPublishFunctionReady, handlePublish])
+  }, [onPublishFunctionReady])
 
   const submitAllMediaFiles = async (slug: string) => {
     setIsSubmittingMedia(true)
@@ -339,6 +344,13 @@ export function CompletionAndPublish({
 
   const formatDate = (date: { year: string; month: string; day: string }) => {
     if (!date.month || !date.day || !date.year) return "Not specified"
+    
+    // Check if month is already a month name (like "January", "February", etc.)
+    if (MONTHS.includes(date.month)) {
+      return `${date.month} ${date.day}, ${date.year}`
+    }
+    
+    // If month is numeric, convert to month name
     const monthIndex = parseInt(date.month) - 1
     if (monthIndex < 0 || monthIndex > 11) return "Not specified"
     return `${MONTHS[monthIndex]} ${date.day}, ${date.year}`

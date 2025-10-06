@@ -44,7 +44,14 @@ export const UserProfile = () => {
             setFile(selectedFile)
             const reader = new FileReader()
             reader.onload = (e) => {
-                setPreviewImage(e.target?.result as string)
+                try {
+                    setPreviewImage(e.target?.result as string)
+                } catch (error) {
+                    console.warn('FileReader error handled:', error);
+                }
+            }
+            reader.onerror = (error) => {
+                console.warn('FileReader error:', error);
             }
             reader.readAsDataURL(selectedFile)
         }

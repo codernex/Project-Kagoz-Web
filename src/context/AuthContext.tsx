@@ -64,9 +64,17 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
                 })
                 setIsAuth(true)
                 setUser(decodedUser); // Set the user
-                // setOpen()
-                // router.push(`/biz/null/dashboard`)
-                router.push(`/business-dashboard`)
+                
+                // Use requestAnimationFrame to ensure DOM is stable before navigation
+                requestAnimationFrame(() => {
+                    try {
+                        router.push(`/business-dashboard`)
+                    } catch (error) {
+                        console.warn('Navigation error handled:', error);
+                        // Fallback to window.location if router fails
+                        window.location.href = '/business-dashboard';
+                    }
+                });
             }
 
         } catch (error: any) {
@@ -107,8 +115,23 @@ export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
     const logout = () => {
         cookies.remove('auth_token'); // Delete the auth_token cookie
         setIsAuth(false)
-        router.push('/')
         setUser(null); // Reset user state
+        
+        // Show success toast message
+        toast.success('Successfully logged out!', {
+            duration: 3000,
+        });
+        
+        // Use requestAnimationFrame to ensure DOM is stable before navigation
+        requestAnimationFrame(() => {
+            try {
+                router.push('/')
+            } catch (error) {
+                console.warn('Navigation error handled:', error);
+                // Fallback to window.location if router fails
+                window.location.href = '/';
+            }
+        });
     };
 
     return (

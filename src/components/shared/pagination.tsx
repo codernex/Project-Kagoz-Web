@@ -22,10 +22,18 @@ export const Pagination: React.FC<PaginateProps> = ({ totalPages, page: currentP
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", pageNumber.toString());
     router.push(`?${params.toString()}`, { scroll: false });
-    window.scrollTo({
-      behavior: 'smooth',
-      top: 400
-    })
+    
+    // Use setTimeout to prevent DOM manipulation issues
+    setTimeout(() => {
+      try {
+        window.scrollTo({
+          behavior: 'smooth',
+          top: 400
+        });
+      } catch (error) {
+        console.warn('Scroll error handled:', error);
+      }
+    }, 0);
   };
 
 

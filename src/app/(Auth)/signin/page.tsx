@@ -5,8 +5,10 @@ import { ArrowLeft, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import LoginForm from "../_components/loginform";
+import { useRouter } from "next/navigation";
 
 const Signin: React.FC = () => {
+  const router = useRouter();
   return (
     <div className=" flex items-center justify-center font-inter py-[54px]">
       <div className="lg:max-w-[942px] w-[90%] place-items-center grid lg:grid-cols-2 grid-cols-1 gap-[56px] bg-white rounded-2xl ">
@@ -57,9 +59,15 @@ const Signin: React.FC = () => {
 
         {/* Right side */}
         <div className="p-8 rounded-[16px] bg-white authform-shadow w-full">
-          <Link href="/" className="common-text !text-[16px] !font-normal text-[#111827] flex items-center mb-[23px]">
+          <div 
+            onClick={() => {
+              // Use replace instead of push to avoid history issues
+             window.location.href = '/';
+            }} 
+            className="common-text cursor-pointer !text-[16px] !font-normal text-[#111827] flex items-center mb-[23px]"
+          >
             <ArrowLeft className="w-[16px] h-[16px] mr-1" /> Back to Search
-          </Link>
+          </div>
 
           <h2 className="auth-heading !font-semibold text-[#111827] mb-2">Sign In</h2>
           <p className="common-text !font-normal text-[#2D3643] mb-8">

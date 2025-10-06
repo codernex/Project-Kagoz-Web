@@ -68,6 +68,22 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
                   if (typeof businessData.startingDate === 'object' && businessData.startingDate !== null) {
                     const date = businessData.startingDate as { year?: string; month?: string; day?: string }
                     if (date.year && date.month && date.day) {
+                      const months = [
+                        "January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"
+                      ]
+                      
+                      // Check if month is already a month name (like "January", "February", etc.)
+                      if (months.includes(date.month)) {
+                        return `${date.month} ${date.day}, ${date.year}`
+                      }
+                      
+                      // If month is numeric, convert to month name
+                      const monthIndex = parseInt(date.month) - 1
+                      if (monthIndex >= 0 && monthIndex <= 11) {
+                        return `${months[monthIndex]} ${date.day}, ${date.year}`
+                      }
+                      
                       return `${date.year}-${date.month}-${date.day}`
                     }
                   } else if (typeof businessData.startingDate === 'string' && businessData.startingDate !== '') {
