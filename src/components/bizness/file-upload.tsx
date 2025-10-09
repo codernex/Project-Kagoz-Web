@@ -5,7 +5,6 @@ import { X, Upload, Camera } from "lucide-react"
 import Image from "next/image"
 import { Label } from "@/components/ui/label"
 import { cn, appendApi } from "@/lib/utils"
-import UploadErrorHandler from "./upload-error-handler"
 
 interface UploadedFile {
   id: string
@@ -46,7 +45,7 @@ export default function FileUploader({
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [imageErrors, setImageErrors] = React.useState<Set<string>>(new Set())
   const [isProcessing, setIsProcessing] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [sizeWarning, setSizeWarning] = React.useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
   const resolvePreviewSrc = (src?: string): string => {
     console.log("🔍 resolvePreviewSrc called with:", { src, type: typeof src, length: src?.length })
@@ -133,36 +132,44 @@ export default function FileUploader({
     if (!fileList) return
 
     const fileArray = Array.from(fileList)
-    const errors: string[] = []
     const validFiles: File[] = []
 
     console.log('Processing files:', fileArray.length, 'files, maxSizeMB:', maxSizeMB)
 
-    // Clear any previous errors
-    setError(null)
+    // Clear any previous warnings
+    setSizeWarning(null)
 
     for (const file of fileArray) {
       const error = validateFile(file)
       if (error) {
-        errors.push(error)
+        // For size errors, show immediate error and reject the file
+        if (error.includes('too large')) {
+          onError?.(error)
+          console.log('File size validation failed:', error)
+          continue // Skip this file
+        } else {
+          // For other errors (like file type), show error and reject
+          onError?.(error)
+          console.log('File validation failed:', error)
+          continue // Skip this file
+        }
       } else {
         validFiles.push(file)
       }
     }
 
-    if (errors.length > 0) {
-      const errorMessage = errors.join('\n')
-      console.log('File validation errors:', errorMessage)
-      setError(errorMessage)
-      onError?.(errorMessage)
+    // No need for size warnings since we reject large files immediately
+
+    // If no valid files after filtering, silently return without error
+    if (validFiles.length === 0) {
+      console.log('No valid files to upload after validation')
       return
     }
 
     // Check if adding these files would exceed the max limit
     if (files.length + validFiles.length > max) {
       const errorMessage = `You can only upload ${max} file${max > 1 ? 's' : ''} at a time. Currently you have ${files.length} file${files.length > 1 ? 's' : ''} uploaded.`
-      setError(errorMessage)
-      onError?.(errorMessage)
+      console.log('File limit exceeded (silently rejected):', errorMessage)
       return
     }
 
@@ -188,8 +195,7 @@ export default function FileUploader({
     } catch (error) {
       console.error('File processing error:', error)
       const errorMessage = 'Failed to process files. Please check your files and try again.'
-      setError(errorMessage)
-      onError?.(errorMessage)
+      console.log('File processing failed (silently rejected):', errorMessage)
     } finally {
       setIsProcessing(false)
     }
@@ -201,9 +207,10 @@ export default function FileUploader({
     onChange?.(newFiles)
   }
 
-  const clearError = () => {
-    setError(null)
+  const clearWarning = () => {
+    setSizeWarning(null)
   }
+
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -243,11 +250,22 @@ export default function FileUploader({
           <p className="text-xs text-gray-500">{description}</p>
         )}
         
-        <UploadErrorHandler 
-          error={error} 
-          onDismiss={clearError}
-          className="mb-2"
-        />
+        {/* Size Warning Display */}
+        {sizeWarning && (
+          <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md mb-2">
+            <div className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0">⚠️</div>
+            <div className="flex-1">
+              <p className="text-sm text-yellow-700 font-medium">File Size Warning</p>
+              <p className="text-xs text-yellow-600 mt-1 whitespace-pre-line">{sizeWarning}</p>
+            </div>
+            <button
+              onClick={clearWarning}
+              className="text-yellow-400 hover:text-yellow-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {files.length === 0 ? (
           // Upload area
@@ -337,11 +355,22 @@ export default function FileUploader({
         <p className="text-xs text-gray-500">{description}</p>
       )}
       
-      <UploadErrorHandler 
-        error={error} 
-        onDismiss={clearError}
-        className="mb-2"
-      />
+      {/* Size Warning Display */}
+      {sizeWarning && (
+        <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md mb-2">
+          <div className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0">⚠️</div>
+          <div className="flex-1">
+            <p className="text-sm text-yellow-700 font-medium">File Size Warning</p>
+            <p className="text-xs text-yellow-600 mt-1 whitespace-pre-line">{sizeWarning}</p>
+          </div>
+          <button
+            onClick={clearWarning}
+            className="text-yellow-400 hover:text-yellow-600 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Initial upload area - only shown when no files are uploaded */}
       {files.length === 0 && (

@@ -82,6 +82,7 @@ export default function SpecialFeaturesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [changedModules, setChangedModules] = useState<Set<string>>(new Set())
   const [youtubeUrlError, setYoutubeUrlError] = useState<string>('')
+  const [showValidationErrors, setShowValidationErrors] = useState(false)
 
   // Video modal state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
@@ -271,8 +272,51 @@ export default function SpecialFeaturesPage() {
   }
 
 
+  // Check if form has any data to save
+  const hasAnyData = () => {
+    const hasPromoVideo = formData.promoVideoUrl.trim() !== ''
+    const hasCustomerLogos = formData.customerLogos.length > 0
+    const hasFeaturedOffers = formData.featuredOffers.length > 0
+    const hasFeaturedOfferCta = formData.featuredOfferCtaUrl.trim() !== ''
+    const hasCustomerFeedback = formData.customerFeedback.name.trim() !== '' || 
+                               formData.customerFeedback.company.trim() !== '' || 
+                               formData.customerFeedback.youtubeUrl.trim() !== '' || 
+                               formData.customerFeedback.customerImage.length > 0
+    
+    return hasPromoVideo || hasCustomerLogos || hasFeaturedOffers || hasFeaturedOfferCta || hasCustomerFeedback
+  }
+
   // Check if all required fields are filled (including existing data)
   const isFormValid = () => {
+    // First check if there's any data to save
+    if (!hasAnyData()) {
+      return false // Disable save button if no data
+    }
+
+    // Check for files that are too large
+    const maxSizeBytes = 1 * 1024 * 1024 // 1MB limit
+    
+    // Check customer logos
+    for (const logo of formData.customerLogos) {
+      if (logo.file && logo.file.size > maxSizeBytes) {
+        return false // File too large
+      }
+    }
+    
+    // Check customer images
+    for (const image of formData.customerFeedback.customerImage) {
+      if (image.file && image.file.size > maxSizeBytes) {
+        return false // File too large
+      }
+    }
+    
+    // Check featured offers
+    for (const offer of formData.featuredOffers) {
+      if (offer.file && offer.file.size > maxSizeBytes) {
+        return false // File too large
+      }
+    }
+
     // Check if customer feedback fields are filled (all or none)
     const hasCustomerName = formData.customerFeedback.name.trim() !== ''
     const hasCompanyName = formData.customerFeedback.company.trim() !== ''
@@ -282,34 +326,33 @@ export default function SpecialFeaturesPage() {
     // Validate YouTube URL if provided
     const youtubeUrlValid = !hasYoutubeUrl || validateYouTubeUrl(formData.customerFeedback.youtubeUrl).isValid
     
-    // Customer feedback is optional - either all fields are filled or none
-    const customerFeedbackComplete = (hasCustomerName && hasCompanyName && hasYoutubeUrl && hasCustomerImage && youtubeUrlValid) || 
-                                   (!hasCustomerName && !hasCompanyName && !hasYoutubeUrl && !hasCustomerImage)
-    
-    // Debug logging
-    console.log('Form validation debug:', {
-      hasCustomerName,
-      hasCompanyName,
-      hasYoutubeUrl,
-      hasCustomerImage,
-      customerFeedbackComplete,
-      formData: {
-        customerLogos: formData.customerLogos.length,
-        featuredOffers: formData.featuredOffers.length,
-        featuredOfferCtaUrl: formData.featuredOfferCtaUrl,
-        customerFeedback: formData.customerFeedback
+    // If any customer feedback field is filled, all must be filled
+    if (hasCustomerName || hasCompanyName || hasYoutubeUrl || hasCustomerImage) {
+      if (!hasCustomerName || !hasCompanyName || !hasYoutubeUrl || !hasCustomerImage || !youtubeUrlValid) {
+        return false // Customer feedback is incomplete
       }
-    })
+    }
     
-    // Make customer feedback completely optional - only require that if customer feedback is provided, it should be complete
-    const customerFeedbackValid = !hasCustomerName || (hasCustomerName && hasCompanyName && hasYoutubeUrl)
-    
-    // Form is valid if customer feedback is valid (all other fields are optional)
-    return customerFeedbackValid
+    // Form is valid if we have data and customer feedback is complete (if started)
+    return true
   }
 
   const onSubmit = async (data: SpecialFeaturesData) => {
+    // Check if there's any data to save
+    if (!hasAnyData()) {
+      toast.error('Please fill in at least one field before saving')
+      return
+    }
+
+    // Show validation errors if form is invalid
+    if (!isFormValid()) {
+      setShowValidationErrors(true)
+      toast.error('Please fill in all required fields before submitting')
+      return
+    }
+    
     setIsSubmitting(true)
+    setShowValidationErrors(false)
     
     try {
       const targetSlug = (slug as string) || (selectedSlug as string)
@@ -414,9 +457,21 @@ export default function SpecialFeaturesPage() {
       // Clear changed modules after successful submission
       setChangedModules(new Set())
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving special features:', error)
-      toast.error('Error saving special features. Please try again.')
+      
+      // Show more specific error messages
+      if (error?.data?.message) {
+        toast.error(error.data.message)
+      } else if (error?.message) {
+        toast.error(error.message)
+      } else if (error?.status === 413) {
+        toast.error('File too large. Please reduce file size and try again.')
+      } else if (error?.status === 400) {
+        toast.error('Invalid data. Please check your inputs and try again.')
+      } else {
+        toast.error('Error saving special features. Please try again.')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -665,6 +720,18 @@ export default function SpecialFeaturesPage() {
         </div>
 
       
+
+        {/* No Data Message */}
+        {!hasAnyData() && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mx-6">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <p className="text-gray-600 text-sm">
+                Fill in at least one field to enable the Save button
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Save Button */}
         <div className="flex justify-center p-6">

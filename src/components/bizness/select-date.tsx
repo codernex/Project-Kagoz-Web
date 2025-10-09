@@ -111,7 +111,7 @@ function DateSelectorCore({
         {/* Year */}
         <Select value={year} onValueChange={setYear}>
           <SelectTrigger className="w-[120px] h-[48px] border border-[#E5E7EB] rounded-[8px]">
-            <SelectValue placeholder="Year" />
+            <SelectValue placeholder={required ? "Year *" : "Year"} />
           </SelectTrigger>
           <SelectContent>
             {years.map((y) => (
@@ -125,7 +125,7 @@ function DateSelectorCore({
         {/* Month */}
         <Select value={month} onValueChange={setMonth}>
           <SelectTrigger className="w-[140px] h-[48px] border border-[#E5E7EB] rounded-[8px]">
-            <SelectValue placeholder="Month" />
+            <SelectValue placeholder={required ? "Month *" : "Month"} />
           </SelectTrigger>
           <SelectContent>
             {months.map((m) => (
@@ -139,7 +139,7 @@ function DateSelectorCore({
         {/* Day */}
         <Select value={day} onValueChange={setDay}>
           <SelectTrigger className="w-[100px] h-[48px] border border-[#E5E7EB] rounded-[8px]">
-            <SelectValue placeholder="Day" />
+            <SelectValue placeholder={required ? "Day *" : "Day"} />
           </SelectTrigger>
           <SelectContent>
             {days.map((d) => (
