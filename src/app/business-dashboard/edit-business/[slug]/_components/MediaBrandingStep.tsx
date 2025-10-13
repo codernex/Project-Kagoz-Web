@@ -216,6 +216,31 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
     alert(error)
   }
 
+  // Ensure we can always send a file with trade license update.
+  // If no new file is selected, try to fetch the existing preview URL
+  // and convert it into a File so the API receives both fields together.
+  const getTradeLicenseFileToUpload = async (): Promise<File | null> => {
+    if (formData.tradeLicense?.file) {
+      return formData.tradeLicense.file
+    }
+    const previewUrl = formData.tradeLicense?.preview
+    if (!previewUrl) return null
+    try {
+      // If preview is not an absolute URL, prefix with API base like elsewhere
+      const absoluteUrl = previewUrl.startsWith('http') || previewUrl.startsWith('blob:')
+        ? previewUrl
+        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${previewUrl}`
+      const response = await fetch(absoluteUrl)
+      const blob = await response.blob()
+      const fileName = formData.tradeLicense?.name || 'trade-license.png'
+      // Try to preserve type; default to PNG
+      const fileType = blob.type || 'image/png'
+      return new File([blob], fileName, { type: fileType })
+    } catch (_err) {
+      return null
+    }
+  }
+
   const validateForm = () => {
     const newErrors: { logo?: string } = {}
     
@@ -260,14 +285,13 @@ export default function MediaBrandingStep({ data, onUpdate, onBack, onSubmit }: 
         }
       }
       
-      // 4. Update trade license - always include date in the payload
+      // 4. Update trade license - always include date and try to include image
       if (slug) {
         const licenseFormData = new FormData()
         
-        // Add trade license file if it's a new file (API expects 'image' field)
-        if (formData.tradeLicense?.file) {
-          licenseFormData.append('image', formData.tradeLicense.file)
-        }
+        // Add trade license file (new or fetched existing) so backend always receives image
+        const licenseFile = await getTradeLicenseFileToUpload()
+        if (licenseFile) licenseFormData.append('image', licenseFile)
         
         // Always include the trade license expiry date in the payload
         const expireDate = getTradeLicenseExpireDate()

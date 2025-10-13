@@ -74,6 +74,12 @@ function DateSelectorCore({
   const [year, setYear] = React.useState(value?.year || "")
   const [month, setMonth] = React.useState(value?.month || "")
   const [day, setDay] = React.useState(value?.day || "")
+  
+  // Use ref to avoid dependency issues
+  const onChangeRef = React.useRef(onChange)
+  React.useEffect(() => {
+    onChangeRef.current = onChange
+  })
 
   const years = React.useMemo(() => Array.from({ length: 50 }, (_, i) => `${2000 + i}`), [])
   const months = React.useMemo(
@@ -95,10 +101,10 @@ function DateSelectorCore({
 
   // Notify parent when changed
   React.useEffect(() => {
-    if (year && month && day && onChange) {
-      onChange({ year, month, day })
+    if (year && month && day && onChangeRef.current) {
+      onChangeRef.current({ year, month, day })
     }
-  }, [year, month, day]) // Removed onChange from dependencies to prevent infinite loop
+  }, [year, month, day])
 
   return (
     <div className="space-y-2">

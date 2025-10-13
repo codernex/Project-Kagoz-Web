@@ -37,6 +37,11 @@ interface StepProps {
 export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, isNextDisabled, businessSlug }: StepProps) {
   const { slug } = useParams() as { slug?: string }
   
+  // Stable callback for date change to prevent unnecessary re-renders
+  const handleDateChange = useCallback((v: any) => {
+    setFormValue('issueDate', v)
+  }, [setFormValue])
+  
   // Media files will be submitted in CompletionAndPublish component
   const [formData, setFormData] = useState<MediaBrandingData>(() => {
     // Initialize from businessData if available
@@ -219,7 +224,7 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
           name="licenseIssueDate"
           required
           value={businessData.issueDate}
-          onChange={useCallback((v: any) => setFormValue('issueDate', v), [setFormValue])}
+          onChange={handleDateChange}
         />
         {errors.issueDate && (
           <p className="text-red-500 text-sm mt-1">{errors.issueDate}</p>
@@ -235,8 +240,9 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
                 label=""
                 description=""
                 required={true}
-                max={2}
-                maxSizeMB={10}
+                max={1}
+                maxSizeMB={2}
+                acceptedTypes={["image/png"]}
                 recommendedSize="1200x800 px"
                 value={formData.license}
                 onChange={handleLicenseChange}
@@ -256,7 +262,8 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
                 description="Add gallery images"
                 required={true}
                 max={5}
-                maxSizeMB={10}
+                maxSizeMB={2}
+                acceptedTypes={["image/png"]}
                 recommendedSize="800x600 px"
                 value={formData.gallery}
                 onChange={handleGalleryChange}

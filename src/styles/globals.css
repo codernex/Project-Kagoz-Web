@@ -185,3 +185,6 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Safari and Chrome */
 }
+.example-text {
+  @apply text-sm text-[#6F6D71] font-normal leading-5 tracking-[0%] text-center;
+}

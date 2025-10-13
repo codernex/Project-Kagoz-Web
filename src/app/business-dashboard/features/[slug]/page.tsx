@@ -82,7 +82,6 @@ export default function SpecialFeaturesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [changedModules, setChangedModules] = useState<Set<string>>(new Set())
   const [youtubeUrlError, setYoutubeUrlError] = useState<string>('')
-  const [showValidationErrors, setShowValidationErrors] = useState(false)
 
   // Video modal state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
@@ -92,67 +91,90 @@ export default function SpecialFeaturesPage() {
   const isLoading = videoLoading || offersLoading || clientsLoading || businessLoading
 
 
-  // Auto-populate form fields based on API data
+  // Auto-populate form fields based on API data - but only if data actually exists and is not placeholder/static data
   useEffect(() => {
     if (isLoading) return;
 
     const populateForm = () => {
-      // Set promo video URL
-      if (businessData?.youtubeVideo) {
+      // Only set promo video URL if it's a real YouTube URL (not placeholder)
+      if (businessData?.youtubeVideo && businessData.youtubeVideo.includes('youtube.com')) {
         console.log('Loading promo video from API:', businessData.youtubeVideo);
         setValue('promoVideoUrl', businessData.youtubeVideo);
       }
 
-      // Set customer logos
+      // Only set customer logos if they exist and are not placeholder data
       if (featuredClients && featuredClients.length > 0) {
-        const convertedLogos = convertToUploadedFiles(featuredClients, 'image');
-        setValue('customerLogos', convertedLogos);
-      }
-
-      // Set featured offers with images
-      if (featuredOffers && featuredOffers.length > 0) {
-        // Convert featured offer images to ImageUpload format
-        const offerImages = featuredOffers.map((offer: any, index: number) => ({
-          id: `existing-offer-${offer.id || index}`,
-          file: null,
-          preview: offer.imageUrl?.startsWith('http') 
-            ? offer.imageUrl 
-            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${offer.imageUrl}`,
-          name: `Featured Offer ${index + 1}`,
-          size: '0 KB',
-          uploaded: true
-        }));
-        setValue('featuredOffers', offerImages);
+        // Filter out any placeholder/static data
+        const realClients = featuredClients.filter((client: any) => 
+          client.url && 
+          !client.url.includes('placeholder') && 
+          !client.url.includes('static') &&
+          !client.name?.toLowerCase().includes('duress') &&
+          !client.name?.toLowerCase().includes('appstick')
+        );
         
-        // Set CTA URL from first offer
-        const firstOffer = featuredOffers[0];
-        if (firstOffer?.ctaUrl) {
-          setValue('featuredOfferCtaUrl', firstOffer.ctaUrl);
+        if (realClients.length > 0) {
+          const convertedLogos = convertToUploadedFiles(realClients, 'image');
+          setValue('customerLogos', convertedLogos);
         }
       }
 
-      if (videoFeedbacks && videoFeedbacks.length > 0) {
-        // Don't auto-populate customer feedback fields - let user enter fresh data
-        // const firstFeedback = videoFeedbacks[0] as any;
-        // if (firstFeedback) {
-        //   setValue('customerFeedback.name', firstFeedback?.name || '');
-        //   setValue('customerFeedback.company', firstFeedback?.companyName || '');
-        //   setValue('customerFeedback.youtubeUrl', firstFeedback?.videoUrl || '');
-        //   setValue('customerFeedback.rating', firstFeedback?.rating || 1);
-        // }
+      // Only set featured offers if they exist and are not placeholder data
+      if (featuredOffers && featuredOffers.length > 0) {
+        // Filter out any placeholder/static data
+        const realOffers = featuredOffers.filter((offer: any) => 
+          offer.imageUrl && 
+          !offer.imageUrl.includes('placeholder') && 
+          !offer.imageUrl.includes('static') &&
+          !offer.imageUrl.includes('carrot') &&
+          !offer.imageUrl.includes('grow')
+        );
         
-        // Convert logo URLs to ImageUpload format
-        const logoImages = videoFeedbacks.map((feedback: any, index: number) => ({
-          id: `existing-logo-${feedback.id || index}`,
-          file: null,
-          preview: feedback.logoUrl?.startsWith('http') 
-            ? feedback.logoUrl 
-            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${feedback.logoUrl}`,
-          name: `${feedback.name || 'Customer'} Logo`,
-          size: '0 KB',
-          uploaded: true
-        }));
-        setValue('customerFeedback.customerImage', logoImages);
+        if (realOffers.length > 0) {
+          const offerImages = realOffers.map((offer: any, index: number) => ({
+            id: `existing-offer-${offer.id || index}`,
+            file: null,
+            preview: offer.imageUrl?.startsWith('http') 
+              ? offer.imageUrl 
+              : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${offer.imageUrl}`,
+            name: `Featured Offer ${index + 1}`,
+            size: '0 KB',
+            uploaded: true
+          }));
+          setValue('featuredOffers', offerImages);
+          
+          // Set CTA URL from first offer
+          const firstOffer = realOffers[0];
+          if (firstOffer?.ctaUrl) {
+            setValue('featuredOfferCtaUrl', firstOffer.ctaUrl);
+          }
+        }
+      }
+
+      // Only set video feedbacks if they exist and are not placeholder data
+      if (videoFeedbacks && videoFeedbacks.length > 0) {
+        // Filter out any placeholder/static data
+        const realFeedbacks = videoFeedbacks.filter((feedback: any) => 
+          feedback.videoUrl && 
+          !feedback.videoUrl.includes('placeholder') && 
+          !feedback.videoUrl.includes('static') &&
+          !feedback.name?.toLowerCase().includes('duress') &&
+          !feedback.name?.toLowerCase().includes('appstick')
+        );
+        
+        if (realFeedbacks.length > 0) {
+          const logoImages = realFeedbacks.map((feedback: any, index: number) => ({
+            id: `existing-logo-${feedback.id || index}`,
+            file: null,
+            preview: feedback.logoUrl?.startsWith('http') 
+              ? feedback.logoUrl 
+              : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${feedback.logoUrl}`,
+            name: `${feedback.name || 'Customer'} Logo`,
+            size: '0 KB',
+            uploaded: true
+          }));
+          setValue('customerFeedback.customerImage', logoImages);
+        }
       }
     };
 
@@ -272,51 +294,8 @@ export default function SpecialFeaturesPage() {
   }
 
 
-  // Check if form has any data to save
-  const hasAnyData = () => {
-    const hasPromoVideo = formData.promoVideoUrl.trim() !== ''
-    const hasCustomerLogos = formData.customerLogos.length > 0
-    const hasFeaturedOffers = formData.featuredOffers.length > 0
-    const hasFeaturedOfferCta = formData.featuredOfferCtaUrl.trim() !== ''
-    const hasCustomerFeedback = formData.customerFeedback.name.trim() !== '' || 
-                               formData.customerFeedback.company.trim() !== '' || 
-                               formData.customerFeedback.youtubeUrl.trim() !== '' || 
-                               formData.customerFeedback.customerImage.length > 0
-    
-    return hasPromoVideo || hasCustomerLogos || hasFeaturedOffers || hasFeaturedOfferCta || hasCustomerFeedback
-  }
-
   // Check if all required fields are filled (including existing data)
   const isFormValid = () => {
-    // First check if there's any data to save
-    if (!hasAnyData()) {
-      return false // Disable save button if no data
-    }
-
-    // Check for files that are too large
-    const maxSizeBytes = 1 * 1024 * 1024 // 1MB limit
-    
-    // Check customer logos
-    for (const logo of formData.customerLogos) {
-      if (logo.file && logo.file.size > maxSizeBytes) {
-        return false // File too large
-      }
-    }
-    
-    // Check customer images
-    for (const image of formData.customerFeedback.customerImage) {
-      if (image.file && image.file.size > maxSizeBytes) {
-        return false // File too large
-      }
-    }
-    
-    // Check featured offers
-    for (const offer of formData.featuredOffers) {
-      if (offer.file && offer.file.size > maxSizeBytes) {
-        return false // File too large
-      }
-    }
-
     // Check if customer feedback fields are filled (all or none)
     const hasCustomerName = formData.customerFeedback.name.trim() !== ''
     const hasCompanyName = formData.customerFeedback.company.trim() !== ''
@@ -326,33 +305,34 @@ export default function SpecialFeaturesPage() {
     // Validate YouTube URL if provided
     const youtubeUrlValid = !hasYoutubeUrl || validateYouTubeUrl(formData.customerFeedback.youtubeUrl).isValid
     
-    // If any customer feedback field is filled, all must be filled
-    if (hasCustomerName || hasCompanyName || hasYoutubeUrl || hasCustomerImage) {
-      if (!hasCustomerName || !hasCompanyName || !hasYoutubeUrl || !hasCustomerImage || !youtubeUrlValid) {
-        return false // Customer feedback is incomplete
-      }
-    }
+    // Customer feedback is optional - either all fields are filled or none
+    const customerFeedbackComplete = (hasCustomerName && hasCompanyName && hasYoutubeUrl && hasCustomerImage && youtubeUrlValid) || 
+                                   (!hasCustomerName && !hasCompanyName && !hasYoutubeUrl && !hasCustomerImage)
     
-    // Form is valid if we have data and customer feedback is complete (if started)
-    return true
+    // Debug logging
+    console.log('Form validation debug:', {
+      hasCustomerName,
+      hasCompanyName,
+      hasYoutubeUrl,
+      hasCustomerImage,
+      customerFeedbackComplete,
+      formData: {
+        customerLogos: formData.customerLogos.length,
+        featuredOffers: formData.featuredOffers.length,
+        featuredOfferCtaUrl: formData.featuredOfferCtaUrl,
+        customerFeedback: formData.customerFeedback
+      }
+    })
+    
+    // Make customer feedback completely optional - only require that if customer feedback is provided, it should be complete
+    const customerFeedbackValid = !hasCustomerName || (hasCustomerName && hasCompanyName && hasYoutubeUrl)
+    
+    // Form is valid if customer feedback is valid (all other fields are optional)
+    return customerFeedbackValid
   }
 
   const onSubmit = async (data: SpecialFeaturesData) => {
-    // Check if there's any data to save
-    if (!hasAnyData()) {
-      toast.error('Please fill in at least one field before saving')
-      return
-    }
-
-    // Show validation errors if form is invalid
-    if (!isFormValid()) {
-      setShowValidationErrors(true)
-      toast.error('Please fill in all required fields before submitting')
-      return
-    }
-    
     setIsSubmitting(true)
-    setShowValidationErrors(false)
     
     try {
       const targetSlug = (slug as string) || (selectedSlug as string)
@@ -457,21 +437,9 @@ export default function SpecialFeaturesPage() {
       // Clear changed modules after successful submission
       setChangedModules(new Set())
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving special features:', error)
-      
-      // Show more specific error messages
-      if (error?.data?.message) {
-        toast.error(error.data.message)
-      } else if (error?.message) {
-        toast.error(error.message)
-      } else if (error?.status === 413) {
-        toast.error('File too large. Please reduce file size and try again.')
-      } else if (error?.status === 400) {
-        toast.error('Invalid data. Please check your inputs and try again.')
-      } else {
-        toast.error('Error saving special features. Please try again.')
-      }
+      toast.error('Error saving special features. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -641,46 +609,57 @@ export default function SpecialFeaturesPage() {
             </div>
 
             <div className="flex">
-            {videoFeedbacks && videoFeedbacks.length > 0 && (
-           <div className="bg-white rounded-[8px] w-full p-6">
-            <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {videoFeedbacks.map((feedback: any, index: number) => {
-                const getVideoId = (url: string) => {
-                  if (!url) return null;
-                  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-                  return match ? match[1] : null;
-                };
-                
-                const videoId = getVideoId(feedback.videoUrl || feedback.url);
-                
-                return (
-                <div key={feedback.id || index} className="flex-shrink-0">
-                   
-                  {/* Video Thumbnails */}
-                  {videoId && (
-                    <div 
-                      className="relative w-[190px] h-[120px] bg-gray-200 rounded-[8px] overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
-                      onClick={() => window.open(feedback.videoUrl || feedback.url, '_blank')}
-                    >
-                      <img 
-                        src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                        alt={`${feedback.name || 'Customer'} video thumbnail`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-0 h-0 border-l-[6px] border-l-gray-600 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
-                        </div>
-                      </div>
+            {videoFeedbacks && videoFeedbacks.length > 0 && (() => {
+              // Filter out static/placeholder data
+              const realFeedbacks = videoFeedbacks.filter((feedback: any) => 
+                feedback.videoUrl && 
+                !feedback.videoUrl.includes('placeholder') && 
+                !feedback.videoUrl.includes('static') &&
+                !feedback.name?.toLowerCase().includes('duress') &&
+                !feedback.name?.toLowerCase().includes('appstick')
+              );
+              
+              return realFeedbacks.length > 0 ? (
+                <div className="bg-white rounded-[8px] w-full p-6">
+                  <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    {realFeedbacks.map((feedback: any, index: number) => {
+                      const getVideoId = (url: string) => {
+                        if (!url) return null;
+                        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+                        return match ? match[1] : null;
+                      };
                       
-                    </div>
-                  )}
+                      const videoId = getVideoId(feedback.videoUrl || feedback.url);
+                      
+                      return (
+                      <div key={feedback.id || index} className="flex-shrink-0">
+                         
+                        {/* Video Thumbnails */}
+                        {videoId && (
+                          <div 
+                            className="relative w-[190px] h-[120px] bg-gray-200 rounded-[8px] overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+                            onClick={() => window.open(feedback.videoUrl || feedback.url, '_blank')}
+                          >
+                            <img 
+                              src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                              alt={`${feedback.name || 'Customer'} video thumbnail`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                                <div className="w-0 h-0 border-l-[6px] border-l-gray-600 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
+                              </div>
+                            </div>
+                            
+                          </div>
+                        )}
+                      </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+              ) : null;
+            })()}
             </div>
            </div>
          </div>
@@ -720,18 +699,6 @@ export default function SpecialFeaturesPage() {
         </div>
 
       
-
-        {/* No Data Message */}
-        {!hasAnyData() && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mx-6">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-              <p className="text-gray-600 text-sm">
-                Fill in at least one field to enable the Save button
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Save Button */}
         <div className="flex justify-center p-6">

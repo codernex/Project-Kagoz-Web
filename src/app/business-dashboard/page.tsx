@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Table from "@/components/bizness/table"
+import DeleteConfirmationModal from "@/components/shared/delete-confirmation-modal"
 
-import { useGetBusinessByCurrentUserQuery } from "@/redux/api/business"
+import { useGetBusinessByCurrentUserQuery, useDeleteBusinessMutation } from "@/redux/api/business"
 import { useAuth } from "@/context/AuthContext"
 
 interface Business {
@@ -16,6 +17,8 @@ interface Business {
 
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [businessToDelete, setBusinessToDelete] = useState<{ id: number; name: string; slug: string } | null>(null)
   const { isAuth } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -40,6 +43,7 @@ export default function Dashboard() {
   }, [])
 
   const { data: businessData, isLoading, isFetching, refetch } = useGetBusinessByCurrentUserQuery({ all: false, limit: 10, page: currentPage }, { skip: !isAuth })
+  const [deleteBusiness, { isLoading: isDeleting }] = useDeleteBusinessMutation()
 console.log(businessData)
   const columns = [
     {
@@ -63,6 +67,33 @@ console.log(businessData)
       console.warn('Navigation error handled:', error)
       window.location.href = `/business-dashboard/edit-business/${row.slug}`
     }
+  }
+
+  const handleDeleteClick = (row: any) => {
+    setBusinessToDelete({
+      id: row.id,
+      name: row.name,
+      slug: row.slug
+    })
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!businessToDelete) return
+
+    try {
+      await deleteBusiness({ id: businessToDelete.id }).unwrap()
+      setDeleteModalOpen(false)
+      setBusinessToDelete(null)
+      // The toast message is already handled by the mutation
+    } catch (error) {
+      console.error('Failed to delete business:', error)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false)
+    setBusinessToDelete(null)
   }
 
   const handlePageChange = (page: number) => {
@@ -102,11 +133,21 @@ console.log(businessData)
           </button>
         }
         onEdit={handleEditClick}
+        onDelete={handleDeleteClick}
         indexed
         pagination
         totalPages={businessData?.totalPages ?? 1}
         page={businessData?.currentPage ?? currentPage}
         setPage={handlePageChange}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        businessName={businessToDelete?.name || ""}
+        isLoading={isDeleting}
       />
     </main>
   )

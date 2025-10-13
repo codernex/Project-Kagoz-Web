@@ -1,9 +1,22 @@
 'use client'
 import React from "react";
 import { CheckCircle, Phone, Globe } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const MatchFoundCard: React.FC = () => {
+type Props = { name: string; mobile?: string; website?: string }
+
+const MatchFoundCard: React.FC<Props> = ({ name, mobile, website }) => {
+  const router = useRouter();
+
+  const handleClaimBusiness = () => {
+    router.push('/signin');
+  };
+
+  const handleContinueToAdd = () => {
+    router.push('/signin');
+  };
+
   return (
     <div className=" inter-font mt-8 px-[10.5px]">
       {/* Header */}
@@ -23,22 +36,32 @@ const MatchFoundCard: React.FC = () => {
       <div className="border border-[#E4E4E4] rounded-[12px] p-6 ">
         <div className="text-start space-y-3 mb-6">
           <p className="font-normal text-[18px] leading-[22px] text-[#B45309]">
-            Business Name: Rahman Electronics
+            Business Name: {name}
           </p>
-          <p className="flex items-center font-normal text-[18px] leading-[22px] gap-2 text-[#1D4ED8] mt-1">
-            <Phone className="size-5" /> +8801712345678
-          </p>
-          <p className="flex items-center font-normal text-[18px] leading-[22px] gap-2 text-[#0D9488] mt-1">
-            <Globe className="size-5" /> www.rahmanelectronics.com
-          </p>
+          {mobile && (
+            <p className="flex items-center font-normal text-[18px] leading-[22px] gap-2 text-[#1D4ED8] mt-1">
+              <Phone className="w-[20px] h-[20px]" /> {mobile}
+            </p>
+          )}
+          {website && (
+            <p className="flex items-center font-normal text-[18px] leading-[22px] gap-2 text-[#0D9488] mt-1">
+              <Globe className="w-[20px] h-[20px]" /> {website}
+            </p>
+          )}
         </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-2">
-          <button className="w-full px-6 py-2 bg-[#F1EBFF]  text-[#6F00FF] rounded-[8px] text-base leading-[22px] font-medium">
-            <CheckCircle className="inline-block mr-2 size-4" /> Claim This Business
+          <button 
+            onClick={handleClaimBusiness}
+            className="w-full px-6 py-2 bg-[#F1EBFF]  text-[#6F00FF] rounded-[8px] text-[16px] leading-[22px] font-medium"
+          >
+            <CheckCircle className="inline-block mr-2 w-[16px] h-[16px]" /> Claim This Business
           </button>
-          <button className="w-full px-6 py-2 bg-[#F9FAFB] text-[#2D3643] rounded-[8px] text-base leading-[22px] font-medium">
+          <button 
+            onClick={handleContinueToAdd}
+            className="w-full px-6 py-2 bg-[#F9FAFB] text-[#2D3643] rounded-[8px] text-[16px] leading-[22px] font-medium"
+          >
             ✕ Not Mine – Continue to Add My Business
           </button>
         </div>
