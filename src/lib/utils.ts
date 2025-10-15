@@ -86,5 +86,6 @@ export const normalizeLocation = (location: string) => {
 };
 
 export const isBlocked = (date: Date | string | undefined) => {
-  return isBefore(new Date(date || new Date()), subMonths(new Date(), 6));
+  return false;
+  // return isBefore(new Date(date || new Date()), subMonths(new Date(), 6));
 };
