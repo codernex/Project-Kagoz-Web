@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PenLine } from "lucide-react";
+import { PenLine, Trash2 } from "lucide-react";
 import { Pagination } from "@/components/shared/pagination";
 import LivePreviewButton from "@/components/shared/live-preview-button";
 
@@ -37,6 +37,7 @@ export default function Table({
   loading,
   action,
   onEdit,
+  onDelete,
   indexed,
   pagination,
   totalPages = 1,
@@ -106,6 +107,12 @@ export default function Table({
                         slug={row.slug} 
                         status={row.status} 
                       />
+                      <button
+                        className="border border-red-500 text-red-500 bg-white px-5 py-2 rounded-[8px] font-medium text-sm flex items-center gap-2 hover:bg-red-50 transition"
+                        onClick={() => onDelete && onDelete(row)}
+                      >
+                        <Trash2 className="w-[16px] h-[16px]" /> 
+                      </button>
                     </div>
                   </td>
                 </tr>

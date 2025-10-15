@@ -91,67 +91,90 @@ export default function SpecialFeaturesPage() {
   const isLoading = videoLoading || offersLoading || clientsLoading || businessLoading
 
 
-  // Auto-populate form fields based on API data
+  // Auto-populate form fields based on API data - but only if data actually exists and is not placeholder/static data
   useEffect(() => {
     if (isLoading) return;
 
     const populateForm = () => {
-      // Set promo video URL
-      if (businessData?.youtubeVideo) {
+      // Only set promo video URL if it's a real YouTube URL (not placeholder)
+      if (businessData?.youtubeVideo && businessData.youtubeVideo.includes('youtube.com')) {
         console.log('Loading promo video from API:', businessData.youtubeVideo);
         setValue('promoVideoUrl', businessData.youtubeVideo);
       }
 
-      // Set customer logos
+      // Only set customer logos if they exist and are not placeholder data
       if (featuredClients && featuredClients.length > 0) {
-        const convertedLogos = convertToUploadedFiles(featuredClients, 'image');
-        setValue('customerLogos', convertedLogos);
-      }
-
-      // Set featured offers with images
-      if (featuredOffers && featuredOffers.length > 0) {
-        // Convert featured offer images to ImageUpload format
-        const offerImages = featuredOffers.map((offer: any, index: number) => ({
-          id: `existing-offer-${offer.id || index}`,
-          file: null,
-          preview: offer.imageUrl?.startsWith('http') 
-            ? offer.imageUrl 
-            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${offer.imageUrl}`,
-          name: `Featured Offer ${index + 1}`,
-          size: '0 KB',
-          uploaded: true
-        }));
-        setValue('featuredOffers', offerImages);
+        // Filter out any placeholder/static data
+        const realClients = featuredClients.filter((client: any) => 
+          client.url && 
+          !client.url.includes('placeholder') && 
+          !client.url.includes('static') &&
+          !client.name?.toLowerCase().includes('duress') &&
+          !client.name?.toLowerCase().includes('appstick')
+        );
         
-        // Set CTA URL from first offer
-        const firstOffer = featuredOffers[0];
-        if (firstOffer?.ctaUrl) {
-          setValue('featuredOfferCtaUrl', firstOffer.ctaUrl);
+        if (realClients.length > 0) {
+          const convertedLogos = convertToUploadedFiles(realClients, 'image');
+          setValue('customerLogos', convertedLogos);
         }
       }
 
-      if (videoFeedbacks && videoFeedbacks.length > 0) {
-        // Don't auto-populate customer feedback fields - let user enter fresh data
-        // const firstFeedback = videoFeedbacks[0] as any;
-        // if (firstFeedback) {
-        //   setValue('customerFeedback.name', firstFeedback?.name || '');
-        //   setValue('customerFeedback.company', firstFeedback?.companyName || '');
-        //   setValue('customerFeedback.youtubeUrl', firstFeedback?.videoUrl || '');
-        //   setValue('customerFeedback.rating', firstFeedback?.rating || 1);
-        // }
+      // Only set featured offers if they exist and are not placeholder data
+      if (featuredOffers && featuredOffers.length > 0) {
+        // Filter out any placeholder/static data
+        const realOffers = featuredOffers.filter((offer: any) => 
+          offer.imageUrl && 
+          !offer.imageUrl.includes('placeholder') && 
+          !offer.imageUrl.includes('static') &&
+          !offer.imageUrl.includes('carrot') &&
+          !offer.imageUrl.includes('grow')
+        );
         
-        // Convert logo URLs to ImageUpload format
-        const logoImages = videoFeedbacks.map((feedback: any, index: number) => ({
-          id: `existing-logo-${feedback.id || index}`,
-          file: null,
-          preview: feedback.logoUrl?.startsWith('http') 
-            ? feedback.logoUrl 
-            : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${feedback.logoUrl}`,
-          name: `${feedback.name || 'Customer'} Logo`,
-          size: '0 KB',
-          uploaded: true
-        }));
-        setValue('customerFeedback.customerImage', logoImages);
+        if (realOffers.length > 0) {
+          const offerImages = realOffers.map((offer: any, index: number) => ({
+            id: `existing-offer-${offer.id || index}`,
+            file: null,
+            preview: offer.imageUrl?.startsWith('http') 
+              ? offer.imageUrl 
+              : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${offer.imageUrl}`,
+            name: `Featured Offer ${index + 1}`,
+            size: '0 KB',
+            uploaded: true
+          }));
+          setValue('featuredOffers', offerImages);
+          
+          // Set CTA URL from first offer
+          const firstOffer = realOffers[0];
+          if (firstOffer?.ctaUrl) {
+            setValue('featuredOfferCtaUrl', firstOffer.ctaUrl);
+          }
+        }
+      }
+
+      // Only set video feedbacks if they exist and are not placeholder data
+      if (videoFeedbacks && videoFeedbacks.length > 0) {
+        // Filter out any placeholder/static data
+        const realFeedbacks = videoFeedbacks.filter((feedback: any) => 
+          feedback.videoUrl && 
+          !feedback.videoUrl.includes('placeholder') && 
+          !feedback.videoUrl.includes('static') &&
+          !feedback.name?.toLowerCase().includes('duress') &&
+          !feedback.name?.toLowerCase().includes('appstick')
+        );
+        
+        if (realFeedbacks.length > 0) {
+          const logoImages = realFeedbacks.map((feedback: any, index: number) => ({
+            id: `existing-logo-${feedback.id || index}`,
+            file: null,
+            preview: feedback.logoUrl?.startsWith('http') 
+              ? feedback.logoUrl 
+              : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/uploads/${feedback.logoUrl}`,
+            name: `${feedback.name || 'Customer'} Logo`,
+            size: '0 KB',
+            uploaded: true
+          }));
+          setValue('customerFeedback.customerImage', logoImages);
+        }
       }
     };
 
@@ -586,46 +609,57 @@ export default function SpecialFeaturesPage() {
             </div>
 
             <div className="flex">
-            {videoFeedbacks && videoFeedbacks.length > 0 && (
-           <div className="bg-white rounded-[8px] w-full p-6">
-            <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {videoFeedbacks.map((feedback: any, index: number) => {
-                const getVideoId = (url: string) => {
-                  if (!url) return null;
-                  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-                  return match ? match[1] : null;
-                };
-                
-                const videoId = getVideoId(feedback.videoUrl || feedback.url);
-                
-                return (
-                <div key={feedback.id || index} className="flex-shrink-0">
-                   
-                  {/* Video Thumbnails */}
-                  {videoId && (
-                    <div 
-                      className="relative w-[190px] h-[120px] bg-gray-200 rounded-[8px] overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
-                      onClick={() => window.open(feedback.videoUrl || feedback.url, '_blank')}
-                    >
-                      <img 
-                        src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                        alt={`${feedback.name || 'Customer'} video thumbnail`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                          <div className="w-0 h-0 border-l-[6px] border-l-gray-600 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
-                        </div>
-                      </div>
+            {videoFeedbacks && videoFeedbacks.length > 0 && (() => {
+              // Filter out static/placeholder data
+              const realFeedbacks = videoFeedbacks.filter((feedback: any) => 
+                feedback.videoUrl && 
+                !feedback.videoUrl.includes('placeholder') && 
+                !feedback.videoUrl.includes('static') &&
+                !feedback.name?.toLowerCase().includes('duress') &&
+                !feedback.name?.toLowerCase().includes('appstick')
+              );
+              
+              return realFeedbacks.length > 0 ? (
+                <div className="bg-white rounded-[8px] w-full p-6">
+                  <div className="flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    {realFeedbacks.map((feedback: any, index: number) => {
+                      const getVideoId = (url: string) => {
+                        if (!url) return null;
+                        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+                        return match ? match[1] : null;
+                      };
                       
-                    </div>
-                  )}
+                      const videoId = getVideoId(feedback.videoUrl || feedback.url);
+                      
+                      return (
+                      <div key={feedback.id || index} className="flex-shrink-0">
+                         
+                        {/* Video Thumbnails */}
+                        {videoId && (
+                          <div 
+                            className="relative w-[190px] h-[120px] bg-gray-200 rounded-[8px] overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+                            onClick={() => window.open(feedback.videoUrl || feedback.url, '_blank')}
+                          >
+                            <img 
+                              src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                              alt={`${feedback.name || 'Customer'} video thumbnail`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                                <div className="w-0 h-0 border-l-[6px] border-l-gray-600 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
+                              </div>
+                            </div>
+                            
+                          </div>
+                        )}
+                      </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+              ) : null;
+            })()}
             </div>
            </div>
          </div>

@@ -22,6 +22,7 @@ interface MediaBrandingData {
   banner: UploadedFile | null
   license: UploadedFile[]
   gallery: UploadedFile[]
+  issueDate?: { year: string; month: string; day: string }
 }
 
 interface StepProps {
@@ -35,6 +36,11 @@ interface StepProps {
 
 export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, isNextDisabled, businessSlug }: StepProps) {
   const { slug } = useParams() as { slug?: string }
+  
+  // Stable callback for date change to prevent unnecessary re-renders
+  const handleDateChange = useCallback((v: any) => {
+    setFormValue('issueDate', v)
+  }, [setFormValue])
   
   // Media files will be submitted in CompletionAndPublish component
   const [formData, setFormData] = useState<MediaBrandingData>(() => {
@@ -59,7 +65,17 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
     banner?: string
     license?: string
     gallery?: string
+    issueDate?: string
   }>({})
+
+  // Clear issueDate error when date is selected
+  React.useEffect(() => {
+    if (businessData.issueDate && businessData.issueDate.year && businessData.issueDate.month && businessData.issueDate.day) {
+      if (errors.issueDate) {
+        setErrors(prev => ({ ...prev, issueDate: undefined }))
+      }
+    }
+  }, [businessData.issueDate, errors.issueDate])
 
   const handleLogoChange = (files: UploadedFile[]) => {
     const newData = { ...formData, logo: files[0] || null }
@@ -117,6 +133,7 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
       banner?: string
       license?: string
       gallery?: string
+      issueDate?: string
     } = {}
     
     if (!formData.logo) {
@@ -129,6 +146,11 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
 
     if (formData.gallery.length === 0) {
       newErrors.gallery = "At least one gallery image is required"
+    }
+
+    // Validate license issue date
+    if (!businessData.issueDate || !businessData.issueDate.year || !businessData.issueDate.month || !businessData.issueDate.day) {
+      newErrors.issueDate = "License issue date is required"
     }
 
     setErrors(newErrors)
@@ -195,15 +217,18 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
             </div>
 
             <div className="">
-                <Label className="text-sm font-medium text-[#111827]">Verified License</Label>
+                <Label className="text-sm font-medium text-[#111827]">Verified License <span className="text-red-500">*</span></Label>
               <p className="text-xs text-gray-500 mb-3">Upload your business license</p>
               
             <DateSelector
           name="licenseIssueDate"
           required
           value={businessData.issueDate}
-          onChange={useCallback((v: any) => setFormValue('issueDate', v), [setFormValue])}
+          onChange={handleDateChange}
         />
+        {errors.issueDate && (
+          <p className="text-red-500 text-sm mt-1">{errors.issueDate}</p>
+        )}
             </div>
             {/* Business License */}
             <div>
@@ -215,8 +240,9 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
                 label=""
                 description=""
                 required={true}
-                max={2}
-                maxSizeMB={10}
+                max={1}
+                maxSizeMB={2}
+                acceptedTypes={["image/png"]}
                 recommendedSize="1200x800 px"
                 value={formData.license}
                 onChange={handleLicenseChange}
@@ -236,7 +262,8 @@ export function StepMediaBranding({ businessData, setFormValue, onPrev, onNext, 
                 description="Add gallery images"
                 required={true}
                 max={5}
-                maxSizeMB={10}
+                maxSizeMB={2}
+                acceptedTypes={["image/png"]}
                 recommendedSize="800x600 px"
                 value={formData.gallery}
                 onChange={handleGalleryChange}

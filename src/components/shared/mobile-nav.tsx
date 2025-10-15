@@ -119,10 +119,11 @@ const MobileNav: React.FC = () => {
           </div>
           <CustomButton onClick={() => {
             if (isAuth) {
-              router.push(`/biz/${selectedSlug}/dashboard`)
+              router.push(`/business-dashboard`)
             } else {
-              setOpen()
-              setIsOpen(false)
+              // setOpen()
+              // setIsOpen(false)
+              router.push(`/search`)
             }
           }} className="min-h-[51px] min-w-[196px] rounded-xl">
             <Plus />

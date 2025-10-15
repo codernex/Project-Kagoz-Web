@@ -239,6 +239,17 @@ const business = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Business"],
     }),
+    deleteBusiness: builder.mutation<{ message: string }, { id: number }>({
+      query: ({ id }) => ({
+        url: `/business/${id}`,
+        method: "DELETE",
+      }),
+      onQueryStarted: async (_, { queryFulfilled }) => {
+        await queryFulfilled;
+        successMessage("Business deleted successfully");
+      },
+      invalidatesTags: ["CurrentUsersBusiness", "Business"],
+    }),
     setOpeningHours: builder.mutation<any, any>({
       query: ({ slug, ...data }) => {
         return {
@@ -361,6 +372,7 @@ export const {
   useUpdateBusinessMutation,
   useUpdateBusinessYouTubeVideoMutation,
   useUpdateBusinessMediaMutation,
+  useDeleteBusinessMutation,
   useAddCategoryToBusinessMutation,
   useGetFaqsQuery,
   useAddFaqMutation,

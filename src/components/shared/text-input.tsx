@@ -1,6 +1,6 @@
 import { InputProps } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Control, FieldPath } from 'react-hook-form';
+import { Control, FieldPath, RegisterOptions } from 'react-hook-form';
 import {
     FormControl,
     FormField,
@@ -14,6 +14,15 @@ import { Eye, EyeClosed } from 'lucide-react';
 
 export type FieldValues = Record<string, any>;
 
+interface TextInputProps<TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>> extends Omit<InputProps, 'name'> {
+    name?: TName;
+    control?: Control<TFieldValues>;
+    label?: string;
+    variant?: 'primary' | 'secondary';
+    placeholderIcon?: React.ElementType;
+    rules?: RegisterOptions<TFieldValues, TName>;
+}
+
 export function TextInput<
     TFieldValues extends FieldValues = FieldValues,
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -24,14 +33,9 @@ export function TextInput<
     variant = 'primary',
     type,
     placeholderIcon: PlaceholderIcon,
+    rules,
     ...props
-}: InputProps & {
-    name?: TName;
-    control?: Control<TFieldValues>;
-    label?: string;
-    variant?: 'primary' | 'secondary';
-    placeholderIcon?: React.ElementType;
-}) {
+}: TextInputProps<TFieldValues, TName>) {
     const [show, setShow] = useState(false);
     const [inputType, setInputType] = useState(type);
 
@@ -102,6 +106,7 @@ export function TextInput<
             }}
             name={(name ?? '') as any}
             control={control}
+            rules={rules}
         />
     );
 }
