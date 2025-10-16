@@ -125,7 +125,7 @@ const Hero = () => {
           <div className="py-lg md:hidden">
             <NavSearch />
           </div>
-          <div className="mt-[4rem] hidden lg:block">
+          <div className="mt-[4rem] hidden lg:block pb-[10rem]">
             <div onBlur={handleBlur}>
               <div className="bg-black pt-6 px-4 pb-0 rounded-t-xs rounded-b-none w-[80%] mx-auto md:bg-transparent md:space-y-0 flex flex-col justify-center items-center md:flex-row md:!space-x-4 mb-0 md:pt-0 h-fit">
                 <Button onClick={() => {
@@ -179,48 +179,7 @@ const Hero = () => {
             </div>
           </div>
         </div>
-        {
-          <div className="w-full py-[8rem] max-w-[70%] mx-auto hidden md:block">
-            <Swiper
-              slidesPerView={9}
-              className="mb-2"
-              autoplay
-              modules={[ Autoplay]}
-              breakpoints={{
-                320: {
-                  slidesPerView: 2,
-                },
-                768: {
-                  slidesPerView: 5,
-                },
-                1024: {
-                  slidesPerView: 7,
-                },
-                1280: {
-                  slidesPerView: 9,
-                },
-              }}
-            >
-              {Array.from({ length: 20 }).map((_, index) => {
-                return (
-                  <SwiperSlide key={index}>
-                    <div className="flex justify-center w-full">
-                      <div className="relative rounded-full w-full h-[8rem] max-w-[8rem] overflow-hidden">
-                        <Image
-                          alt="Logo"
-                          src={"/images/featured/logo.png"}
-                          fill
-                          sizes="100%"
-                        />
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-            <p className="font-normal text-center">Featured Business</p>
-          </div>
-        }
+      
       </div>
     </section>
   );

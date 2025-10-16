@@ -1,15 +1,15 @@
-"use client"
+"use client";
 import BlogCard from "@/components/shared/blog-card";
+import BlogCardSkeleton from "@/components/shared/blog-card-skeleton";
 import { Button } from "@/components/ui/button";
 import { useFetchOnVisible } from "@/hooks/useLazyApiCall";
-import { useLazyGetPostsQuery } from "@/redux/api";
+import { useGetPostsQuery, useLazyGetPostsQuery } from "@/redux/api";
 import Link from "next/link";
 import { useRef } from "react";
 
 export default function Blog() {
-  const ref = useRef<HTMLElement>(null)
-  const [getPosts, { data }] = useLazyGetPostsQuery()
-  useFetchOnVisible(ref, getPosts)
+  const ref = useRef<HTMLElement>(null);
+  const { data, isLoading } = useGetPostsQuery();
   return (
     <section ref={ref} id="blog" className="section_padding bg-bgPrimaryShade">
       <div className="container space-y-[6rem]">
@@ -22,9 +22,13 @@ export default function Blog() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[4rem]">
-          {data?.map((post, index) => {
-            return <BlogCard key={index} post={post} />;
-          })}
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, key) => (
+                <BlogCardSkeleton key={key} />
+              ))
+            : data?.slice(0, 4)?.map((post, index) => {
+                return <BlogCard key={index} post={post} />;
+              })}
         </div>
         <div className="flex justify-center">
           <Button

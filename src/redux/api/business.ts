@@ -73,7 +73,10 @@ const business = baseApi.injectEndpoints({
     }),
 
     // Dedicated YouTube URL update mutation
-    updateBusinessYouTubeVideo: builder.mutation<IBusiness, { slug: string; youtubeVideo: string }>({
+    updateBusinessYouTubeVideo: builder.mutation<
+      IBusiness,
+      { slug: string; youtubeVideo: string }
+    >({
       query: ({ slug, youtubeVideo }) => ({
         url: `/business/${slug}`,
         data: { youtubeVideo },
@@ -86,7 +89,10 @@ const business = baseApi.injectEndpoints({
       invalidatesTags: ["Business"],
     }),
     // New: send logo and banner together via multipart/form-data (POST)
-    updateBusinessMedia: builder.mutation<IBusiness, { slug: string; data: FormData }>({
+    updateBusinessMedia: builder.mutation<
+      IBusiness,
+      { slug: string; data: FormData }
+    >({
       query: ({ slug, data }) => ({
         url: `/business/${slug}`,
         data,
@@ -158,7 +164,10 @@ const business = baseApi.injectEndpoints({
     }),
 
     // New mutation for uploading multiple gallery photos at once
-    uploadMultiplePhotos: builder.mutation<IPhoto[], { slug: string; files: File[] }>({
+    uploadMultiplePhotos: builder.mutation<
+      IPhoto[],
+      { slug: string; files: File[] }
+    >({
       query: ({ slug, files }) => {
         const formData = new FormData();
         files.forEach((file, index) => {
@@ -383,6 +392,7 @@ export const {
   useGetTotalPageViewsQuery,
   useGetDailyPageViewsQuery,
   useLazyGetSiteFaqQuery,
+  useGetSiteFaqQuery,
   useGetSponsoredBusinessQuery,
   useLazyGetSponsoredBusinessQuery,
   useGetBusinessByQueryQuery,
