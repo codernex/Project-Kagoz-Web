@@ -26,7 +26,8 @@ const generateTimeOptions = () => {
 const timeOptions = generateTimeOptions()
 
 const transformToApiFormat = (data: BusinessHoursData) => {
-  if (data.is24Hours || data.closedOnHolidays) return { isOpen247: true }
+  // Only treat explicit 24/7 as isOpen247; never send closedOnHolidays in payload
+  if (data.is24Hours) return { isOpen247: true }
   const daysArray = Object.entries(data.businessHours)
     .filter(([, sch]) => sch.isOpen && sch.slots.length)
     .map(([day, sch]) => ({
@@ -40,7 +41,7 @@ const transformToApiFormat = (data: BusinessHoursData) => {
         return { from: parseTime(s.start), to: parseTime(s.end) }
       })
     }))
-  return daysArray.length ? { isOpen247: false, days: daysArray } : {}
+  return { isOpen247: false, days: daysArray }
 }
 
 const transformFromApiFormat = (apiData: any, daysList: string[]): BusinessHoursData => {
@@ -69,7 +70,7 @@ interface BusinessHoursData { is24Hours: boolean; closedOnHolidays: boolean; bus
 interface BusinessHoursStepProps { data: BusinessHoursData; businessData?: any; onUpdate: (data: BusinessHoursData) => void; onNext: () => void; onBack: () => void }
 
 export default function BusinessHoursStep({ data, businessData, onUpdate, onNext, onBack }: BusinessHoursStepProps) {
-  console.log("🚀 ~ BusinessHoursStep ~ data:", data)
+  // console.log("🚀 ~ BusinessHoursStep ~ data:", data)
   const [formData, setFormData] = useState<BusinessHoursData>(data)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [setOpeningHours] = useSetOpeningHoursMutation()

@@ -23,13 +23,13 @@ const MatchFoundCard: React.FC<Props> = ({ name, mobile, website }) => {
      
       <div className="text-[#15803D] font-medium flex items-center mb-5 gap-2">
         <div className="p-2 bg-[#DCFCE7] rounded-full">
-            <CheckCircle className="text-[#15803D]  size-4" />
+            <CheckCircle className="text-[#15803D]  w-[16px] h-[16px]" />
             </div> Match Found:
       </div>
 
       {/* Success Info */}
       <div className="bg-[#F0FDF4] text-[#15803D] py-5 text-start mb-6 px-6 rounded-[8px] text-base leading-[22px] font-medium flex items-center gap-2">
-        <Image src="/icons/checkmark.png" alt="Success Icon" width={20} height={20} className="size-4" />  We found 1 business that may match yours
+        <Image src="/checkmark.png" alt="Success Icon" width={20} height={20} className="w-[16px] h-[16px]" />  We found 1 business that may match yours
       </div>
 
       {/* Business Info Card */}
@@ -51,7 +51,7 @@ const MatchFoundCard: React.FC<Props> = ({ name, mobile, website }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <button 
             onClick={handleClaimBusiness}
             className="w-full px-6 py-2 bg-[#F1EBFF]  text-[#6F00FF] rounded-[8px] text-[16px] leading-[22px] font-medium"
