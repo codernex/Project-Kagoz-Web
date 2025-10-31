@@ -1,3 +1,4 @@
+// src/components/StepLocationContact.tsx
 "use client";
 
 import type { BusinessData } from "./businessSetup";
@@ -44,7 +45,7 @@ export function StepLocationContact({
   const api = (existingBusiness as any) || {}
   const defaultValues: LocationContactInput = {
     city: api.city || businessData.city || "",
-    country: api.country || businessData.country || "",
+    country: api.country || businessData.country || "Bangladesh",
     facebook: api.facebook || businessData.facebook || "",
     houseInfo: api.houseInfo || businessData.houseInfo || "",
     localArea: api.localArea || businessData.localArea || "",
@@ -92,6 +93,14 @@ export function StepLocationContact({
         <div className="col-span-2 w-full space-y-3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <TextInput
+              name="houseInfo"
+              control={form.control}
+              label="House"
+              required
+              width="100%"
+              placeholder="Enter house"
+            />
+            <TextInput
               name="streetAddress"
               control={form.control}
               placeholderIcon={Home}
@@ -100,14 +109,7 @@ export function StepLocationContact({
               required
               placeholder="Enter street address"
             />
-            <TextInput
-              name="houseInfo"
-              control={form.control}
-              label="House / Road Info"
-              required
-              width="100%"
-              placeholder="Enter house/road info"
-            />
+            
             <TextInput
               name="localArea"
               control={form.control}
@@ -119,6 +121,7 @@ export function StepLocationContact({
             <TextInput
               name="city"
               control={form.control}
+              required
               label="City"
               width="100%"
               placeholder="Enter city"
@@ -138,6 +141,7 @@ export function StepLocationContact({
               required
               width="100%"
               placeholder="Enter country"
+              defaultValue="Bangladesh"
             />
           </div>
           <TextInput
@@ -148,6 +152,10 @@ export function StepLocationContact({
             placeholderIcon={Phone}
             width="100%"
             placeholder="Enter mobile number"
+             rules={{
+              maxLength: { value: 11, message: 'Mobile number cannot exceed 11 digits' },
+              pattern: { value: /^\d*$/, message: 'Only digits are allowed' }
+            }}
           />
           <TextInput
             name="website"

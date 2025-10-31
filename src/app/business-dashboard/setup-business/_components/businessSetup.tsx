@@ -192,11 +192,12 @@ export function BusinessSetupWizard() {
         // Update all business hours data in a single state update to avoid multiple re-renders
         setBusinessData((prev) => ({
           ...prev,
-          businessHours: data.businessHours,
-          is24x7: data.is24x7,
-          closedOnHolidays: data.closedOnHolidays,
-          // Add the new openingHours structure
-          openingHours: data.openingHours
+          // Preserve existing businessHours if not provided by step 2
+          businessHours: (data.businessHours ?? prev.businessHours),
+          is24x7: (data.is24x7 ?? prev.is24x7),
+          closedOnHolidays: (data.closedOnHolidays ?? prev.closedOnHolidays),
+          // Add or preserve the new openingHours structure
+          openingHours: (data.openingHours ?? prev.openingHours)
         }));
       }
       setCurrentStep(currentStep + 1)
@@ -210,7 +211,6 @@ export function BusinessSetupWizard() {
       case 1: 
         return businessData.streetAddress && businessData.city && businessData.mobile
       case 2: 
-        // For step 2 (business hours), always allow next since we handle validation internally
         return true
       case 3: 
         return true 

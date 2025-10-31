@@ -1,3 +1,4 @@
+// src/components/shared/text-input.tsx
 import { InputProps } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Control, FieldPath, RegisterOptions } from 'react-hook-form';
@@ -73,17 +74,49 @@ export function TextInput<
                                         style={{ width: '1.8rem', height: '1.8rem' }}
                                         className="absolute left-3 top-1/2 -translate-y-1/2 ml-2 mt-[2px] !text-[#949494] text-muted" />
                                     )}
-                                    <Input
-                                        className={cn(
-                                            'sm:placeholder:text-[16px] placeholder:text-[14px] placeholder: text-black  placeholder:text-muteds',
-                                            props.className,
-                                            PlaceholderIcon ? 'pl-14' : '' 
-                                        )}
-                                        key={inputType}
-                                        type={inputType}
-                                        {...field}
-                                        {...props}
-                                    />
+                                    {(() => {
+                                        // Avoid passing defaultValue alongside field.value (controlled input)
+                                        const { defaultValue, ...safeProps } = props as any
+
+                                        // wrapper onChange to auto-prefix website field
+                                        const handleChange = (e: any) => {
+                                            // get raw value (works for both event and direct value)
+                                            const raw = e && e.target ? e.target.value : e;
+
+                                            if (field.name === 'website') {
+                                                // remove existing protocol and optional www.
+                                                const domain = String(raw || '').replace(/^https?:\/\/(www\.)?/i, '').trim();
+
+                                                if (!domain) {
+                                                    // keep empty if user cleared input
+                                                    field.onChange('');
+                                                } else {
+                                                    // set normalized value with https://www.<domain>
+                                                    // (keeps it simple — always prefix https://www.)
+                                                    field.onChange(`https://www.${domain}`);
+                                                }
+                                            } else {
+                                                // default behaviour for other fields
+                                                field.onChange(e);
+                                            }
+                                        };
+
+                                        return (
+                                            <Input
+                                                className={cn(
+                                                    'sm:placeholder:text-[16px] placeholder:text-[14px] placeholder: text-black  placeholder:text-muteds',
+                                                    props.className,
+                                                    PlaceholderIcon ? 'pl-14' : ''
+                                                )}
+                                                key={inputType}
+                                                type={inputType}
+                                                {...field}
+                                                {...safeProps}
+                                                // override onChange to our wrapper
+                                                onChange={handleChange}
+                                            />
+                                        )
+                                    })()}
 
                                     {type === 'password' && (
                                         <div

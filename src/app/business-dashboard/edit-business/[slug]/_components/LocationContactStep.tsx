@@ -228,6 +228,10 @@ export default function LocationContactStep({
             width="100%"
             placeholderIcon={Phone}
             label="Mobile Number"
+            rules={{
+              maxLength: { value: 11, message: 'Mobile number cannot exceed 11 digits' },
+              pattern: { value: /^\d*$/, message: 'Only digits are allowed' }
+            }}
           />
 
           <TextInput
@@ -237,6 +241,7 @@ export default function LocationContactStep({
             placeholderIcon={Globe}
             width="100%"
             placeholder="https://www.example.com"
+            
           />
 
           <TextInput

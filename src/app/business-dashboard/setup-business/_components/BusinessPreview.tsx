@@ -156,12 +156,12 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
               <Clock className="h-[16px] w-[16px] text-gray-400 mt-0.5" />
               <div>
                 <p className="font-medium">Business Hours</p>
-                {businessData.is24x7 ? (
+                {businessData?.is24x7 ? (
                   <div className="space-y-2">
                     <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
                       Open 24 hours a day, 7 days a week
                     </Badge>
-                    {businessData.closedOnHolidays && (
+                    {businessData?.closedOnHolidays && (
                       <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 flex items-center gap-1">
                         <Leaf className="w-3 h-3" />
                         <Leaf className="h-[16px] w-[16px]" />
@@ -173,21 +173,22 @@ export function BusinessPreview({ businessData, stepIndex }: BusinessPreviewProp
                 ) : (
                   <div className="space-y-1">
                     {(() => {
-                      const hasOpenDays = Object.values(businessData.businessHours).some((hours) => hours.isOpen)
+                      const hoursObj = (businessData as any)?.businessHours || {}
+                      const hasOpenDays = Object.values(hoursObj).some((h: any) => h && (h as any).isOpen)
                       if (!hasOpenDays) {
                         return <p className="text-xs text-gray-500">Business hours will appear here</p>
                       }
                       return (
                         <>
-                          {Object.entries(businessData.businessHours).map(([day, hours]) => (
+                          {Object.entries(hoursObj).map(([day, hours]: any) => (
                             <div key={day} className="flex justify-between text-xs">
                               <span className="font-medium">{day}</span>
-                              <span className={hours.isOpen ? "text-gray-600" : "text-red-600"}>
-                                {hours.isOpen ? hours.openTime : "Closed"}
+                              <span className={hours?.isOpen ? "text-gray-600" : "text-red-600"}>
+                                {hours?.isOpen ? (hours as any).openTime : "Closed"}
                               </span>
                             </div>
                           ))}
-                          {businessData.closedOnHolidays && (
+                          {businessData?.closedOnHolidays && (
                             <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 mt-2 flex items-center gap-1">
                               <Leaf className="w-3 h-3" />
                               Closed on public holidays
