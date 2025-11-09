@@ -1,14 +1,12 @@
 'use client'
 
 import LeftSideOtp from '@/app/(Auth)/_components/leftsideOtp'
-import { Button } from '@/components/ui/button'
 import { InputOTP, InputOTPSlot } from '@/components/shared/otpInput'
-import { ArrowLeft, CheckCircle, Lock, Mail, Phone, Send, Shield } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import React, { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { axiosInstance } from '@/redux/api'
+import { CheckCircle } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 const Page = () => {

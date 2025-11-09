@@ -73,42 +73,6 @@ export default function FooterFour() {
           </Link>
         </div>
         <div className="space-y-[2rem]">
-          <Link href={'tel:+8801534275161'} className="flex space-x-sm items-center">
-            <svg
-              width="36"
-              height="36"
-              viewBox="0 0 36 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="1"
-                y="1"
-                width="34"
-                height="34"
-                rx="17"
-                stroke="#FFFEFF"
-                strokeWidth="2"
-              />
-              <g clipPath="url(#clip0_73_821)">
-                <path
-                  d="M26.5097 22.2102L23.9978 19.6982C23.1007 18.8011 21.5755 19.16 21.2167 20.3262C20.9476 21.1337 20.0504 21.5822 19.243 21.4028C17.4488 20.9542 15.0265 18.6217 14.578 16.7377C14.3088 15.9303 14.8471 15.0331 15.6545 14.764C16.8208 14.4052 17.1796 12.8801 16.2825 11.9829L13.7705 9.47099C13.0528 8.843 11.9763 8.843 11.3483 9.47099L9.64377 11.1755C7.93923 12.9698 9.82319 17.7246 14.0397 21.941C18.2562 26.1575 23.011 28.1313 24.8052 26.337L26.5097 24.6324C27.1378 23.9147 27.1378 22.8382 26.5097 22.2102Z"
-                  fill="#FFFEFF"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_73_821">
-                  <rect
-                    width="17.9622"
-                    height="18"
-                    fill="white"
-                    transform="translate(9.01855 9)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-            <p>+880 1534 275 161 (Admin)</p>
-          </Link>
           <Link href={'tel:+8801913729867'} className="flex space-x-sm items-center">
             <svg
               width="36"
@@ -143,7 +107,7 @@ export default function FooterFour() {
                 </clipPath>
               </defs>
             </svg>
-            <p>+880 1913 729 867 (Support)</p>
+            <p>+880 1913 729 867</p>
           </Link>
           <div className="flex space-x-sm items-center">
             <svg

@@ -2,6 +2,7 @@
 import { appendApi, trimToWordCount } from "@/lib/utils";
 import { useGetBusinessBySlugQuery } from "@/redux/api";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 
 export const AboutBusiness = () => {
@@ -32,7 +33,10 @@ export const AboutBusiness = () => {
             <h2 className="text-mdx font-bold text-black">Our Service List</h2>
             <div className="space-y-smd">
               {data?.primaryCategory ? (
-                <div className="flex items-center space-x-xsm">
+                <Link
+                  href={`/categories/${data.primaryCategory.slug}`}
+                  className="flex items-center space-x-xsm"
+                >
                   {data?.primaryCategory?.iconUrl ? (
                     <div className="h-[4rem] w-[4rem] border border-borderColor rounded-full flex items-center justify-center">
                       <Image
@@ -53,7 +57,7 @@ export const AboutBusiness = () => {
                       {trimToWordCount(data?.primaryCategory?.about || "", 6)}
                     </p>
                   </div>
-                </div>
+                </Link>
               ) : null}
               {data?.subcategories.map((c, index) => {
                 return (
