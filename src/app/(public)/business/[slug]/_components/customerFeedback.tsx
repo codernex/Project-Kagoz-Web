@@ -1,10 +1,18 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useVideoPalyerModal } from "@/hooks/videoPlayerModal";
 import { extractYouTubeVideoId } from "@/lib/utils";
-import { useGetVideoFeedbacksQuery, useIsFeatureActiveQuery } from "@/redux/api";
+import {
+  useGetVideoFeedbacksQuery,
+  useIsFeatureActiveQuery,
+} from "@/redux/api";
 import { FeatureType } from "@/types";
 import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import Image from "next/image";
@@ -18,23 +26,26 @@ import { Autoplay, Navigation } from "swiper/modules";
 import { type Swiper as SwiperType } from "swiper/types";
 
 export const CustomerFeedback = () => {
-  const swiperRef = useRef<SwiperType>();
-  const { slug } = useParams() as { slug: string }
-  const { setOpen } = useVideoPalyerModal()
+  const swiperRef = useRef<SwiperType>(null);
+  const { slug } = useParams() as { slug: string };
+  const { setOpen } = useVideoPalyerModal();
   /**
    * Get Is Feature Active
    */
-  const { data } = useIsFeatureActiveQuery({ slug, type: FeatureType.CUSTOMER_VIDEO_FEEDBACK })
+  const { data } = useIsFeatureActiveQuery({
+    slug,
+    type: FeatureType.CUSTOMER_VIDEO_FEEDBACK,
+  });
 
   /**
    * Get video feedback query
    */
   const { data: videos } = useGetVideoFeedbacksQuery(slug, {
-    skip: !data?.hasFeatureActive
-  })
+    skip: !data?.hasFeatureActive,
+  });
 
   if (!data?.hasFeatureActive) {
-    return null
+    return null;
   }
   return (
     <>
@@ -44,9 +55,7 @@ export const CustomerFeedback = () => {
             Customer Feedback
           </h2>
           <TooltipProvider>
-            <Tooltip
-              delayDuration={200}
-            >
+            <Tooltip delayDuration={200}>
               <TooltipTrigger asChild>
                 <button>
                   <Info className="text-muted" />
@@ -94,7 +103,9 @@ export const CustomerFeedback = () => {
                 <SwiperSlide className="w-full" key={index}>
                   <div className="w-full h-[20rem] relative rounded-[.8rem]  bg-white overflow-hidden flex items-center justify-center">
                     <Image
-                      src={`https://img.youtube.com/vi/${extractYouTubeVideoId(video.videoUrl)}/hqdefault.jpg`}
+                      src={`https://img.youtube.com/vi/${extractYouTubeVideoId(
+                        video.videoUrl
+                      )}/hqdefault.jpg`}
                       alt="Business Image"
                       className="w-[10rem] h-[8rem] z-0 object-cover"
                       fill
@@ -150,6 +161,5 @@ export const CustomerFeedback = () => {
       </div>
       <hr className="border-[#EEEDED]" />
     </>
-
   );
 };

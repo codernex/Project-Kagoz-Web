@@ -1,9 +1,9 @@
 import { useEffect, useState, RefObject } from "react";
 
 interface UseFetchOnVisibleOptions {
-    threshold?: number;
-    root?: Element | null;
-    rootMargin?: string;
+  threshold?: number;
+  root?: Element | null;
+  rootMargin?: string;
 }
 
 /**
@@ -15,31 +15,31 @@ interface UseFetchOnVisibleOptions {
  * @param options - IntersectionObserver options.
  */
 export const useFetchOnVisible = (
-    elementRef: RefObject<Element>,
-    action: () => void,
-    options: UseFetchOnVisibleOptions = {}
+  elementRef: RefObject<Element | null>,
+  action: () => void,
+  options: UseFetchOnVisibleOptions = {}
 ) => {
-    const [hasFetched, setHasFetched] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
-    useEffect(() => {
-        const { threshold = 0.7, root = null, rootMargin = "0px" } = options;
+  useEffect(() => {
+    const { threshold = 0.7, root = null, rootMargin = "0px" } = options;
 
-        if (!elementRef.current || hasFetched) return;
+    if (!elementRef.current || hasFetched) return;
 
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry?.isIntersecting) {
-                    action();
-                    setHasFetched(true);
-                }
-            },
-            { threshold, root, rootMargin }
-        );
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          action();
+          setHasFetched(true);
+        }
+      },
+      { threshold, root, rootMargin }
+    );
 
-        observer.observe(elementRef.current);
+    observer.observe(elementRef.current);
 
-        return () => {
-            observer.disconnect();
-        };
-    }, [elementRef, action, hasFetched, options]);
+    return () => {
+      observer.disconnect();
+    };
+  }, [elementRef, action, hasFetched, options]);
 };

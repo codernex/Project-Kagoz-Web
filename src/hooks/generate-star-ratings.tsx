@@ -1,11 +1,11 @@
 import { Star } from "lucide-react";
-import { useMemo } from "react";
+import { JSX, useMemo } from "react";
 
 /**
- * 
+ *
  * @param starCount Star Count
  * @param size Icon Size
- * @returns 
+ * @returns
  */
 export const useStarRatings = (starCount: number, size = 16) => {
   const elem = useMemo((): JSX.Element[] => {
@@ -28,7 +28,7 @@ export const useStarRatings = (starCount: number, size = 16) => {
             size={size}
             key={i}
             className="text-yellow-500 fill-yellow-500"
-          />,
+          />
         );
       } else if (i === fullStars && partialStar > 0) {
         // Partial star
@@ -44,7 +44,7 @@ export const useStarRatings = (starCount: number, size = 16) => {
               className="absolute top-0 left-0 overflow-hidden text-yellow-500 fill-yellow-500"
               style={{ clipPath: `inset(0 ${100 - partialStar * 100}% 0 0)` }}
             />
-          </div>,
+          </div>
         );
       } else {
         // Empty star

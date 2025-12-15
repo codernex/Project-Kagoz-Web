@@ -27,7 +27,7 @@ export const FeaturedCustomer = () => {
   const { data: business } = useGetBusinessBySlugQuery(slug)
   const { data, isLoading } = useIsFeatureActiveQuery({ slug, type: FeatureType.FEATURED_CLIENT })
   const { data: featuredCustomers, isLoading: featureLoading } = useGetFeauturedClientsQuery(slug, { skip: !data?.hasFeatureActive })
-  const swiperRef = useRef<SwiperType>();
+  const swiperRef = useRef<SwiperType>(null);
   const block = isBlocked(business?.updatedAt)
 
   if (!data?.hasFeatureActive) {
